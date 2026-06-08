@@ -1,0 +1,28 @@
+import { HttpException, HttpStatus } from '@nestjs/common';
+import { ErrorCode, ErrorMessage } from './error-codes';
+
+const ErrorCodeToHttpStatus: Record<ErrorCode, HttpStatus> = {
+  [ErrorCode.AUTH_INVALID_CREDENTIALS]: HttpStatus.UNAUTHORIZED,
+  [ErrorCode.AUTH_EMAIL_ALREADY_EXISTS]: HttpStatus.CONFLICT,
+  [ErrorCode.AUTH_INVALID_TOKEN]: HttpStatus.UNAUTHORIZED,
+  [ErrorCode.AUTH_TOKEN_EXPIRED]: HttpStatus.UNAUTHORIZED,
+  [ErrorCode.AUTH_OTP_INVALID]: HttpStatus.BAD_REQUEST,
+  [ErrorCode.AUTH_OTP_EXPIRED]: HttpStatus.BAD_REQUEST,
+  [ErrorCode.AUTH_USER_NOT_FOUND]: HttpStatus.NOT_FOUND,
+  [ErrorCode.AUTH_WEAK_PASSWORD]: HttpStatus.BAD_REQUEST,
+  [ErrorCode.AUTH_INVALID_EMAIL]: HttpStatus.BAD_REQUEST,
+  [ErrorCode.VALIDATION_FAILED]: HttpStatus.BAD_REQUEST,
+  [ErrorCode.INTERNAL_SERVER_ERROR]: HttpStatus.INTERNAL_SERVER_ERROR,
+};
+
+export class AppException extends HttpException {
+  public readonly code: ErrorCode;
+
+  constructor(code: ErrorCode, statusCode?: HttpStatus) {
+    const message = ErrorMessage[code];
+    const status = statusCode ?? ErrorCodeToHttpStatus[code] ?? HttpStatus.INTERNAL_SERVER_ERROR;
+
+    super({ code, message, statusCode: status }, status);
+    this.code = code;
+  }
+}

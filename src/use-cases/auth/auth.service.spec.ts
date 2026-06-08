@@ -1,6 +1,7 @@
 import { AuthService } from './auth.service';
 import { MockUserRepository } from './mock-user-repository';
 import { UserEntity, UserRole } from '../../core/entities/user.entity';
+import { ErrorCode } from '../../core/errors';
 
 describe('AuthService', () => {
   let authService: AuthService;
@@ -32,16 +33,18 @@ describe('AuthService', () => {
       const email = 'existing@example.com';
       const password = 'SecurePass123!';
 
-      // Pre-existing user
       const existingUser = UserEntity.create({
         email,
         passwordHash: 'hashed-password',
       });
       mockRepository.addUser(existingUser);
 
-      await expect(authService.register(email, password)).rejects.toThrow(
-        'Email already registered',
-      );
+      try {
+        await authService.register(email, password);
+        fail('Should have thrown an error');
+      } catch (error) {
+        expect(error.code).toBe(ErrorCode.AUTH_EMAIL_ALREADY_EXISTS);
+      }
     });
 
     it('should normalize email to lowercase', async () => {
@@ -59,10 +62,9 @@ describe('AuthService', () => {
       const email = 'user@example.com';
       const password = 'SecurePass123!';
 
-      // Pre-existing user with hashed password (assuming bcrypt hash)
       const existingUser = UserEntity.create({
         email,
-        passwordHash: '$2b$10$validhash', // This will need to match during implementation
+        passwordHash: '$2b$10$validhash',
       });
       mockRepository.addUser(existingUser);
 
@@ -79,26 +81,122 @@ describe('AuthService', () => {
       const email = 'nonexistent@example.com';
       const password = 'SecurePass123!';
 
-      await expect(authService.login(email, password)).rejects.toThrow(
-        'Invalid credentials',
-      );
+      try {
+        await authService.login(email, password);
+        fail('Should have thrown an error');
+      } catch (error) {
+        expect(error.code).toBe(ErrorCode.AUTH_INVALID_CREDENTIALS);
+      }
     });
 
     it('should reject login with wrong password', async () => {
       const email = 'user@example.com';
-      const correctPassword = 'SecurePass123!';
       const wrongPassword = 'WrongPass456!';
 
-      // Pre-existing user
       const existingUser = UserEntity.create({
         email,
         passwordHash: '$2b$10$validhash',
       });
       mockRepository.addUser(existingUser);
 
-      await expect(authService.login(email, wrongPassword)).rejects.toThrow(
-        'Invalid credentials',
-      );
+      try {
+        await authService.login(email, wrongPassword);
+        fail('Should have thrown an error');
+      } catch (error) {
+        expect(error.code).toBe(ErrorCode.AUTH_INVALID_CREDENTIALS);
+      }
+    });
+  });
+
+  describe('forgotPassword', () => {
+    it('should send OTP for existing user', async () => {
+      const email = 'user@example.com';
+
+      const existingUser = UserEntity.create({
+        email,
+        passwordHash: 'hashed-password',
+      });
+      mockRepository.addUser(existingUser);
+
+      const result = await authService.forgotPassword(email);
+
+      expect(result.message).toBeDefined();
+    });
+
+    it('should reject if user not found', async () => {
+      const email = 'nonexistent@example.com';
+
+      try {
+        await authService.forgotPassword(email);
+        fail('Should have thrown an error');
+      } catch (error) {
+        expect(error.code).toBe(ErrorCode.AUTH_USER_NOT_FOUND);
+      }
+    });
+  });
+
+  describe('verifyOtp', () => {
+    it('should return reset token with valid OTP', async () => {
+      const email = 'user@example.com';
+      const otp = '123456';
+
+      const existingUser = UserEntity.create({
+        email,
+        passwordHash: 'hashed-password',
+      });
+      mockRepository.addUser(existingUser);
+
+      const result = await authService.verifyOtp(email, otp);
+
+      expect(result.resetToken).toBeDefined();
+    });
+
+    it('should reject if user not found', async () => {
+      const email = 'nonexistent@example.com';
+      const otp = '123456';
+
+      try {
+        await authService.verifyOtp(email, otp);
+        fail('Should have thrown an error');
+      } catch (error) {
+        expect(error.code).toBe(ErrorCode.AUTH_USER_NOT_FOUND);
+      }
+    });
+
+    it('should reject invalid OTP', async () => {
+      const email = 'user@example.com';
+      const invalidOtp = '000000';
+
+      const existingUser = UserEntity.create({
+        email,
+        passwordHash: 'hashed-password',
+      });
+      mockRepository.addUser(existingUser);
+
+      try {
+        await authService.verifyOtp(email, invalidOtp);
+        fail('Should have thrown an error');
+      } catch (error) {
+        expect(error.code).toBe(ErrorCode.AUTH_OTP_INVALID);
+      }
+    });
+
+    it('should reject expired OTP', async () => {
+      const email = 'user@example.com';
+      const expiredOtp = '999999';
+
+      const existingUser = UserEntity.create({
+        email,
+        passwordHash: 'hashed-password',
+      });
+      mockRepository.addUser(existingUser);
+
+      try {
+        await authService.verifyOtp(email, expiredOtp);
+        fail('Should have thrown an error');
+      } catch (error) {
+        expect(error.code).toBe(ErrorCode.AUTH_OTP_EXPIRED);
+      }
     });
   });
 
@@ -107,7 +205,6 @@ describe('AuthService', () => {
       const userId = 'user-123';
       const email = 'user@example.com';
 
-      // Pre-existing user
       const existingUser = new UserEntity(
         userId,
         email,
@@ -118,8 +215,6 @@ describe('AuthService', () => {
       );
       mockRepository.addUser(existingUser);
 
-      // This test will fail until JWT generation is implemented
-      // We'll need to generate a valid token first
       const result = await authService.validateToken('valid-token');
 
       expect(result).toBeDefined();
@@ -129,15 +224,21 @@ describe('AuthService', () => {
     });
 
     it('should reject invalid token', async () => {
-      await expect(authService.validateToken('invalid-token')).rejects.toThrow(
-        'Invalid token',
-      );
+      try {
+        await authService.validateToken('invalid-token');
+        fail('Should have thrown an error');
+      } catch (error) {
+        expect(error.code).toBe(ErrorCode.AUTH_INVALID_TOKEN);
+      }
     });
 
     it('should reject expired token', async () => {
-      await expect(authService.validateToken('expired-token')).rejects.toThrow(
-        'Token expired',
-      );
+      try {
+        await authService.validateToken('expired-token');
+        fail('Should have thrown an error');
+      } catch (error) {
+        expect(error.code).toBe(ErrorCode.AUTH_TOKEN_EXPIRED);
+      }
     });
   });
 });
