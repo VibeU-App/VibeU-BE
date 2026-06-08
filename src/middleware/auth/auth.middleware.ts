@@ -1,6 +1,7 @@
 import { NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import { AppException, ErrorCode } from '../../core/errors';
+import { UserRole } from '../../core/entities/user.entity';
 import { TokenPayload } from './token-payload.interface';
 
 export class AuthMiddleware implements NestMiddleware {
@@ -25,7 +26,7 @@ export class AuthMiddleware implements NestMiddleware {
     const payload: TokenPayload = {
       sub: 'user-123',
       email: 'user@example.com',
-      role: 'user',
+      role: UserRole.USER,
     };
 
     // Attach user to request
