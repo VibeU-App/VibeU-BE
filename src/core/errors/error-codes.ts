@@ -9,6 +9,7 @@ export enum ErrorCode {
   AUTH_USER_NOT_FOUND = 'AUTH_1007',
   AUTH_WEAK_PASSWORD = 'AUTH_1008',
   AUTH_INVALID_EMAIL = 'AUTH_1009',
+  AUTH_FORBIDDEN = 'AUTH_1010',
 
   // Validation Errors (2xxx)
   VALIDATION_FAILED = 'VAL_2001',
@@ -27,6 +28,7 @@ export const ErrorMessage: Record<ErrorCode, string> = {
   [ErrorCode.AUTH_USER_NOT_FOUND]: 'No account found with this email',
   [ErrorCode.AUTH_WEAK_PASSWORD]: 'Password must be at least 8 characters with uppercase, lowercase, number, and special character',
   [ErrorCode.AUTH_INVALID_EMAIL]: 'Please provide a valid email address',
+  [ErrorCode.AUTH_FORBIDDEN]: 'You do not have permission to access this resource',
   [ErrorCode.VALIDATION_FAILED]: 'Request validation failed',
   [ErrorCode.INTERNAL_SERVER_ERROR]: 'An unexpected error occurred',
 };
