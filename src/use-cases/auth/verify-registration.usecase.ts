@@ -1,19 +1,17 @@
 import { IUserRepository } from './user-repository.interface';
-import { IEmailService } from './email-service.interface';
 import { IOtpRepository } from './otp-repository.interface';
 
-export interface OtpResult {
+export interface VerifyRegistrationResult {
   message: string;
 }
 
-export class ForgotPasswordUsecase {
+export class VerifyRegistrationUsecase {
   constructor(
     private readonly userRepository: IUserRepository,
-    private readonly emailService: IEmailService,
     private readonly otpRepository: IOtpRepository,
   ) {}
 
-  async execute(email: string): Promise<OtpResult> {
+  async execute(email: string, otp: string): Promise<VerifyRegistrationResult> {
     throw new Error('Not implemented');
   }
 }

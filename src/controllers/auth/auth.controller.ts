@@ -1,5 +1,10 @@
 import { Controller, Post, Body } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { RegisterDto } from '../../dtos/auth/register.dto';
+import { LoginDto } from '../../dtos/auth/login.dto';
+import { VerifyOtpDto } from '../../dtos/auth/verify-otp.dto';
+import { VerifyRegistrationDto } from '../../dtos/auth/verify-registration.dto';
+import { ResetPasswordDto } from '../../dtos/auth/reset-password.dto';
 
 @ApiTags('Auth')
 @Controller('api/v1/auth')
@@ -8,14 +13,21 @@ export class AuthController {
 
   @Post('register')
   @ApiOperation({ summary: 'Register a new user' })
-  async register(@Body() body: { email: string; password: string }): Promise<any> {
+  async register(@Body() dto: RegisterDto): Promise<any> {
     // TODO: Implement - delegate to RegisterUsecase
+    throw new Error('Not implemented');
+  }
+
+  @Post('verify-registration')
+  @ApiOperation({ summary: 'Verify registration OTP' })
+  async verifyRegistration(@Body() dto: VerifyRegistrationDto): Promise<any> {
+    // TODO: Implement - delegate to VerifyRegistrationUsecase
     throw new Error('Not implemented');
   }
 
   @Post('login')
   @ApiOperation({ summary: 'User login' })
-  async login(@Body() body: { email: string; password: string }): Promise<any> {
+  async login(@Body() dto: LoginDto): Promise<any> {
     // TODO: Implement - delegate to LoginUsecase
     throw new Error('Not implemented');
   }
@@ -27,10 +39,17 @@ export class AuthController {
     throw new Error('Not implemented');
   }
 
-  @Post('verify-otp')
-  @ApiOperation({ summary: 'Verify OTP and get reset token' })
-  async verifyOtp(@Body() body: { email: string; otp: string }): Promise<any> {
+  @Post('verify-reset-otp')
+  @ApiOperation({ summary: 'Verify reset OTP and get reset token' })
+  async verifyResetOtp(@Body() dto: VerifyOtpDto): Promise<any> {
     // TODO: Implement - delegate to VerifyOtpUsecase
+    throw new Error('Not implemented');
+  }
+
+  @Post('reset-password')
+  @ApiOperation({ summary: 'Reset password with reset token' })
+  async resetPassword(@Body() dto: ResetPasswordDto): Promise<any> {
+    // TODO: Implement - delegate to ResetPasswordUsecase
     throw new Error('Not implemented');
   }
 }

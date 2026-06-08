@@ -1,25 +1,26 @@
-import { VerifyOtpUsecase } from './verify-otp.usecase';
+import { VerifyRegistrationUsecase } from './verify-registration.usecase';
+import { MockUserRepository } from './mock-user-repository';
 import { MockOtpRepository } from './mock-otp-repository';
-import { MockJwtService } from './mock-jwt-service';
 import { ErrorCode } from '../../core/errors';
 
-describe('VerifyOtpUsecase', () => {
-  let usecase: VerifyOtpUsecase;
+describe('VerifyRegistrationUsecase', () => {
+  let usecase: VerifyRegistrationUsecase;
+  let mockUserRepository: MockUserRepository;
   let mockOtpRepository: MockOtpRepository;
-  let mockJwtService: MockJwtService;
 
   beforeEach(() => {
+    mockUserRepository = new MockUserRepository();
     mockOtpRepository = new MockOtpRepository();
-    mockJwtService = new MockJwtService();
-    usecase = new VerifyOtpUsecase(mockOtpRepository, mockJwtService);
+    usecase = new VerifyRegistrationUsecase(mockUserRepository, mockOtpRepository);
   });
 
   afterEach(() => {
+    mockUserRepository.clear();
     mockOtpRepository.clear();
   });
 
-  it('should return reset token with valid OTP', async () => {
-    // TODO: Pre-add valid OTP
+  it('should verify user with valid OTP', async () => {
+    // TODO: Pre-add user and valid OTP
     try {
       await usecase.execute('user@example.com', '123456');
       fail('Should have thrown an error');
@@ -38,12 +39,21 @@ describe('VerifyOtpUsecase', () => {
   });
 
   it('should reject expired OTP', async () => {
-    // TODO: Pre-add expired OTP and expect AUTH_OTP_EXPIRED error
+    // TODO: Pre-add expired OTP
     try {
       await usecase.execute('user@example.com', '999999');
       fail('Should have thrown an error');
     } catch (error) {
       expect(error.code).toBe(ErrorCode.AUTH_OTP_EXPIRED);
+    }
+  });
+
+  it('should reject if user not found', async () => {
+    try {
+      await usecase.execute('nonexistent@example.com', '123456');
+      fail('Should have thrown an error');
+    } catch (error) {
+      expect(error.code).toBe(ErrorCode.AUTH_USER_NOT_FOUND);
     }
   });
 });
