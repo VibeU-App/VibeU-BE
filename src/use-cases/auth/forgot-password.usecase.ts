@@ -1,5 +1,5 @@
 import { IUserRepository } from './user-repository.interface';
-import { IEmailService } from './email-service.interface';
+import { IMailService } from '../../services/mail/mail.interface';
 import { IOtpRepository } from './otp-repository.interface';
 
 export interface OtpResult {
@@ -9,7 +9,7 @@ export interface OtpResult {
 export class ForgotPasswordUsecase {
   constructor(
     private readonly userRepository: IUserRepository,
-    private readonly emailService: IEmailService,
+    private readonly mailService: IMailService,
     private readonly otpRepository: IOtpRepository,
   ) {}
 

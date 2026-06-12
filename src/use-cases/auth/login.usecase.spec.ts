@@ -1,20 +1,19 @@
 import { LoginUsecase } from './login.usecase';
-import { MockUserRepository } from './mock-user-repository';
-import { MockHashService } from './mock-hash-service';
-import { MockJwtService } from './mock-jwt-service';
+import { MockUserRepository, MockCryptoService, MockJwtService } from './test-mocks';
 import { ErrorCode } from '../../core/errors';
+import { UserEntity } from '../../core/entities/user.entity';
 
 describe('LoginUsecase', () => {
   let usecase: LoginUsecase;
   let mockUserRepository: MockUserRepository;
-  let mockHashService: MockHashService;
+  let mockCryptoService: MockCryptoService;
   let mockJwtService: MockJwtService;
 
   beforeEach(() => {
     mockUserRepository = new MockUserRepository();
-    mockHashService = new MockHashService();
+    mockCryptoService = new MockCryptoService();
     mockJwtService = new MockJwtService();
-    usecase = new LoginUsecase(mockUserRepository, mockHashService, mockJwtService);
+    usecase = new LoginUsecase(mockUserRepository, mockCryptoService, mockJwtService);
   });
 
   afterEach(() => {
@@ -50,7 +49,14 @@ describe('LoginUsecase', () => {
   });
 
   it('should reject login if user is not verified', async () => {
-    // TODO: Pre-add unverified user and expect AUTH_USER_NOT_VERIFIED error
+    // Pre-add an unverified user
+    const unverifiedUser = UserEntity.create({
+      email: 'unverified@example.com',
+      passwordHash: '$2b$10$hashed_SecurePass123!',
+      verified: false,
+    });
+    mockUserRepository.addUser({ ...unverifiedUser, id: 'unverified-user-1' } as UserEntity);
+
     try {
       await usecase.execute('unverified@example.com', 'SecurePass123!');
       fail('Should have thrown an error');

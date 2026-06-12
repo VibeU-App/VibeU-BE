@@ -1,5 +1,5 @@
 import { IUserRepository } from './user-repository.interface';
-import { IHashService } from './hash-service.interface';
+import { ICryptoService } from '../../services/crypto/crypto.interface';
 
 export interface ResetPasswordResult {
   message: string;
@@ -8,7 +8,7 @@ export interface ResetPasswordResult {
 export class ResetPasswordUsecase {
   constructor(
     private readonly userRepository: IUserRepository,
-    private readonly hashService: IHashService,
+    private readonly cryptoService: ICryptoService,
   ) {}
 
   async execute(email: string, newPassword: string): Promise<ResetPasswordResult> {

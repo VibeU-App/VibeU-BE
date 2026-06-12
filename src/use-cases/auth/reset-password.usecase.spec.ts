@@ -1,17 +1,16 @@
 import { ResetPasswordUsecase } from './reset-password.usecase';
-import { MockUserRepository } from './mock-user-repository';
-import { MockHashService } from './mock-hash-service';
+import { MockUserRepository, MockCryptoService } from './test-mocks';
 import { ErrorCode } from '../../core/errors';
 
 describe('ResetPasswordUsecase', () => {
   let usecase: ResetPasswordUsecase;
   let mockUserRepository: MockUserRepository;
-  let mockHashService: MockHashService;
+  let mockCryptoService: MockCryptoService;
 
   beforeEach(() => {
     mockUserRepository = new MockUserRepository();
-    mockHashService = new MockHashService();
-    usecase = new ResetPasswordUsecase(mockUserRepository, mockHashService);
+    mockCryptoService = new MockCryptoService();
+    usecase = new ResetPasswordUsecase(mockUserRepository, mockCryptoService);
   });
 
   afterEach(() => {

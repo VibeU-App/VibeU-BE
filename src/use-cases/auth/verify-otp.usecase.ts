@@ -1,5 +1,5 @@
 import { IOtpRepository } from './otp-repository.interface';
-import { IJwtService } from './jwt-service.interface';
+import { IJwtService } from '../../services/token/jwt.service';
 
 export interface VerifyOtpResult {
   resetToken: string;

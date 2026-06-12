@@ -1,6 +1,6 @@
 import { IUserRepository } from './user-repository.interface';
-import { IHashService } from './hash-service.interface';
-import { IEmailService } from './email-service.interface';
+import { ICryptoService } from '../../services/crypto/crypto.interface';
+import { IMailService } from '../../services/mail/mail.interface';
 import { IOtpRepository } from './otp-repository.interface';
 import { UserEntity } from '../../core/entities/user.entity';
 
@@ -11,8 +11,8 @@ export interface RegisterResult {
 export class RegisterUsecase {
   constructor(
     private readonly userRepository: IUserRepository,
-    private readonly hashService: IHashService,
-    private readonly emailService: IEmailService,
+    private readonly cryptoService: ICryptoService,
+    private readonly mailService: IMailService,
     private readonly otpRepository: IOtpRepository,
   ) {}
 

@@ -1,33 +1,31 @@
 import { RegisterUsecase } from './register.usecase';
-import { MockUserRepository } from './mock-user-repository';
-import { MockHashService } from './mock-hash-service';
-import { MockEmailService } from './mock-email-service';
-import { MockOtpRepository } from './mock-otp-repository';
+import { MockUserRepository, MockCryptoService, MockMailService, MockOtpRepository } from './test-mocks';
 import { ErrorCode } from '../../core/errors';
+import { UserEntity } from '../../core/entities/user.entity';
 
 describe('RegisterUsecase', () => {
   let usecase: RegisterUsecase;
   let mockUserRepository: MockUserRepository;
-  let mockHashService: MockHashService;
-  let mockEmailService: MockEmailService;
+  let mockCryptoService: MockCryptoService;
+  let mockMailService: MockMailService;
   let mockOtpRepository: MockOtpRepository;
 
   beforeEach(() => {
     mockUserRepository = new MockUserRepository();
-    mockHashService = new MockHashService();
-    mockEmailService = new MockEmailService();
+    mockCryptoService = new MockCryptoService();
+    mockMailService = new MockMailService();
     mockOtpRepository = new MockOtpRepository();
     usecase = new RegisterUsecase(
       mockUserRepository,
-      mockHashService,
-      mockEmailService,
+      mockCryptoService,
+      mockMailService,
       mockOtpRepository,
     );
   });
 
   afterEach(() => {
     mockUserRepository.clear();
-    mockEmailService.clear();
+    mockMailService.clear();
     mockOtpRepository.clear();
   });
 
@@ -38,7 +36,13 @@ describe('RegisterUsecase', () => {
   });
 
   it('should reject registration with duplicate email', async () => {
-    // TODO: Pre-add user and expect AUTH_EMAIL_ALREADY_EXISTS error
+    // Pre-add a user with this email
+    const existingUser = UserEntity.create({
+      email: 'existing@example.com',
+      passwordHash: '$2b$10$hashed_ExistingPass123!',
+    });
+    mockUserRepository.addUser({ ...existingUser, id: 'existing-user-1' } as UserEntity);
+
     try {
       await usecase.execute('existing@example.com', 'SecurePass123!');
       fail('Should have thrown an error');

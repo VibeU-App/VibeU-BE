@@ -1,6 +1,6 @@
 import { IUserRepository } from './user-repository.interface';
-import { IHashService } from './hash-service.interface';
-import { IJwtService } from './jwt-service.interface';
+import { ICryptoService } from '../../services/crypto/crypto.interface';
+import { IJwtService } from '../../services/token/jwt.service';
 import { UserEntity } from '../../core/entities/user.entity';
 
 export interface LoginResult {
@@ -11,7 +11,7 @@ export interface LoginResult {
 export class LoginUsecase {
   constructor(
     private readonly userRepository: IUserRepository,
-    private readonly hashService: IHashService,
+    private readonly cryptoService: ICryptoService,
     private readonly jwtService: IJwtService,
   ) {}
 

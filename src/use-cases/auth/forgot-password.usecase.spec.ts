@@ -1,25 +1,23 @@
 import { ForgotPasswordUsecase } from './forgot-password.usecase';
-import { MockUserRepository } from './mock-user-repository';
-import { MockEmailService } from './mock-email-service';
-import { MockOtpRepository } from './mock-otp-repository';
+import { MockUserRepository, MockMailService, MockOtpRepository } from './test-mocks';
 import { ErrorCode } from '../../core/errors';
 
 describe('ForgotPasswordUsecase', () => {
   let usecase: ForgotPasswordUsecase;
   let mockUserRepository: MockUserRepository;
-  let mockEmailService: MockEmailService;
+  let mockMailService: MockMailService;
   let mockOtpRepository: MockOtpRepository;
 
   beforeEach(() => {
     mockUserRepository = new MockUserRepository();
-    mockEmailService = new MockEmailService();
+    mockMailService = new MockMailService();
     mockOtpRepository = new MockOtpRepository();
-    usecase = new ForgotPasswordUsecase(mockUserRepository, mockEmailService, mockOtpRepository);
+    usecase = new ForgotPasswordUsecase(mockUserRepository, mockMailService, mockOtpRepository);
   });
 
   afterEach(() => {
     mockUserRepository.clear();
-    mockEmailService.clear();
+    mockMailService.clear();
     mockOtpRepository.clear();
   });
 

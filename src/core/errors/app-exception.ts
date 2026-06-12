@@ -17,6 +17,12 @@ const ErrorCodeToHttpStatus: Record<ErrorCode, HttpStatus> = {
   [ErrorCode.INTERNAL_SERVER_ERROR]: HttpStatus.INTERNAL_SERVER_ERROR,
 };
 
+/**
+ * Custom application exception that includes an error code.
+ * 
+ * The envelope filter catches this and includes the error code
+ * in the response metadata for the frontend to handle.
+ */
 export class AppException extends HttpException {
   public readonly code: ErrorCode;
 
@@ -24,7 +30,7 @@ export class AppException extends HttpException {
     const message = ErrorMessage[code];
     const status = statusCode ?? ErrorCodeToHttpStatus[code] ?? HttpStatus.INTERNAL_SERVER_ERROR;
 
-    super({ code, message, statusCode: status }, status);
+    super(message, status);
     this.code = code;
   }
 }

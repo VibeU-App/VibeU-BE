@@ -2,9 +2,17 @@ import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { apiReference } from '@scalar/nestjs-api-reference';
 import { AppModule } from './app.module';
+import { EnvelopeInterceptor } from './core/envelope/envelope.interceptor';
+import { EnvelopeExceptionFilter } from './core/envelope/envelope.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Register envelope interceptor to wrap all successful responses
+  app.useGlobalInterceptors(new EnvelopeInterceptor());
+
+  // Register envelope exception filter to wrap all errors
+  app.useGlobalFilters(new EnvelopeExceptionFilter());
 
   // Swagger setup
   const config = new DocumentBuilder()

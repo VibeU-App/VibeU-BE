@@ -1,6 +1,5 @@
 import { VerifyOtpUsecase } from './verify-otp.usecase';
-import { MockOtpRepository } from './mock-otp-repository';
-import { MockJwtService } from './mock-jwt-service';
+import { MockOtpRepository, MockJwtService } from './test-mocks';
 import { ErrorCode } from '../../core/errors';
 
 describe('VerifyOtpUsecase', () => {
@@ -38,7 +37,14 @@ describe('VerifyOtpUsecase', () => {
   });
 
   it('should reject expired OTP', async () => {
-    // TODO: Pre-add expired OTP and expect AUTH_OTP_EXPIRED error
+    // Pre-add an expired OTP
+    mockOtpRepository.addOtp({
+      id: 'expired-otp-1',
+      email: 'user@example.com',
+      code: '999999',
+      expiresAt: new Date(Date.now() - 1000), // Expired 1 second ago
+    });
+
     try {
       await usecase.execute('user@example.com', '999999');
       fail('Should have thrown an error');
