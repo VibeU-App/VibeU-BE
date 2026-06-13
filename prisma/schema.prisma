@@ -2,8 +2,7 @@
 // Docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -45,7 +44,6 @@ model User {
   // Relations
   accountStatus AccountStatus @relation(fields: [accountStatusId], references: [id])
   sessions      Session[]
-  otps          Otp[]
 
   // Soft delete index
   @@index([deletedAt])
@@ -71,18 +69,5 @@ model Session {
   @@map("sessions")
 }
 
-// OTP model - stores one-time passwords for verification
-model Otp {
-  id        String   @id @default(uuid())
-  userId    String   @map("user_id")
-  code      String
-  expiresAt DateTime @map("expires_at")
-  createdAt DateTime @default(now()) @map("created_at")
-
-  // Relations
-  user User @relation(fields: [userId], references: [id])
-
-  // Index for quick lookup
-  @@index([userId, code])
-  @@map("otps")
-}
+// OTP is stored in memory (not database)
+// See: src/frameworks/database/postgres/otp-cache.service.ts

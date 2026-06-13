@@ -5,14 +5,14 @@ import { AccountStatusEntity, AccountStatusName } from '../../../core/entities/u
 /**
  * Service that loads account statuses into memory at startup.
  *
- * Instead of querying the database every time we need to check an account status,
- * we load all statuses into a HashMap once when the server starts.
- * This provides O(1) lookups by name or ID.
+ * Uses PostgreSQL's shared_buffers (via pg_prewarm) for fast DB queries.
+ * Keeps a small HashMap in memory for O(1) lookups by name or ID.
  *
  * Why this approach:
  * - Account statuses are a small, fixed lookup table (PENDING, ACTIVE, INACTIVE, TERMINATED)
  * - They rarely change (only via migrations)
- * - Frequent lookups during auth flows would add unnecessary DB queries
+ * - O(1) lookups avoid even the fastest DB queries
+ * - Database is prewarmed by DatabasePrewarmService on startup
  *
  * Usage:
  *   const status = accountStatusLoader.getByName(AccountStatusName.ACTIVE);
@@ -31,6 +31,7 @@ export class AccountStatusLoaderService implements OnModuleInit {
   /**
    * Called automatically when the NestJS module initializes.
    * Loads all account statuses from the database into memory.
+   * DB queries are fast because pg_prewarm preloaded the table.
    */
   async onModuleInit() {
     await this.loadStatuses();

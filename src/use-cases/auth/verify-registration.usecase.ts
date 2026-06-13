@@ -1,5 +1,5 @@
 import { IUserRepository } from './user-repository.interface';
-import { IOtpRepository } from './otp-repository.interface';
+import { IOtpService } from '../../services/otp/otp.interface';
 
 export interface VerifyRegistrationResult {
   message: string;
@@ -8,7 +8,7 @@ export interface VerifyRegistrationResult {
 export class VerifyRegistrationUsecase {
   constructor(
     private readonly userRepository: IUserRepository,
-    private readonly otpRepository: IOtpRepository,
+    private readonly otpService: IOtpService,
   ) {}
 
   async execute(email: string, otp: string): Promise<VerifyRegistrationResult> {

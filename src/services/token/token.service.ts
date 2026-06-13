@@ -38,13 +38,13 @@ export interface ITokenService {
  * Access tokens:
  * - JWT format (header.payload.signature)
  * - Contains user ID, email, role
- * - Short-lived (15 minutes) for security
+ * - Short-lived (configurable, default 1 hour)
  * - Can be verified without database lookup
  *
  * Refresh tokens:
  * - Opaque random string (64 bytes hex = 128 chars)
  * - No user info embedded - just a random identifier
- * - Long-lived (7 days)
+ * - Long-lived (configurable, default 7 days)
  * - Must be stored in database to validate
  * - Used to issue new access tokens when they expire
  *
@@ -71,7 +71,7 @@ export class TokenService implements ITokenService {
 
   /**
    * Creates a JWT access token.
-   * Token expires in 15 minutes for security.
+   * Token TTL is loaded from config (default: 1 hour).
    */
   private createAccessToken(userId: string, email: string, role: string): string {
     const payload: AccessTokenPayload = {
@@ -80,9 +80,11 @@ export class TokenService implements ITokenService {
       role,
     };
 
-    return jwt.sign(payload, config.jwt.secretKey, {
-      expiresIn: '15m', // Short-lived for security
-    });
+    // JWT expiresIn accepts number (seconds) or string like '1h', '7d'
+    // We convert our seconds config to a number
+    const ttlSeconds = config.jwt.accessTokenTtl;
+
+    return jwt.sign(payload, config.jwt.secretKey, { expiresIn: ttlSeconds });
   }
 
   /**

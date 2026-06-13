@@ -1,4 +1,4 @@
-import { IOtpRepository } from './otp-repository.interface';
+import { IOtpService } from '../../services/otp/otp.interface';
 import { IJwtService } from '../../services/token/jwt.service';
 
 export interface VerifyOtpResult {
@@ -7,7 +7,7 @@ export interface VerifyOtpResult {
 
 export class VerifyOtpUsecase {
   constructor(
-    private readonly otpRepository: IOtpRepository,
+    private readonly otpService: IOtpService,
     private readonly jwtService: IJwtService,
   ) {}
 

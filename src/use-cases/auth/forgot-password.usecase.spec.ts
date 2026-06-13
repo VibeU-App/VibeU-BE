@@ -1,24 +1,24 @@
 import { ForgotPasswordUsecase } from './forgot-password.usecase';
-import { MockUserRepository, MockMailService, MockOtpRepository } from './test-mocks';
+import { MockUserRepository, MockMailService, MockOtpService } from './test-mocks';
 import { ErrorCode } from '../../core/errors';
 
 describe('ForgotPasswordUsecase', () => {
   let usecase: ForgotPasswordUsecase;
   let mockUserRepository: MockUserRepository;
   let mockMailService: MockMailService;
-  let mockOtpRepository: MockOtpRepository;
+  let mockOtpService: MockOtpService;
 
   beforeEach(() => {
     mockUserRepository = new MockUserRepository();
     mockMailService = new MockMailService();
-    mockOtpRepository = new MockOtpRepository();
-    usecase = new ForgotPasswordUsecase(mockUserRepository, mockMailService, mockOtpRepository);
+    mockOtpService = new MockOtpService();
+    usecase = new ForgotPasswordUsecase(mockUserRepository, mockMailService, mockOtpService);
   });
 
   afterEach(() => {
     mockUserRepository.clear();
     mockMailService.clear();
-    mockOtpRepository.clear();
+    mockOtpService.clear();
   });
 
   it('should always return success message even if user not found', async () => {

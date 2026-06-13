@@ -1,24 +1,25 @@
 import { VerifyOtpUsecase } from './verify-otp.usecase';
-import { MockOtpRepository, MockJwtService } from './test-mocks';
+import { MockOtpService, MockJwtService } from './test-mocks';
 import { ErrorCode } from '../../core/errors';
+import { OtpEntity } from '../../core/entities/otp.entity';
 
 describe('VerifyOtpUsecase', () => {
   let usecase: VerifyOtpUsecase;
-  let mockOtpRepository: MockOtpRepository;
+  let mockOtpService: MockOtpService;
   let mockJwtService: MockJwtService;
 
   beforeEach(() => {
-    mockOtpRepository = new MockOtpRepository();
+    mockOtpService = new MockOtpService();
     mockJwtService = new MockJwtService();
-    usecase = new VerifyOtpUsecase(mockOtpRepository, mockJwtService);
+    usecase = new VerifyOtpUsecase(mockOtpService, mockJwtService);
   });
 
   afterEach(() => {
-    mockOtpRepository.clear();
+    mockOtpService.clear();
   });
 
   it('should return reset token with valid OTP', async () => {
-    // TODO: Pre-add valid OTP
+    // TODO: Pre-add valid OTP by userId
     try {
       await usecase.execute('user@example.com', '123456');
       fail('Should have thrown an error');
@@ -38,12 +39,12 @@ describe('VerifyOtpUsecase', () => {
 
   it('should reject expired OTP', async () => {
     // Pre-add an expired OTP
-    mockOtpRepository.addOtp({
-      id: 'expired-otp-1',
-      email: 'user@example.com',
+    const expiredOtp = OtpEntity.create({
+      userId: 'user-123',
       code: '999999',
-      expiresAt: new Date(Date.now() - 1000), // Expired 1 second ago
+      expiryMinutes: -1, // Already expired
     });
+    mockOtpService.addOtp(expiredOtp);
 
     try {
       await usecase.execute('user@example.com', '999999');

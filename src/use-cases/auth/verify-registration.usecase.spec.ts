@@ -1,22 +1,23 @@
 import { VerifyRegistrationUsecase } from './verify-registration.usecase';
-import { MockUserRepository, MockOtpRepository } from './test-mocks';
+import { MockUserRepository, MockOtpService } from './test-mocks';
 import { ErrorCode } from '../../core/errors';
 import { UserEntity } from '../../core/entities/user.entity';
+import { OtpEntity } from '../../core/entities/otp.entity';
 
 describe('VerifyRegistrationUsecase', () => {
   let usecase: VerifyRegistrationUsecase;
   let mockUserRepository: MockUserRepository;
-  let mockOtpRepository: MockOtpRepository;
+  let mockOtpService: MockOtpService;
 
   beforeEach(() => {
     mockUserRepository = new MockUserRepository();
-    mockOtpRepository = new MockOtpRepository();
-    usecase = new VerifyRegistrationUsecase(mockUserRepository, mockOtpRepository);
+    mockOtpService = new MockOtpService();
+    usecase = new VerifyRegistrationUsecase(mockUserRepository, mockOtpService);
   });
 
   afterEach(() => {
     mockUserRepository.clear();
-    mockOtpRepository.clear();
+    mockOtpService.clear();
   });
 
   it('should verify user with valid OTP', async () => {
@@ -26,12 +27,13 @@ describe('VerifyRegistrationUsecase', () => {
       passwordHash: '$2b$10$hashed_SecurePass123!',
     });
     mockUserRepository.addUser({ ...user, id: 'user-1' } as UserEntity);
-    mockOtpRepository.addOtp({
-      id: 'valid-otp-1',
-      email: 'user@example.com',
+
+    const validOtp = OtpEntity.create({
+      userId: 'user-1',
       code: '123456',
-      expiresAt: new Date(Date.now() + 10 * 60 * 1000), // Expires in 10 minutes
+      expiryMinutes: 10,
     });
+    mockOtpService.addOtp(validOtp);
 
     const result = await usecase.execute('user@example.com', '123456');
     expect(result.message).toBeDefined();
@@ -60,12 +62,13 @@ describe('VerifyRegistrationUsecase', () => {
       passwordHash: '$2b$10$hashed_SecurePass123!',
     });
     mockUserRepository.addUser({ ...user, id: 'user-1' } as UserEntity);
-    mockOtpRepository.addOtp({
-      id: 'expired-otp-1',
-      email: 'user@example.com',
+
+    const expiredOtp = OtpEntity.create({
+      userId: 'user-1',
       code: '999999',
-      expiresAt: new Date(Date.now() - 1000), // Expired 1 second ago
+      expiryMinutes: -1, // Already expired
     });
+    mockOtpService.addOtp(expiredOtp);
 
     try {
       await usecase.execute('user@example.com', '999999');

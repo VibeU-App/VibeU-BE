@@ -3,7 +3,7 @@ import { IJwtService } from '../../services/token/jwt.service';
 import { ITokenService, TokenPair, AccessTokenPayload } from '../../services/token/token.service';
 import { IMailService } from '../../services/mail/mail.interface';
 import { IUserRepository } from './user-repository.interface';
-import { IOtpRepository } from './otp-repository.interface';
+import { IOtpService } from '../../services/otp/otp.interface';
 import { ISessionRepository } from './session-repository.interface';
 import { UserEntity, AccountStatusEntity, AccountStatusName } from '../../core/entities/user.entity';
 import { OtpEntity } from '../../core/entities/otp.entity';
@@ -11,7 +11,7 @@ import { SessionEntity } from '../../core/entities/session.entity';
 
 /**
  * Test mock implementations for use-case unit tests.
- * 
+ *
  * These mocks provide simple in-memory implementations that allow
  * tests to run without external dependencies (database, email server, etc.).
  * Each mock has helper methods (addXxx, clear) to set up test scenarios.
@@ -138,32 +138,37 @@ export class MockUserRepository implements IUserRepository {
   }
 }
 
-// Mock OTP repository with in-memory storage
-export class MockOtpRepository implements IOtpRepository {
+// Mock OTP service with in-memory storage and attempt tracking
+export class MockOtpService implements IOtpService {
   private otps: Map<string, OtpEntity> = new Map();
 
   async save(otp: OtpEntity): Promise<OtpEntity> {
-    const savedOtp = new OtpEntity(
-      `mock-otp-${Date.now()}`,
-      otp.userId,
-      otp.code,
-      otp.expiresAt,
-      otp.createdAt,
-    );
-    this.otps.set(`${otp.userId}:${otp.code}`, savedOtp);
-    return savedOtp;
+    this.otps.set(`${otp.userId}:${otp.code}`, otp);
+    return otp;
   }
 
   async findByUserIdAndCode(userId: string, code: string): Promise<OtpEntity | null> {
-    return this.otps.get(`${userId}:${code}`) ?? null;
+    const otp = this.otps.get(`${userId}:${code}`);
+    if (!otp || !otp.isValid()) {
+      return null;
+    }
+    return otp;
   }
 
   async deleteByUserId(userId: string): Promise<void> {
     for (const key of this.otps.keys()) {
-      if (key.startsWith(userId + ':')) {
+      if (key.startsWith(`${userId}:`)) {
         this.otps.delete(key);
       }
     }
+  }
+
+  async incrementAttempts(userId: string, code: string): Promise<boolean> {
+    const otp = this.otps.get(`${userId}:${code}`);
+    if (!otp) {
+      return false;
+    }
+    return otp.incrementAttempts();
   }
 
   addOtp(otp: OtpEntity): void {

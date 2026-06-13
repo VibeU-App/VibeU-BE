@@ -1,5 +1,5 @@
 import { RegisterUsecase } from './register.usecase';
-import { MockUserRepository, MockCryptoService, MockMailService, MockOtpRepository } from './test-mocks';
+import { MockUserRepository, MockCryptoService, MockMailService, MockOtpService } from './test-mocks';
 import { ErrorCode } from '../../core/errors';
 import { UserEntity } from '../../core/entities/user.entity';
 
@@ -8,25 +8,25 @@ describe('RegisterUsecase', () => {
   let mockUserRepository: MockUserRepository;
   let mockCryptoService: MockCryptoService;
   let mockMailService: MockMailService;
-  let mockOtpRepository: MockOtpRepository;
+  let mockOtpService: MockOtpService;
 
   beforeEach(() => {
     mockUserRepository = new MockUserRepository();
     mockCryptoService = new MockCryptoService();
     mockMailService = new MockMailService();
-    mockOtpRepository = new MockOtpRepository();
+    mockOtpService = new MockOtpService();
     usecase = new RegisterUsecase(
       mockUserRepository,
       mockCryptoService,
       mockMailService,
-      mockOtpRepository,
+      mockOtpService,
     );
   });
 
   afterEach(() => {
     mockUserRepository.clear();
     mockMailService.clear();
-    mockOtpRepository.clear();
+    mockOtpService.clear();
   });
 
   it('should register a new user with valid email and password', async () => {
