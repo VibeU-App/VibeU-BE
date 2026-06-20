@@ -20,7 +20,8 @@ export interface IOtpService {
 
   /**
    * Finds an OTP by user ID and code.
-   * Returns null if not found, expired, or max attempts exceeded.
+   * Returns null only if the code does not match.
+   * Caller is responsible for checking validity (expiration, max attempts).
    */
   findByUserIdAndCode(userId: string, code: string): Promise<OtpEntity | null>;
 

@@ -39,25 +39,11 @@ export class OtpCacheService implements IOtpService {
 
   /**
    * Finds an OTP by user ID and code.
-   * Returns null if not found, expired, or max attempts exceeded.
-   * Automatically cleans up expired/invalid OTPs.
+   * Returns null only if not found.
    */
   async findByUserIdAndCode(userId: string, code: string): Promise<OtpEntity | null> {
     const key = this.getKey(userId, code);
-    const otp = this.otps.get(key);
-
-    if (!otp) {
-      return null;
-    }
-
-    // Clean up expired or invalid OTPs
-    if (!otp.isValid()) {
-      this.otps.delete(key);
-      this.logger.debug(`Cleaned up invalid OTP for user ${userId}`);
-      return null;
-    }
-
-    return otp;
+    return this.otps.get(key) || null;
   }
 
   /**

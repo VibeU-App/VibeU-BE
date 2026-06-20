@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { IUserRepository } from '../../../use-cases/auth/user-repository.interface';
 import { UserEntity } from '../../../core/entities/user.entity';
+import { AccountStatusName } from '../../../core/entities/user.entity';
 import { PrismaService } from '../prisma/prisma.service';
 
 /**
@@ -101,10 +102,21 @@ export class PrismaUserRepository implements IUserRepository {
       user.email,
       user.passwordHash,
       user.accountStatusId,
+      user.role,
       user.isVerified,
       user.createdAt,
       user.updatedAt,
       user.deletedAt,
     );
+  }
+
+  /**
+   * Finds an account status ID by its name.
+   */
+  async findStatusByName(name: string): Promise<string | null> {
+    const status = await this.prisma.accountStatus.findFirst({
+      where: { name: name as AccountStatusName },
+    });
+    return status?.id ?? null;
   }
 }

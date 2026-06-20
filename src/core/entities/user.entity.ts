@@ -37,6 +37,7 @@ export class UserEntity {
     public readonly email: string,
     public readonly passwordHash: string,
     public readonly accountStatusId: string,
+    public readonly role: UserRole,
     public readonly isVerified: boolean,
     public readonly createdAt: Date,
     public readonly updatedAt: Date,
@@ -50,6 +51,7 @@ export class UserEntity {
     email: string;
     passwordHash: string;
     accountStatusId?: string;
+    role?: UserRole;
     isVerified?: boolean;
   }): UserEntity {
     const now = new Date();
@@ -58,6 +60,7 @@ export class UserEntity {
       props.email.toLowerCase(),
       props.passwordHash,
       props.accountStatusId ?? '', // Should be set to PENDING status ID
+      props.role ?? UserRole.USER,
       props.isVerified ?? false,
       now,
       now,
