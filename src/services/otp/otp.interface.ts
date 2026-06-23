@@ -20,7 +20,7 @@ export interface IOtpService {
 
   /**
    * Finds an OTP by user ID and code.
-   * Returns null if not found, expired, or max attempts exceeded.
+   * Returns null if not found.
    */
   findByUserIdAndCode(userId: string, code: string): Promise<OtpEntity | null>;
 

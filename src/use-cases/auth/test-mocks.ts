@@ -149,7 +149,7 @@ export class MockOtpService implements IOtpService {
 
   async findByUserIdAndCode(userId: string, code: string): Promise<OtpEntity | null> {
     const otp = this.otps.get(`${userId}:${code}`);
-    if (!otp || !otp.isValid()) {
+    if (!otp) {
       return null;
     }
     return otp;
