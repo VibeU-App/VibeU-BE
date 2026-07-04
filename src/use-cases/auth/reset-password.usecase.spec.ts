@@ -65,4 +65,39 @@ describe('ResetPasswordUsecase', () => {
 
     expect(testUser.passwordHash).not.toBe(newPass);
   });
+
+  it('should reject weak passwords', async () => {
+    const testUser : UserEntity = new UserEntity(
+      'user-123', 'user@example.com', 'Examplepassword123!', '0',
+      false, new Date(Date.now()), new Date(Date.now()), null,
+    )
+
+    mockUserRepository.addUser(testUser);
+    const testToken = mockJwtService.signPayload(mockToken);
+    
+    try {
+      await usecase.execute("weakpassword", testToken);
+      fail('Should have thrown an error');
+    } catch (error) {
+      expect(error.getResponse().code).toBe(ErrorCode.AUTH_WEAK_PASSWORD);
+    }
+  });
+
+  it('should reject new password matching old password', async () => {
+    const passwordHash = await mockCryptoService.hash('Examplepassword123!');
+    const testUser : UserEntity = new UserEntity(
+      'user-123', 'user@example.com', passwordHash, '0',
+      false, new Date(Date.now()), new Date(Date.now()), null,
+    )
+
+    mockUserRepository.addUser(testUser);
+    const testToken = mockJwtService.signPayload(mockToken);
+    
+    try {
+      await usecase.execute("Examplepassword123!", testToken);
+      fail('Should have thrown an error');
+    } catch (error) {
+      expect(error.getResponse().code).toBe(ErrorCode.AUTH_MATCHING_OLD_PASSWORD);
+    }
+  });
 });

@@ -31,13 +31,13 @@ describe('ForgotPasswordUsecase', () => {
 
   it('should send OTP if user exists', async () => {
     const user : UserEntity = UserEntity.create({
-      email: "user@example.com",
+      email: "user@example.edu.vn",
       passwordHash: "i3hr92hr9ebfusboc",
     });
 
     mockUserRepository.addUser(user);
 
-    await usecase.execute('user@example.com');
+    await usecase.execute('user@example.edu.vn');
     
     // Verify that an email is sent
     expect(mockMailService.sentEmails.length).toBe(1);
@@ -47,5 +47,32 @@ describe('ForgotPasswordUsecase', () => {
 
     // Verify that the OTP is truthy
     expect(mockMailService.sentEmails[0].otp).toBeTruthy();
+  });
+
+  it('should reject if not a .edu email', async () => {
+    const user : UserEntity = UserEntity.create({
+      email: "user@notedu.com",
+      passwordHash: "i3hr92hr9ebfusboc",
+    });
+
+    mockUserRepository.addUser(user);
+
+    await usecase.execute("user@notedu.com");
+
+    // Verify that no email is sent if it's not a .edu email
+    expect(mockMailService.sentEmails.length).toEqual(0);
+  });
+
+  it('should normalize emails', async () => {
+    const user : UserEntity = UserEntity.create({
+      email: "user1+tag1@example.edu",
+      passwordHash: "i3hr92hr9ebfusboc",
+    });
+
+    mockUserRepository.addUser(user);
+
+    await usecase.execute("user1+tag1@example.edu");
+
+    expect(mockMailService.sentEmails[0]["email"]).toBe("user1@example.edu");
   });
 });

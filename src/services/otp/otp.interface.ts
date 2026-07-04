@@ -22,7 +22,7 @@ export interface IOtpService {
    * Finds an OTP by user ID and code.
    * Returns null if not found.
    */
-  findByUserIdAndCode(userId: string, code: string): Promise<OtpEntity | null>;
+  findByUserId(userId: string): Promise<OtpEntity | null>;
 
   /**
    * Deletes all OTPs for a user.
@@ -34,5 +34,5 @@ export interface IOtpService {
    * Increments attempt count for an OTP.
    * Returns false if max attempts exceeded.
    */
-  incrementAttempts(userId: string, code: string): Promise<boolean>;
+  incrementAttempts(userId: string): Promise<boolean>;
 }

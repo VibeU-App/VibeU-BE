@@ -20,34 +20,45 @@ export class VerifyOtpUsecase {
     const user = await this.userRepository.findByEmail(email);
     
     if (!!user) {
-      const userOtp = await this.otpService.findByUserIdAndCode(user.id, otp);
+      const userOtp = await this.otpService.findByUserId(user.id);
 
-      if (!userOtp || userOtp.isMaxAttemptsReached()) {
-        throw new BadRequestException({
-          code: ErrorCode.AUTH_OTP_INVALID,
-          message: "Invalid OTP",
-        });
-      }
+      if (!!userOtp) {
+        if (userOtp.code !== otp) {
+          this.otpService.incrementAttempts(user.id);
+          throw new BadRequestException({
+            code: ErrorCode.AUTH_OTP_INVALID,
+            message: "Invalid OTP",
+          });
+        }
 
-      if (userOtp.isExpired()) {
-        throw new BadRequestException({
-          code: ErrorCode.AUTH_OTP_EXPIRED,
-          message: "Expired OTP",
-        });
-      }
+        if (userOtp.isMaxAttemptsReached()) {
+          throw new BadRequestException({
+            code: ErrorCode.AUTH_OTP_INVALID,
+            message: "Invalid OTP",
+          });
+        }
 
-      await this.otpService.deleteByUserId(user.id);
-      const payload = {
-        sub: user.id,
-        email: user.email,
-        role: UserRole.USER,
-        purpose: "password_reset",
-      }
+        if (userOtp.isExpired()) {
+          throw new BadRequestException({
+            code: ErrorCode.AUTH_OTP_EXPIRED,
+            message: "Expired OTP",
+          });
+        }
 
-      return {
-        resetToken: this.jwtService.signPayload(payload),
+        await this.otpService.deleteByUserId(user.id);
+        const payload = {
+          sub: user.id,
+          email: user.email,
+          role: UserRole.USER,
+          purpose: "password_reset",
+        }
+
+        return {
+          resetToken: this.jwtService.signPayload(payload),
+        }
       }
     }
+  
 
     throw new BadRequestException({
       code: ErrorCode.AUTH_USER_NOT_FOUND,

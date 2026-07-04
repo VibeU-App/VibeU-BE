@@ -17,16 +17,31 @@ export class ResetPasswordUsecase {
   ) {}
 
   async execute(newPassword: string, resetToken: string): Promise<ResetPasswordResult> {
+    const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/;
+    
+    if (!strongPasswordRegex.test(newPassword)) {
+      throw new BadRequestException({
+        code: ErrorCode.AUTH_WEAK_PASSWORD,
+        message: "Password is too weak",
+      });
+    }
+
     const tokenData = this.jwtService.verifyToken(resetToken);
     const userId = tokenData?.sub;
-
     
     if (!!userId) {
       const user = await this.userRepository.findById(userId);
 
-      
       if (!!user) {
         const passwordHash = await this.cryptoService.hash(newPassword);
+        
+        if (user.passwordHash === passwordHash) {
+          throw new BadRequestException({
+            code: ErrorCode.AUTH_MATCHING_OLD_PASSWORD,
+            message: "New password must be different from old password",
+          });
+        }
+
         const newUser : UserEntity = {
           id: userId,
           email: user.email,
