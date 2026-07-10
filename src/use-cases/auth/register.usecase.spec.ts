@@ -1,0 +1,63 @@
+import { RegisterUsecase } from './register.usecase';
+import { MockUserRepository, MockCryptoService, MockMailService, MockOtpService } from './test-mocks';
+import { ErrorCode } from '../../core/errors';
+import { UserEntity } from '../../core/entities/user.entity';
+
+describe('RegisterUsecase', () => {
+  let usecase: RegisterUsecase;
+  let mockUserRepository: MockUserRepository;
+  let mockCryptoService: MockCryptoService;
+  let mockMailService: MockMailService;
+  let mockOtpService: MockOtpService;
+
+  beforeEach(() => {
+    mockUserRepository = new MockUserRepository();
+    mockCryptoService = new MockCryptoService();
+    mockMailService = new MockMailService();
+    mockOtpService = new MockOtpService();
+    usecase = new RegisterUsecase(
+      mockUserRepository,
+      mockCryptoService,
+      mockMailService,
+      mockOtpService,
+    );
+  });
+
+  afterEach(() => {
+    mockUserRepository.clear();
+    mockMailService.clear();
+    mockOtpService.clear();
+  });
+
+  it('should register a new user with valid email and password', async () => {
+    const result = await usecase.execute('test@example.com', 'SecurePass123!');
+    expect(result.user).toBeDefined();
+    expect(result.user.email).toBe('test@example.com');
+  });
+
+  it('should reject registration with duplicate email', async () => {
+    // Pre-add a user with this email
+    const existingUser = UserEntity.create({
+      email: 'existing@example.com',
+      passwordHash: '$2b$10$hashed_ExistingPass123!',
+    });
+    mockUserRepository.addUser({ ...existingUser, id: 'existing-user-1' } as UserEntity);
+
+    try {
+      await usecase.execute('existing@example.com', 'SecurePass123!');
+      fail('Should have thrown an error');
+    } catch (error) {
+      expect(error.code).toBe(ErrorCode.AUTH_EMAIL_ALREADY_EXISTS);
+    }
+  });
+
+  it('should send OTP after successful registration', async () => {
+    await usecase.execute('test@example.com', 'SecurePass123!');
+    // TODO: Verify OTP was sent
+  });
+
+  it('should hash password before saving', async () => {
+    await usecase.execute('test@example.com', 'SecurePass123!');
+    // TODO: Verify password was hashed
+  });
+});

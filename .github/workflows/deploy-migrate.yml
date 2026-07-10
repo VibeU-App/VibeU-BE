@@ -1,0 +1,58 @@
+name: Deploy & Migrate to Production
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'prisma/schema.prisma'
+      - 'prisma/migrations/**'
+
+jobs:
+  deploy-migrate:
+    name: Deploy & Run Migrations
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Generate Prisma Client
+        run: pnpm prisma generate
+
+      - name: Run production migrations
+        run: pnpm prisma migrate deploy
+        env:
+          # Use DIRECT_URL for migrations (bypasses PgBouncer)
+          DATABASE_URL: ${{ secrets.DIRECT_URL }}
+
+      - name: Verify migration success
+        run: |
+          echo "✅ Migrations applied successfully"
+          pnpm prisma migrate status
+        env:
+          DATABASE_URL: ${{ secrets.DIRECT_URL }}
+
+  # Optional: Deploy to hosting platform (e.g., Railway, Render, etc.)
+  # deploy-app:
+  #   name: Deploy Application
+  #   runs-on: ubuntu-latest
+  #   needs: deploy-migrate
+  #   steps:
+  #     - name: Deploy to Railway
+  #       uses: bervProject/railway-deploy@main
+  #       with:
+  #         railway_token: ${{ secrets.RAILWAY_TOKEN }}

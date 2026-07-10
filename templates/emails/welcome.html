@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Welcome to VibeU</title>
+  <style>
+    /* Reset */
+    body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+    img { -ms-interpolation-mode: bicubic; }
+
+    /* Base */
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f4f4f5;
+      margin: 0;
+      padding: 0;
+      width: 100%;
+    }
+
+    /* Container */
+    .email-wrapper {
+      padding: 40px 20px;
+    }
+    .email-container {
+      max-width: 480px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+    }
+
+    /* Header */
+    .email-header {
+      background: linear-gradient(135deg, #E11D48 0%, #BE123C 100%);
+      padding: 40px 24px;
+      text-align: center;
+    }
+    .email-header h1 {
+      color: #ffffff;
+      font-size: 28px;
+      font-weight: 700;
+      margin: 0;
+      letter-spacing: -0.5px;
+    }
+
+    /* Body */
+    .email-body {
+      padding: 40px 24px;
+      text-align: center;
+    }
+    .email-body p {
+      color: #3f3f46;
+      font-size: 16px;
+      line-height: 1.6;
+      margin: 0 0 16px;
+    }
+
+    /* Success Icon */
+    .success-icon {
+      margin: 0 0 24px;
+    }
+    .success-icon span {
+      display: inline-block;
+      width: 72px;
+      height: 72px;
+      line-height: 72px;
+      background: linear-gradient(135deg, #E11D48 0%, #BE123C 100%);
+      border-radius: 50%;
+      font-size: 36px;
+      color: #ffffff;
+    }
+
+    /* Welcome Text */
+    .welcome-title {
+      color: #18181b;
+      font-size: 24px;
+      font-weight: 700;
+      margin: 0 0 12px;
+    }
+    .welcome-subtitle {
+      color: #71717a;
+      font-size: 16px;
+      margin: 0 0 32px;
+    }
+
+    /* CTA Button */
+    .cta-container {
+      margin: 32px 0;
+    }
+    .cta-button {
+      display: inline-block;
+      background: linear-gradient(135deg, #E11D48 0%, #BE123C 100%);
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: 600;
+      text-decoration: none;
+      padding: 14px 32px;
+      border-radius: 8px;
+      transition: opacity 0.2s;
+    }
+    .cta-button:hover {
+      opacity: 0.9;
+    }
+
+    /* Features */
+    .features {
+      background: #fafafa;
+      border-radius: 8px;
+      padding: 24px;
+      margin: 32px 0 0;
+      text-align: left;
+    }
+    .features-title {
+      color: #18181b;
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0 0 16px;
+    }
+    .feature-item {
+      display: flex;
+      align-items: center;
+      margin: 12px 0;
+    }
+    .feature-icon {
+      color: #E11D48;
+      margin-right: 12px;
+      font-size: 18px;
+    }
+    .feature-text {
+      color: #52525b;
+      font-size: 14px;
+      margin: 0;
+    }
+
+    /* Footer */
+    .email-footer {
+      padding: 24px;
+      border-top: 1px solid #e4e4e7;
+    }
+    .footer-text {
+      color: #a1a1aa;
+      font-size: 12px;
+      text-align: center;
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    /* Responsive */
+    @media only screen and (max-width: 600px) {
+      .email-wrapper {
+        padding: 20px 12px;
+      }
+      .email-header {
+        padding: 32px 16px;
+      }
+      .email-header h1 {
+        font-size: 24px;
+      }
+      .email-body {
+        padding: 32px 16px;
+      }
+      .welcome-title {
+        font-size: 20px;
+      }
+      .cta-button {
+        display: block;
+        text-align: center;
+      }
+      .features {
+        padding: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="email-wrapper">
+    <div class="email-container">
+      <div class="email-header">
+        <h1>Welcome to {{appName}}!</h1>
+      </div>
+      <div class="email-body">
+        <div class="success-icon">
+          <span>&#10003;</span>
+        </div>
+        <h2 class="welcome-title">You're all set!</h2>
+        <p class="welcome-subtitle">Your email has been verified successfully.</p>
+        <p>You can now log in to your account and start using all features.</p>
+        <div class="cta-container">
+          <a href="{{loginUrl}}" class="cta-button">Go to Login</a>
+        </div>
+        <div class="features">
+          <p class="features-title">What you can do:</p>
+          <div class="feature-item">
+            <span class="feature-icon">&#10003;</span>
+            <p class="feature-text">Complete your profile</p>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">&#10003;</span>
+            <p class="feature-text">Explore all features</p>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">&#10003;</span>
+            <p class="feature-text">Connect with others</p>
+          </div>
+        </div>
+      </div>
+      <div class="email-footer">
+        <p class="footer-text">Thank you for joining us!<br>If you have any questions, feel free to reach out.</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

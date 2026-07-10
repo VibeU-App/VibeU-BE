@@ -1,0 +1,73 @@
+// Prisma schema for VibeU backend
+// Docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Account status enum values
+enum AccountStatusName {
+  PENDING
+  ACTIVE
+  INACTIVE
+  TERMINATED
+}
+
+// Account status lookup table
+model AccountStatus {
+  id        String            @id @default(uuid())
+  name      AccountStatusName @unique
+  createdAt DateTime          @default(now()) @map("created_at")
+  updatedAt DateTime          @updatedAt @map("updated_at")
+
+  // Relations
+  users User[]
+
+  @@map("account_statuses")
+}
+
+// User model - stores user account information
+model User {
+  id               String    @id @default(uuid())
+  email            String    @unique
+  passwordHash     String    @map("password_hash")
+  accountStatusId  String    @map("account_status_id")
+  isVerified       Boolean   @default(false) @map("is_verified")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+  deletedAt        DateTime? @map("deleted_at")
+
+  // Relations
+  accountStatus AccountStatus @relation(fields: [accountStatusId], references: [id])
+  sessions      Session[]
+
+  // Soft delete index
+  @@index([deletedAt])
+  @@map("users")
+}
+
+// Session model - stores user refresh tokens
+model Session {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  refreshToken String   @unique @map("refresh_token")
+  expiresAt    DateTime @map("expires_at")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+
+  // Indexes
+  @@index([userId])
+  @@index([deletedAt])
+  @@map("sessions")
+}
+
+// OTP is stored in memory (not database)
+// See: src/frameworks/database/postgres/otp-cache.service.ts
