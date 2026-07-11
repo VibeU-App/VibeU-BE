@@ -1,7 +1,7 @@
+import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import { IUserRepository } from './user-repository.interface';
 import { IOtpService } from '../../services/otp/otp.interface';
 import { IJwtService } from '../../services/token/jwt.service';
-import { BadRequestException } from '@nestjs/common';
 import { UserRole } from '../../core/entities';
 import { ErrorCode } from '../../core/errors';
 
@@ -24,7 +24,7 @@ export class VerifyOtpUsecase {
     
     if (!!user) {
       const userOtp = await this.otpService.findByUserId(user.id);
-
+      console.log('userOtp:', userOtp); // Debugging line to check the value of userOtp
       if (!!userOtp) {
         if (userOtp.code !== otp) {
           this.otpService.incrementAttempts(user.id);
