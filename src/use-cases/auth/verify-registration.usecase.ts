@@ -31,7 +31,7 @@ export class VerifyRegistrationUsecase {
     }
 
     // 3. Verify OTP
-    const otp = await this.otpService.findByUserIdAndCode(user.id, otpCode);
+    const otp = await this.otpService.findByUserId(user.id);
     if (!otp) {
       throw new AppException(ErrorCode.AUTH_OTP_INVALID);
     }
