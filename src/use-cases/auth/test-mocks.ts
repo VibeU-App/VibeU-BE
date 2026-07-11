@@ -73,16 +73,54 @@ export class MockTokenService implements ITokenService {
 export class MockMailService implements IMailService {
   public sentEmails: Array<{ email: string; otp: string; type: string }> = [];
 
+  isValidEmail(email: string): boolean {
+    const emailRegex = /^\w[+-.\w]*\@[-a-z0-9]+(\.[-a-z0-9]+)*\.edu(\.[a-z]{2})?$/;
+    return emailRegex.test(email.toLowerCase());
+  }
+
+  getTargetEmail(email: string): string | null {
+    if (this.isValidEmail(email)) {
+      const emailParts = email.split("@");
+      const identifier = emailParts[0];
+      const domains = emailParts[1];
+      let targetEmail = email;
+
+      if (identifier.includes("+")) {
+        targetEmail = targetEmail.split("+")[0] + "@" + domains;
+      }
+
+      if (identifier.includes(".") && domains.split(".")[0] == "gmail") {
+        targetEmail = targetEmail.split("@")[0].replaceAll(".", "") + "@" + domains;
+      }
+
+      return targetEmail.toLowerCase();
+    } else {
+      return null;
+    }
+  }
+
   async sendOtp(email: string, otp: string): Promise<void> {
-    this.sentEmails.push({ email, otp, type: 'verification' });
+    const targetEmail : string | null = this.getTargetEmail(email);
+    
+    if (targetEmail !== null) {
+      this.sentEmails.push({ email: targetEmail, otp, type: 'verification' });
+    }
   }
 
   async sendPasswordResetOtp(email: string, otp: string): Promise<void> {
-    this.sentEmails.push({ email, otp, type: 'password-reset' });
+    const targetEmail : string | null = this.getTargetEmail(email);
+    
+    if (targetEmail !== null) {
+      this.sentEmails.push({ email: targetEmail, otp, type: 'password-reset' });
+    }
   }
 
   async sendWelcomeEmail(email: string): Promise<void> {
-    this.sentEmails.push({ email, otp: '', type: 'welcome' });
+    const targetEmail : string | null = this.getTargetEmail(email);
+    
+    if (targetEmail !== null) {
+      this.sentEmails.push({ email: targetEmail, otp: '', type: 'welcome' });
+    }
   }
 
   clear(): void {
@@ -150,12 +188,16 @@ export class MockOtpService implements IOtpService {
   private otps: Map<string, OtpEntity> = new Map();
 
   async save(otp: OtpEntity): Promise<OtpEntity> {
-    this.otps.set(`${otp.userId}:${otp.code}`, otp);
+    this.otps.set(`${otp.userId}:optCode`, otp);
     return otp;
   }
 
-  async findByUserIdAndCode(userId: string, code: string): Promise<OtpEntity | null> {
-    return this.otps.get(`${userId}:${code}`) || null;
+  async findByUserId(userId: string): Promise<OtpEntity | null> {
+    const otp = this.otps.get(`${userId}:optCode`);
+    if (!otp) {
+      return null;
+    }
+    return otp;
   }
 
   async deleteByUserId(userId: string): Promise<void> {
@@ -166,8 +208,8 @@ export class MockOtpService implements IOtpService {
     }
   }
 
-  async incrementAttempts(userId: string, code: string): Promise<boolean> {
-    const otp = this.otps.get(`${userId}:${code}`);
+  async incrementAttempts(userId: string): Promise<boolean> {
+    const otp = this.otps.get(`${userId}:optCode`);
     if (!otp) {
       return false;
     }
@@ -175,7 +217,7 @@ export class MockOtpService implements IOtpService {
   }
 
   addOtp(otp: OtpEntity): void {
-    this.otps.set(`${otp.userId}:${otp.code}`, otp);
+    this.otps.set(`${otp.userId}:optCode`, otp);
   }
 
   clear(): void {

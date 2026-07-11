@@ -1,44 +1,73 @@
 import { VerifyOtpUsecase } from './verify-otp.usecase';
-import { MockOtpService, MockJwtService } from './test-mocks';
+import { MockOtpService, MockJwtService, MockUserRepository } from './test-mocks';
 import { ErrorCode } from '../../core/errors';
 import { OtpEntity } from '../../core/entities/otp.entity';
+import { UserEntity } from '../../core/entities';
 
 describe('VerifyOtpUsecase', () => {
   let usecase: VerifyOtpUsecase;
   let mockOtpService: MockOtpService;
   let mockJwtService: MockJwtService;
+  let mockUserRepository: MockUserRepository;
 
   beforeEach(() => {
     mockOtpService = new MockOtpService();
     mockJwtService = new MockJwtService();
-    usecase = new VerifyOtpUsecase(mockOtpService, mockJwtService);
+    mockUserRepository = new MockUserRepository();
+    usecase = new VerifyOtpUsecase(mockOtpService, mockJwtService, mockUserRepository);
   });
 
   afterEach(() => {
     mockOtpService.clear();
+    mockUserRepository.clear();
   });
 
   it('should return reset token with valid OTP', async () => {
-    // TODO: Pre-add valid OTP by userId
-    try {
-      await usecase.execute('user@example.com', '123456');
-      fail('Should have thrown an error');
-    } catch (error) {
-      expect(error.code).toBe(ErrorCode.AUTH_OTP_INVALID);
-    }
+    const validOtp = OtpEntity.create({
+      userId: 'user-123',
+      code: '123456',
+      expiryMinutes: 10,
+    });
+    mockOtpService.addOtp(validOtp);
+
+    const testUser : UserEntity = new UserEntity(
+      'user-123', 'user@example.com', 'Examplepassword123!', '0',
+      false, new Date(Date.now()), new Date(Date.now()), null,
+    )
+    mockUserRepository.addUser(testUser);
+
+    const testResult = await usecase.execute('user@example.com', '123456');
+
+    expect(mockJwtService.verifyToken(testResult.resetToken)).toEqual({
+      sub: testUser.id,
+      email: testUser.email,
+      role: 'user',
+    });
   });
 
   it('should reject invalid OTP', async () => {
+    const validOtp = OtpEntity.create({
+      userId: 'user-123',
+      code: '123456',
+      expiryMinutes: 10,
+    });
+    mockOtpService.addOtp(validOtp);
+
+    const testUser : UserEntity = new UserEntity(
+      'user-123', 'user@example.com', 'Examplepassword123!', '0',
+      false, new Date(Date.now()), new Date(Date.now()), null,
+    )
+    mockUserRepository.addUser(testUser);
+
     try {
       await usecase.execute('user@example.com', '000000');
       fail('Should have thrown an error');
     } catch (error) {
-      expect(error.code).toBe(ErrorCode.AUTH_OTP_INVALID);
+      expect(error.getResponse().code).toBe(ErrorCode.AUTH_OTP_INVALID);
     }
   });
 
   it('should reject expired OTP', async () => {
-    // Pre-add an expired OTP
     const expiredOtp = OtpEntity.create({
       userId: 'user-123',
       code: '999999',
@@ -46,11 +75,17 @@ describe('VerifyOtpUsecase', () => {
     });
     mockOtpService.addOtp(expiredOtp);
 
+    const testUser : UserEntity = new UserEntity(
+      'user-123', 'user@example.com', 'Examplepassword123!', '0',
+      false, new Date(Date.now()), new Date(Date.now()), null,
+    )
+    mockUserRepository.addUser(testUser);
+
     try {
       await usecase.execute('user@example.com', '999999');
       fail('Should have thrown an error');
     } catch (error) {
-      expect(error.code).toBe(ErrorCode.AUTH_OTP_EXPIRED);
+      expect(error.getResponse().code).toBe(ErrorCode.AUTH_OTP_EXPIRED);
     }
   });
 });

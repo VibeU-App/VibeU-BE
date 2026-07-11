@@ -33,22 +33,62 @@ export class SmtpMailService implements IMailService {
   }
 
   /**
+   * Tests the validity of an email:
+   * - Follows standard email format
+   * - Only student emails are allowed (.edu)
+   */
+  isValidEmail(email: string): boolean {
+    const emailRegex = /^\w[+-.\w]*\@[-a-z0-9]+(\.[-a-z0-9]+)*\.edu(\.[a-z]{2})?$/;
+    return emailRegex.test(email.toLowerCase());
+  }
+
+  /**
+   * Gets the target email:
+   * - If the identifier contains "+", the rest of the identifier will be ignored.
+   * - If the identifier of a ".gmail" email contains ".", it will be ignored.
+   * - If the email is invalid, null is returned
+   */
+  getTargetEmail(email: string): string | null {
+    if (this.isValidEmail(email)) {
+      const emailParts = email.split("@");
+      const identifier = emailParts[0];
+      const domains = emailParts[1];
+      let targetEmail = email;
+
+      if (identifier.includes("+")) {
+        targetEmail = targetEmail.split("+")[0] + "@" + domains;
+      }
+
+      if (identifier.includes(".") && domains.split(".")[0] == "gmail") {
+        targetEmail = targetEmail.split("@")[0].replaceAll(".", "") + "@" + domains;
+      }
+
+      return targetEmail.toLowerCase();
+    } else {
+      return null;
+    }
+  }
+
+  /**
    * Sends an OTP code for email verification.
    * Uses the otp-verification template.
    */
   async sendOtp(email: string, otp: string): Promise<void> {
-    const html = this.templateLoader.render('otp-verification', {
-      appName: 'VibeU',
-      otp,
-      expiryMinutes: 10,
-    });
+    const targetEmail : string | null = this.getTargetEmail(email);
+    if (targetEmail !== null) {
+      const html = this.templateLoader.render('otp-verification', {
+        appName: 'VibeU',
+        otp,
+        expiryMinutes: 10,
+      });
 
-    await this.transporter.sendMail({
-      from: `"VibeU" <${config.smtp.user}>`,
-      to: email,
-      subject: 'Your Verification Code',
-      html,
-    });
+      await this.transporter.sendMail({
+        from: `"VibeU" <${config.smtp.user}>`,
+        to: targetEmail,
+        subject: 'Your Verification Code',
+        html,
+      });
+    }
   }
 
   /**
@@ -56,18 +96,21 @@ export class SmtpMailService implements IMailService {
    * Uses the password-reset template.
    */
   async sendPasswordResetOtp(email: string, otp: string): Promise<void> {
-    const html = this.templateLoader.render('password-reset', {
-      appName: 'VibeU',
-      otp,
-      expiryMinutes: 10,
-    });
+    const targetEmail : string | null = this.getTargetEmail(email);
+    if (targetEmail !== null) {
+      const html = this.templateLoader.render('password-reset', {
+        appName: 'VibeU',
+        otp,
+        expiryMinutes: 10,
+      });
 
-    await this.transporter.sendMail({
-      from: `"VibeU" <${config.smtp.user}>`,
-      to: email,
-      subject: 'Password Reset Code',
-      html,
-    });
+      await this.transporter.sendMail({
+        from: `"VibeU" <${config.smtp.user}>`,
+        to: targetEmail,
+        subject: 'Password Reset Code',
+        html,
+      });
+    }
   }
 
   /**
@@ -75,15 +118,18 @@ export class SmtpMailService implements IMailService {
    * Uses the welcome template.
    */
   async sendWelcomeEmail(email: string): Promise<void> {
-    const html = this.templateLoader.render('welcome', {
-      appName: 'VibeU',
-    });
+    const targetEmail : string | null = this.getTargetEmail(email);
+    if (targetEmail !== null) {
+      const html = this.templateLoader.render('welcome', {
+        appName: 'VibeU',
+      });
 
-    await this.transporter.sendMail({
-      from: `"VibeU" <${config.smtp.user}>`,
-      to: email,
-      subject: 'Welcome to VibeU!',
-      html,
-    });
+      await this.transporter.sendMail({
+        from: `"VibeU" <${config.smtp.user}>`,
+        to: targetEmail,
+        subject: 'Welcome to VibeU!',
+        html,
+      });
+    }
   }
 }

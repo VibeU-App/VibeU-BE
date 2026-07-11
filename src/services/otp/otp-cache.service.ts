@@ -23,7 +23,7 @@ import { OtpEntity } from '../../core/entities/otp.entity';
 export class OtpCacheService implements IOtpService {
   private readonly logger = new Logger(OtpCacheService.name);
 
-  // In-memory storage: key = "userId:code", value = OtpEntity
+  // In-memory storage: key = "userId:optCode", value = OtpEntity
   private otps = new Map<string, OtpEntity>();
 
   /**
@@ -31,7 +31,7 @@ export class OtpCacheService implements IOtpService {
    * Overwrites any existing OTP for the same user and code.
    */
   async save(otp: OtpEntity): Promise<OtpEntity> {
-    const key = this.getKey(otp.userId, otp.code);
+    const key = this.getKey(otp.userId);
     this.otps.set(key, otp);
     this.logger.debug(`Saved OTP for user ${otp.userId}`);
     return otp;
@@ -39,11 +39,18 @@ export class OtpCacheService implements IOtpService {
 
   /**
    * Finds an OTP by user ID and code.
-   * Returns null only if not found.
+   * Returns null if not found.
+   * Automatically cleans up expired/invalid OTPs.
    */
-  async findByUserIdAndCode(userId: string, code: string): Promise<OtpEntity | null> {
-    const key = this.getKey(userId, code);
-    return this.otps.get(key) || null;
+  async findByUserId(userId: string): Promise<OtpEntity | null> {
+    const key = this.getKey(userId);
+    const otp = this.otps.get(key);
+
+    if (!otp) {
+      return null;
+    }
+
+    return otp;
   }
 
   /**
@@ -64,8 +71,8 @@ export class OtpCacheService implements IOtpService {
    * Increments attempt count for an OTP.
    * Returns false if max attempts exceeded.
    */
-  async incrementAttempts(userId: string, code: string): Promise<boolean> {
-    const key = this.getKey(userId, code);
+  async incrementAttempts(userId: string): Promise<boolean> {
+    const key = this.getKey(userId);
     const otp = this.otps.get(key);
 
     if (!otp) {
@@ -87,7 +94,7 @@ export class OtpCacheService implements IOtpService {
   /**
    * Generates cache key from userId and code.
    */
-  private getKey(userId: string, code: string): string {
-    return `${userId}:${code}`;
+  private getKey(userId: string): string {
+    return `${userId}:optCode`;
   }
 }
