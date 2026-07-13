@@ -2,7 +2,7 @@ import { VerifyOtpUsecase } from './verify-otp.usecase';
 import { MockOtpService, MockJwtService, MockUserRepository } from './test-mocks';
 import { ErrorCode } from '../../core/errors';
 import { OtpEntity } from '../../core/entities/otp.entity';
-import { UserEntity } from '../../core/entities';
+import { UserEntity, UserRole } from '../../core/entities';
 
 describe('VerifyOtpUsecase', () => {
   let usecase: VerifyOtpUsecase;
@@ -32,6 +32,7 @@ describe('VerifyOtpUsecase', () => {
 
     const testUser : UserEntity = new UserEntity(
       'user-123', 'user@example.com', 'Examplepassword123!', '0',
+      UserRole.USER,
       false, new Date(Date.now()), new Date(Date.now()), null,
     )
     mockUserRepository.addUser(testUser);
@@ -55,6 +56,7 @@ describe('VerifyOtpUsecase', () => {
 
     const testUser : UserEntity = new UserEntity(
       'user-123', 'user@example.com', 'Examplepassword123!', '0',
+      UserRole.USER,
       false, new Date(Date.now()), new Date(Date.now()), null,
     )
     mockUserRepository.addUser(testUser);
@@ -77,6 +79,7 @@ describe('VerifyOtpUsecase', () => {
 
     const testUser : UserEntity = new UserEntity(
       'user-123', 'user@example.com', 'Examplepassword123!', '0',
+      UserRole.USER,
       false, new Date(Date.now()), new Date(Date.now()), null,
     )
     mockUserRepository.addUser(testUser);

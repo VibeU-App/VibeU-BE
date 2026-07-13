@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { apiReference } from '@scalar/nestjs-api-reference';
 import { AppModule } from './app.module';
@@ -7,6 +8,18 @@ import { EnvelopeExceptionFilter } from './core/envelope/envelope.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Register global validation pipe
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+      forbidNonWhitelisted: true,
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
+    }),
+  );
 
   // Register envelope interceptor to wrap all successful responses
   app.useGlobalInterceptors(new EnvelopeInterceptor());

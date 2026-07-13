@@ -153,6 +153,7 @@ export class MockUserRepository implements IUserRepository {
       user.email,
       user.passwordHash,
       user.accountStatusId,
+      user.role,
       user.isVerified,
       user.createdAt,
       user.updatedAt,
@@ -165,6 +166,12 @@ export class MockUserRepository implements IUserRepository {
   async update(user: UserEntity): Promise<UserEntity> {
     this.users.set(user.id, user);
     return user;
+  }
+
+  async findStatusByName(name: string): Promise<string | null> {
+    if (name === AccountStatusName.ACTIVE) return 'mock-active-status-id';
+    if (name === AccountStatusName.PENDING) return 'mock-pending-status-id';
+    return null;
   }
 
   addUser(user: UserEntity): void {

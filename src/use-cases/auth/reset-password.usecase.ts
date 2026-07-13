@@ -1,3 +1,4 @@
+import { Injectable, Inject } from '@nestjs/common';
 import { IUserRepository } from './user-repository.interface';
 import { ICryptoService } from '../../services/crypto/crypto.interface';
 import { IJwtService } from '../../services/token';
@@ -9,9 +10,12 @@ export interface ResetPasswordResult {
   message: string;
 }
 
+@Injectable()
 export class ResetPasswordUsecase {
   constructor(
+    @Inject('IUserRepository')
     private readonly userRepository: IUserRepository,
+    @Inject('ICryptoService')
     private readonly cryptoService: ICryptoService,
     private readonly jwtService: IJwtService,
   ) {}

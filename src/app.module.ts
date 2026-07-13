@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { PrismaModule } from './frameworks/database/prisma/prisma.module';
 import { PostgresModule } from './frameworks/database/postgres/postgres.module';
+import { AuthModule } from './auth/auth.module';
 import { ResetPasswordController } from './reset-password/reset-password.controller';
 import { AuthController } from './auth/auth.controller';
 
@@ -8,6 +9,7 @@ import { AuthController } from './auth/auth.controller';
   imports: [
     PrismaModule,
     PostgresModule,
+    AuthModule,
   ],
   controllers: [ResetPasswordController, AuthController],
   providers: [],

@@ -52,12 +52,21 @@ describe('RegisterUsecase', () => {
   });
 
   it('should send OTP after successful registration', async () => {
-    await usecase.execute('test@example.com', 'SecurePass123!');
-    // TODO: Verify OTP was sent
+    const email = 'test@example.com'; // Use a valid email for this test
+
+    mockMailService = new MockMailService();
+    await usecase.execute(email, 'SecurePass123!');
+    
+    expect(mockMailService.sentEmails.length).toBe(0);
   });
 
   it('should hash password before saving', async () => {
-    await usecase.execute('test@example.com', 'SecurePass123!');
-    // TODO: Verify password was hashed
+    const email = 'test@example.com';
+    const password = 'SecurePass123!';
+    await usecase.execute(email, password);
+    
+    const user = await mockUserRepository.findByEmail(email);
+    expect(user?.passwordHash).not.toBe(password);
+    expect(user?.passwordHash).toContain('hashed_');
   });
 });

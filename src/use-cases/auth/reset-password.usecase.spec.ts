@@ -1,7 +1,7 @@
 import { ResetPasswordUsecase } from './reset-password.usecase';
 import { MockUserRepository, MockCryptoService, MockJwtService } from './test-mocks';
 import { ErrorCode } from '../../core/errors';
-import { UserEntity } from '../../core/entities';
+import { UserEntity, UserRole } from '../../core/entities';
 
 describe('ResetPasswordUsecase', () => {
   let usecase: ResetPasswordUsecase;
@@ -29,6 +29,7 @@ describe('ResetPasswordUsecase', () => {
   it('should reset password successfully', async () => {
     const testUser : UserEntity = new UserEntity(
       'user-123', 'user@example.com', 'Examplepassword123!', '0',
+      UserRole.USER,
       false, new Date(Date.now()), new Date(Date.now()), null,
     )
 
@@ -54,6 +55,7 @@ describe('ResetPasswordUsecase', () => {
   it('should hash the new password before saving', async () => {
     const testUser : UserEntity = new UserEntity(
       'user-123', 'user@example.com', 'Examplepassword123!', '0',
+      UserRole.USER,
       false, new Date(Date.now()), new Date(Date.now()), null,
     )
 
@@ -69,6 +71,7 @@ describe('ResetPasswordUsecase', () => {
   it('should reject weak passwords', async () => {
     const testUser : UserEntity = new UserEntity(
       'user-123', 'user@example.com', 'Examplepassword123!', '0',
+      UserRole.USER,
       false, new Date(Date.now()), new Date(Date.now()), null,
     )
 
@@ -87,6 +90,7 @@ describe('ResetPasswordUsecase', () => {
     const passwordHash = await mockCryptoService.hash('Examplepassword123!');
     const testUser : UserEntity = new UserEntity(
       'user-123', 'user@example.com', passwordHash, '0',
+      UserRole.USER,
       false, new Date(Date.now()), new Date(Date.now()), null,
     )
 

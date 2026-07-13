@@ -17,6 +17,12 @@ enum AccountStatusName {
   TERMINATED
 }
 
+// User role enum values
+enum UserRole {
+  USER
+  ADMIN
+}
+
 // Account status lookup table
 model AccountStatus {
   id        String            @id @default(uuid())
@@ -36,6 +42,7 @@ model User {
   email            String    @unique
   passwordHash     String    @map("password_hash")
   accountStatusId  String    @map("account_status_id")
+  role             UserRole  @default(USER)
   isVerified       Boolean   @default(false) @map("is_verified")
   createdAt        DateTime  @default(now()) @map("created_at")
   updatedAt        DateTime  @updatedAt @map("updated_at")

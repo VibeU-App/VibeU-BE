@@ -7,6 +7,9 @@ import { VerifyRegistrationRequestDto, VerifyRegistrationResponseDto } from '../
 import { ForgotPasswordRequestDto, ForgotPasswordResponseDto } from '../core/dtos/auth/forgot-password.dto';
 import { VerifyOtpRequestDto, VerifyOtpResponseDto } from '../core/dtos/auth/verify-otp.dto';
 import { ResetPasswordRequestDto, ResetPasswordResponseDto } from '../core/dtos/auth/reset-password.dto';
+import { RegisterUsecase } from '../use-cases/auth/register.usecase';
+import { LoginUsecase } from '../use-cases/auth/login.usecase';
+import { VerifyRegistrationUsecase } from '../use-cases/auth/verify-registration.usecase';
 import { ForgotPasswordUsecase } from '../use-cases/auth/forgot-password.usecase';
 import { VerifyOtpUsecase } from '../use-cases/auth/verify-otp.usecase';
 import { ResetPasswordUsecase } from '../use-cases/auth/reset-password.usecase';
@@ -15,6 +18,9 @@ import { ResetPasswordUsecase } from '../use-cases/auth/reset-password.usecase';
 @Controller('api/v1/auth')
 export class AuthController {
   constructor(
+    private readonly registerUsecase: RegisterUsecase,
+    private readonly loginUsecase: LoginUsecase,
+    private readonly verifyRegistrationUsecase: VerifyRegistrationUsecase,
     private readonly forgotPasswordUsecase: ForgotPasswordUsecase,
     private readonly verifyOtpUsecase: VerifyOtpUsecase,
     private readonly resetPasswordUsecase: ResetPasswordUsecase,
@@ -26,8 +32,13 @@ export class AuthController {
   @ApiResponse({ status: 201, description: 'User registered successfully' })
   @ApiResponse({ status: 409, description: 'Email already exists' })
   async register(@Body() dto: RegisterRequestDto): Promise<Envelope<RegisterResponseDto>> {
-    // TODO: Implement - delegate to RegisterUsecase
-    throw new Error('Not implemented');
+    const result = await this.registerUsecase.execute(dto.email, dto.password);
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'User registered successfully. Please check your email for verification code.',
+      data: result,
+      metadata: null,
+    };
   }
 
   @Post('verify-registration')
@@ -36,8 +47,13 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Email verified successfully' })
   @ApiResponse({ status: 400, description: 'Invalid or expired OTP' })
   async verifyRegistration(@Body() dto: VerifyRegistrationRequestDto): Promise<Envelope<VerifyRegistrationResponseDto>> {
-    // TODO: Implement - delegate to VerifyRegistrationUsecase
-    throw new Error('Not implemented');
+    const result = await this.verifyRegistrationUsecase.execute(dto.email, dto.otp);
+    return {
+      statusCode: HttpStatus.OK,
+      message: result.message,
+      data: null,
+      metadata: null,
+    };
   }
 
   @Post('login')
@@ -46,8 +62,13 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Login successful' })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
   async login(@Body() dto: LoginRequestDto): Promise<Envelope<LoginResponseDto>> {
-    // TODO: Implement - delegate to LoginUsecase
-    throw new Error('Not implemented');
+    const result = await this.loginUsecase.execute(dto.email, dto.password);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Login successful',
+      data: result,
+      metadata: null,
+    };
   }
 
   @Post('forgot-password')
