@@ -20,7 +20,7 @@ export class ForgotPasswordUsecase {
     private readonly otpService: IOtpService,
   ) {}
 
-  async execute(email: string): Promise<OtpResult> {
+  async execute(email: string): Promise<ForgotPasswordResult> {
     const user = await this.userRepository.findByEmail(email);
 
     if (!!user) {

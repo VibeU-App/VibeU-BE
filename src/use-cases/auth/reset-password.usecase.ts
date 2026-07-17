@@ -17,6 +17,7 @@ export class ResetPasswordUsecase {
     private readonly userRepository: IUserRepository,
     @Inject('ICryptoService')
     private readonly cryptoService: ICryptoService,
+    @Inject('IJwtService')
     private readonly jwtService: IJwtService,
   ) {}
 
@@ -46,17 +47,17 @@ export class ResetPasswordUsecase {
           });
         }
 
-        const newUser : UserEntity = {
-          id: userId,
-          email: user.email,
-          passwordHash: passwordHash,
-          accountStatusId: user.accountStatusId,
-          isVerified: user.isVerified,
-          createdAt: user.createdAt,
-          updatedAt: new Date(Date.now()),
-          deletedAt: user.deletedAt,
-          isActive: user.isActive,
-        }
+        const newUser = new UserEntity(
+          userId,
+          user.email,
+          passwordHash,
+          user.accountStatusId,
+          user.role,
+          user.isVerified,
+          user.createdAt,
+          new Date(),
+          user.deletedAt,
+        );
 
         await this.userRepository.update(newUser);
 

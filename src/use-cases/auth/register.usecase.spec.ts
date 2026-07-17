@@ -1,30 +1,37 @@
 import { RegisterUsecase } from './register.usecase';
-import { MockUserRepository, MockCryptoService, MockMailService, MockOtpService } from './test-mocks';
+import { MockUserRepository, MockCryptoService, MockMailService, MockOtpService, MockSessionRepository, MockJwtService } from './test-mocks';
 import { ErrorCode } from '../../core/errors';
 import { UserEntity } from '../../core/entities/user.entity';
 
 describe('RegisterUsecase', () => {
   let usecase: RegisterUsecase;
   let mockUserRepository: MockUserRepository;
+  let mockSessionRepository: MockSessionRepository;
   let mockCryptoService: MockCryptoService;
   let mockMailService: MockMailService;
   let mockOtpService: MockOtpService;
+  let mockJwtService: MockJwtService;
 
   beforeEach(() => {
     mockUserRepository = new MockUserRepository();
+    mockSessionRepository = new MockSessionRepository();
     mockCryptoService = new MockCryptoService();
     mockMailService = new MockMailService();
     mockOtpService = new MockOtpService();
+    mockJwtService = new MockJwtService();
     usecase = new RegisterUsecase(
       mockUserRepository,
+      mockSessionRepository,
       mockCryptoService,
       mockMailService,
       mockOtpService,
+      mockJwtService,
     );
   });
 
   afterEach(() => {
     mockUserRepository.clear();
+    mockSessionRepository.clear();
     mockMailService.clear();
     mockOtpService.clear();
   });

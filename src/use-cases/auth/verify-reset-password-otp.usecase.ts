@@ -5,21 +5,22 @@ import { IJwtService } from '../../services/token/jwt.service';
 import { UserRole } from '../../core/entities';
 import { ErrorCode } from '../../core/errors';
 
-export interface VerifyOtpResult {
+export interface VerifyResetPasswordOtpResult {
   resetToken: string;
 }
 
 @Injectable()
-export class VerifyOtpUsecase {
+export class VerifyResetPasswordOtpUsecase {
   constructor(
     @Inject('IOtpService')
     private readonly otpService: IOtpService,
     @Inject('IJwtService')
     private readonly jwtService: IJwtService,
+    @Inject('IUserRepository')
     private readonly userRepository: IUserRepository,
   ) {}
 
-  async execute(email: string, otp: string): Promise<VerifyOtpResult> {
+  async execute(email: string, otp: string): Promise<VerifyResetPasswordOtpResult> {
     const user = await this.userRepository.findByEmail(email);
     
     if (!!user) {

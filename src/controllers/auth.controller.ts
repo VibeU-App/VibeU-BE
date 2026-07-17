@@ -5,13 +5,13 @@ import { RegisterRequestDto, RegisterResponseDto } from '../core/dtos/auth/regis
 import { LoginRequestDto, LoginResponseDto } from '../core/dtos/auth/login.dto';
 import { VerifyRegistrationRequestDto, VerifyRegistrationResponseDto } from '../core/dtos/auth/verify-registration.dto';
 import { ForgotPasswordRequestDto, ForgotPasswordResponseDto } from '../core/dtos/auth/forgot-password.dto';
-import { VerifyOtpRequestDto, VerifyOtpResponseDto } from '../core/dtos/auth/verify-otp.dto';
+import { VerifyResetPasswordOtpRequestDto, VerifyResetPasswordOtpResponseDto } from '../core/dtos/auth/verify-reset-password-otp.dto';
 import { ResetPasswordRequestDto, ResetPasswordResponseDto } from '../core/dtos/auth/reset-password.dto';
 import { RegisterUsecase } from '../use-cases/auth/register.usecase';
 import { LoginUsecase } from '../use-cases/auth/login.usecase';
 import { VerifyRegistrationUsecase } from '../use-cases/auth/verify-registration.usecase';
 import { ForgotPasswordUsecase } from '../use-cases/auth/forgot-password.usecase';
-import { VerifyOtpUsecase } from '../use-cases/auth/verify-otp.usecase';
+import { VerifyResetPasswordOtpUsecase } from '../use-cases/auth/verify-reset-password-otp.usecase';
 import { ResetPasswordUsecase } from '../use-cases/auth/reset-password.usecase';
 
 @ApiTags('Auth')
@@ -22,7 +22,7 @@ export class AuthController {
     private readonly loginUsecase: LoginUsecase,
     private readonly verifyRegistrationUsecase: VerifyRegistrationUsecase,
     private readonly forgotPasswordUsecase: ForgotPasswordUsecase,
-    private readonly verifyOtpUsecase: VerifyOtpUsecase,
+    private readonly verifyResetPasswordOtpUsecase: VerifyResetPasswordOtpUsecase,
     private readonly resetPasswordUsecase: ResetPasswordUsecase,
   ) {}
 
@@ -90,13 +90,13 @@ export class AuthController {
     }
   }
 
-  @Post('verify-otp')
+  @Post('verify-reset-password-otp')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Verify reset OTP and get reset token' })
   @ApiResponse({ status: 200, description: 'Reset token generated' })
   @ApiResponse({ status: 400, description: 'Invalid or expired OTP' })
-  async verifyResetOtp(@Body() dto: VerifyOtpRequestDto): Promise<Envelope<VerifyOtpResponseDto>> {
-    const result = await this.verifyOtpUsecase.execute(dto.email, dto.otp);
+  async verifyResetOtp(@Body() dto: VerifyResetPasswordOtpRequestDto): Promise<Envelope<VerifyResetPasswordOtpResponseDto>> {
+    const result = await this.verifyResetPasswordOtpUsecase.execute(dto.email, dto.otp);
     
     return {
       statusCode: 200,

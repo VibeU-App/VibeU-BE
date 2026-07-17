@@ -1,13 +1,17 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { IUserRepository } from './user-repository.interface';
+import { ISessionRepository } from './session-repository.interface';
 import { ICryptoService } from '../../services/crypto/crypto.interface';
 import { IJwtService } from '../../services/token/jwt.service';
 import { UserEntity } from '../../core/entities/user.entity';
+import { SessionEntity } from '../../core/entities/session.entity';
 import { AppException } from '../../core/errors/app-exception';
 import { ErrorCode } from '../../core/errors/error-codes';
+import * as crypto from 'crypto';
 
 export interface LoginResult {
   accessToken: string;
+  refreshToken: string;
   user: Omit<UserEntity, 'passwordHash'>;
 }
 
@@ -16,6 +20,8 @@ export class LoginUsecase {
   constructor(
     @Inject('IUserRepository')
     private readonly userRepository: IUserRepository,
+    @Inject('ISessionRepository')
+    private readonly sessionRepository: ISessionRepository,
     @Inject('ICryptoService')
     private readonly cryptoService: ICryptoService,
     @Inject('IJwtService')
@@ -35,7 +41,7 @@ export class LoginUsecase {
       throw new AppException(ErrorCode.AUTH_INVALID_CREDENTIALS);
     }
 
-    // 3. Check if user is verified (optional, depending on business rules)
+    // 3. Check if user is verified
     if (!user.isVerified) {
       throw new AppException(ErrorCode.AUTH_USER_NOT_VERIFIED);
     }
@@ -48,9 +54,19 @@ export class LoginUsecase {
     };
     const accessToken = this.jwtService.signPayload(payload);
 
+    // 5. Generate and save opaque refresh token session
+    const refreshToken = crypto.randomBytes(64).toString('hex');
+    const session = SessionEntity.create({
+      userId: user.id,
+      refreshToken,
+      expiresInDays: 7,
+    });
+    await this.sessionRepository.save(session);
+
     const { passwordHash: _, ...userWithoutPassword } = user;
     return {
       accessToken,
+      refreshToken,
       user: userWithoutPassword as Omit<UserEntity, 'passwordHash'>,
     };
   }

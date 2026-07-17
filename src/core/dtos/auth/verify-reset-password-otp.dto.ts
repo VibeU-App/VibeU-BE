@@ -5,7 +5,7 @@ import { ApiProperty } from '@nestjs/swagger';
  * Request DTO for verifying OTP during password reset.
  * Used in the forgot-password flow after user requests a reset code.
  */
-export class VerifyOtpRequestDto {
+export class VerifyResetPasswordOtpRequestDto {
   @ApiProperty({ example: 'user@example.com' })
   @IsEmail()
   email: string;
@@ -20,7 +20,7 @@ export class VerifyOtpRequestDto {
  * Response DTO for successful OTP verification.
  * Returns a reset token that must be used when resetting the password.
  */
-export class VerifyOtpResponseDto {
+export class VerifyResetPasswordOtpResponseDto {
   @ApiProperty({ example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' })
   resetToken: string;
 }

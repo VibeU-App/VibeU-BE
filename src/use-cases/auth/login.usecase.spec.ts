@@ -1,23 +1,26 @@
 import { LoginUsecase } from './login.usecase';
-import { MockUserRepository, MockCryptoService, MockJwtService } from './test-mocks';
+import { MockUserRepository, MockCryptoService, MockJwtService, MockSessionRepository } from './test-mocks';
 import { ErrorCode } from '../../core/errors';
 import { UserEntity } from '../../core/entities/user.entity';
 
 describe('LoginUsecase', () => {
   let usecase: LoginUsecase;
   let mockUserRepository: MockUserRepository;
+  let mockSessionRepository: MockSessionRepository;
   let mockCryptoService: MockCryptoService;
   let mockJwtService: MockJwtService;
 
   beforeEach(() => {
     mockUserRepository = new MockUserRepository();
+    mockSessionRepository = new MockSessionRepository();
     mockCryptoService = new MockCryptoService();
     mockJwtService = new MockJwtService();
-    usecase = new LoginUsecase(mockUserRepository, mockCryptoService, mockJwtService);
+    usecase = new LoginUsecase(mockUserRepository, mockSessionRepository, mockCryptoService, mockJwtService);
   });
 
   afterEach(() => {
     mockUserRepository.clear();
+    mockSessionRepository.clear();
   });
 
   it('should return access token and user data with valid credentials', async () => {

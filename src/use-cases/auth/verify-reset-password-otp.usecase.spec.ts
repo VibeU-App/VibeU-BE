@@ -1,11 +1,11 @@
-import { VerifyOtpUsecase } from './verify-otp.usecase';
+import { VerifyResetPasswordOtpUsecase } from './verify-reset-password-otp.usecase';
 import { MockOtpService, MockJwtService, MockUserRepository } from './test-mocks';
 import { ErrorCode } from '../../core/errors';
 import { OtpEntity } from '../../core/entities/otp.entity';
 import { UserEntity, UserRole } from '../../core/entities';
 
-describe('VerifyOtpUsecase', () => {
-  let usecase: VerifyOtpUsecase;
+describe('VerifyResetPasswordOtpUsecase', () => {
+  let usecase: VerifyResetPasswordOtpUsecase;
   let mockOtpService: MockOtpService;
   let mockJwtService: MockJwtService;
   let mockUserRepository: MockUserRepository;
@@ -14,7 +14,7 @@ describe('VerifyOtpUsecase', () => {
     mockOtpService = new MockOtpService();
     mockJwtService = new MockJwtService();
     mockUserRepository = new MockUserRepository();
-    usecase = new VerifyOtpUsecase(mockOtpService, mockJwtService, mockUserRepository);
+    usecase = new VerifyResetPasswordOtpUsecase(mockOtpService, mockJwtService, mockUserRepository);
   });
 
   afterEach(() => {

@@ -24,6 +24,12 @@ export class RegisterRequestDto {
  * Returns the created user info (without sensitive data).
  */
 export class RegisterResponseDto {
+  @ApiProperty({ example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' })
+  accessToken: string;
+
+  @ApiProperty({ example: 'opaque-refresh-token-string' })
+  refreshToken: string;
+
   @ApiProperty({
     example: {
       id: 'uuid-string',

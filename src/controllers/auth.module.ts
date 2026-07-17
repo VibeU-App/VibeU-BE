@@ -1,19 +1,19 @@
 import { Module } from '@nestjs/common';
-import { AuthController } from '../controllers/auth.controller';
+import { AuthController } from './auth.controller';
 import { RegisterUsecase } from '../use-cases/auth/register.usecase';
 import { LoginUsecase } from '../use-cases/auth/login.usecase';
 import { VerifyRegistrationUsecase } from '../use-cases/auth/verify-registration.usecase';
 import { ForgotPasswordUsecase } from '../use-cases/auth/forgot-password.usecase';
-import { VerifyOtpUsecase } from '../use-cases/auth/verify-otp.usecase';
+import { VerifyResetPasswordOtpUsecase } from '../use-cases/auth/verify-reset-password-otp.usecase';
 import { ResetPasswordUsecase } from '../use-cases/auth/reset-password.usecase';
 import { Argon2Service } from '../services/crypto/argon2.service';
 import { SmtpMailService } from '../services/mail/smtp.service';
-import { OtpCacheService } from '../services/otp/otp-cache.service';
 import { JwtService } from '../services/token/jwt.service';
 import { TemplateLoaderService } from '../services/template/template-loader.service';
+import { PostgresModule } from '../frameworks/database/postgres/postgres.module';
 
 @Module({
-  imports: [],
+  imports: [PostgresModule],
   controllers: [AuthController],
   providers: [
     // Use cases
@@ -21,7 +21,7 @@ import { TemplateLoaderService } from '../services/template/template-loader.serv
     LoginUsecase,
     VerifyRegistrationUsecase,
     ForgotPasswordUsecase,
-    VerifyOtpUsecase,
+    VerifyResetPasswordOtpUsecase,
     ResetPasswordUsecase,
     
     // Services
@@ -35,10 +35,6 @@ import { TemplateLoaderService } from '../services/template/template-loader.serv
       useClass: SmtpMailService,
     },
     {
-      provide: 'IOtpService',
-      useClass: OtpCacheService,
-    },
-    {
       provide: 'IJwtService',
       useClass: JwtService,
     },
@@ -48,7 +44,7 @@ import { TemplateLoaderService } from '../services/template/template-loader.serv
     LoginUsecase,
     VerifyRegistrationUsecase,
     ForgotPasswordUsecase,
-    VerifyOtpUsecase,
+    VerifyResetPasswordOtpUsecase,
     ResetPasswordUsecase,
   ],
 })
