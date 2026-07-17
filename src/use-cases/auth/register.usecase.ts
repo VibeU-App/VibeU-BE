@@ -1,16 +1,15 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { IUserRepository } from './user-repository.interface';
 import { ISessionRepository } from './session-repository.interface';
-import { ICryptoService } from '../../services/crypto/crypto.interface';
-import { IMailService } from '../../services/mail/mail.interface';
-import { IOtpService } from '../../services/otp/otp.interface';
-import { IJwtService } from '../../services/token/jwt.service';
+import { ICryptoService } from '../../infrastructure/services/crypto/crypto.interface';
+import { IMailService } from '../../infrastructure/services/mail/mail.interface';
+import { IOtpService } from '../../infrastructure/services/otp/otp.interface';
+import { ITokenService } from '../../infrastructure/services/token/token.service';
 import { UserEntity } from '../../core/entities/user.entity';
 import { SessionEntity } from '../../core/entities/session.entity';
 import { OtpEntity } from '../../core/entities/otp.entity';
 import { AppException } from '../../core/errors/app-exception';
 import { ErrorCode } from '../../core/errors/error-codes';
-import * as crypto from 'crypto';
 
 export interface RegisterResult {
   accessToken: string;
@@ -31,8 +30,8 @@ export class RegisterUsecase {
     private readonly mailService: IMailService,
     @Inject('IOtpService')
     private readonly otpService: IOtpService,
-    @Inject('IJwtService')
-    private readonly jwtService: IJwtService,
+    @Inject('ITokenService')
+    private readonly tokenService: ITokenService,
   ) {}
 
   async execute(email: string, password: string): Promise<RegisterResult> {
@@ -65,26 +64,20 @@ export class RegisterUsecase {
     // 5. Send verification email
     await this.mailService.sendOtp(savedUser.email, otpCode);
 
-    // 6. Generate access and refresh tokens
-    const payload = {
-      sub: savedUser.id,
-      email: savedUser.email,
-      role: savedUser.role,
-    };
-    const accessToken = this.jwtService.signPayload(payload);
+    // 6. Generate access and refresh tokens using TokenService
+    const tokenPair = this.tokenService.createTokenPair(savedUser.id, savedUser.email, savedUser.role);
 
-    const refreshToken = crypto.randomBytes(64).toString('hex');
     const session = SessionEntity.create({
       userId: savedUser.id,
-      refreshToken,
+      refreshToken: tokenPair.refreshToken,
       expiresInDays: 7,
     });
     await this.sessionRepository.save(session);
 
     const { passwordHash: _, ...userWithoutPassword } = savedUser;
     return {
-      accessToken,
-      refreshToken,
+      accessToken: tokenPair.accessToken,
+      refreshToken: tokenPair.refreshToken,
       user: userWithoutPassword as Omit<UserEntity, 'passwordHash'>,
     };
   }

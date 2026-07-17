@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { IUserRepository } from './user-repository.interface';
-import { ICryptoService } from '../../services/crypto/crypto.interface';
-import { IJwtService } from '../../services/token';
+import { ICryptoService } from '../../infrastructure/services/crypto/crypto.interface';
+import { IJwtService } from '../../infrastructure/services/token';
 import { UserEntity } from '../../core/entities';
 import { BadRequestException } from '@nestjs/common';
 import { ErrorCode } from '../../core/errors';

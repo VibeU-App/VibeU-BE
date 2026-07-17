@@ -1,5 +1,5 @@
 import * as jwt from 'jsonwebtoken';
-import { config } from '../../configuration';
+import { config } from '../../../configuration';
 
 /**
  * Interface for JWT token service.

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { ISessionRepository } from '../../../use-cases/auth/session-repository.interface';
-import { SessionEntity } from '../../../core/entities/session.entity';
+import { ISessionRepository } from '../../../../use-cases/auth/session-repository.interface';
+import { SessionEntity } from '../../../../core/entities/session.entity';
 import { PrismaService } from '../prisma/prisma.service';
 
 /**

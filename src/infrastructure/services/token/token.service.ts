@@ -1,6 +1,6 @@
 import * as jwt from 'jsonwebtoken';
 import * as crypto from 'crypto';
-import { config } from '../../configuration';
+import { config } from '../../../configuration';
 
 /**
  * Token types returned by the token service.

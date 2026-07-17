@@ -1,5 +1,5 @@
 import { LoginUsecase } from './login.usecase';
-import { MockUserRepository, MockCryptoService, MockJwtService, MockSessionRepository } from './test-mocks';
+import { MockUserRepository, MockCryptoService, MockTokenService, MockSessionRepository } from './test-mocks';
 import { ErrorCode } from '../../core/errors';
 import { UserEntity } from '../../core/entities/user.entity';
 
@@ -8,14 +8,14 @@ describe('LoginUsecase', () => {
   let mockUserRepository: MockUserRepository;
   let mockSessionRepository: MockSessionRepository;
   let mockCryptoService: MockCryptoService;
-  let mockJwtService: MockJwtService;
+  let mockTokenService: MockTokenService;
 
   beforeEach(() => {
     mockUserRepository = new MockUserRepository();
     mockSessionRepository = new MockSessionRepository();
     mockCryptoService = new MockCryptoService();
-    mockJwtService = new MockJwtService();
-    usecase = new LoginUsecase(mockUserRepository, mockSessionRepository, mockCryptoService, mockJwtService);
+    mockTokenService = new MockTokenService();
+    usecase = new LoginUsecase(mockUserRepository, mockSessionRepository, mockCryptoService, mockTokenService);
   });
 
   afterEach(() => {

@@ -19,3 +19,24 @@ export class ForgotPasswordResponseDto {
   @ApiProperty({ example: 'If an account exists with this email, you will receive a password reset code.' })
   message: string;
 }
+
+/**
+ * Envelope wrapper DTO for successful forgot password response.
+ */
+export class ForgotPasswordResponseEnvelopeDto {
+  @ApiProperty({ example: 200 })
+  statusCode: number;
+
+  @ApiProperty({ example: 'OK' })
+  message: string;
+
+  @ApiProperty({ type: ForgotPasswordResponseDto })
+  data: ForgotPasswordResponseDto;
+
+  @ApiProperty({
+    example: {
+      timestamp: '2026-07-17T13:30:00.000Z'
+    }
+  })
+  metadata: Record<string, any>;
+}

@@ -1,9 +1,9 @@
-import { ICryptoService } from '../../services/crypto/crypto.interface';
-import { IJwtService } from '../../services/token/jwt.service';
-import { ITokenService, TokenPair, AccessTokenPayload } from '../../services/token/token.service';
-import { IMailService } from '../../services/mail/mail.interface';
+import { ICryptoService } from '../../infrastructure/services/crypto/crypto.interface';
+import { IJwtService } from '../../infrastructure/services/token/jwt.service';
+import { ITokenService, TokenPair, AccessTokenPayload } from '../../infrastructure/services/token/token.service';
+import { IMailService } from '../../infrastructure/services/mail/mail.interface';
 import { IUserRepository } from './user-repository.interface';
-import { IOtpService } from '../../services/otp/otp.interface';
+import { IOtpService } from '../../infrastructure/services/otp/otp.interface';
 import { ISessionRepository } from './session-repository.interface';
 import { UserEntity, AccountStatusEntity, AccountStatusName } from '../../core/entities/user.entity';
 import { OtpEntity } from '../../core/entities/otp.entity';

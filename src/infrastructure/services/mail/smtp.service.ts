@@ -1,7 +1,7 @@
 import * as nodemailer from 'nodemailer';
 import { Injectable } from '@nestjs/common';
 import { IMailService } from './mail.interface';
-import { config } from '../../configuration';
+import { config } from '../../../configuration';
 import { TemplateLoaderService } from '../template/template-loader.service';
 
 /**

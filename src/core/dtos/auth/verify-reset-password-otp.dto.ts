@@ -24,3 +24,24 @@ export class VerifyResetPasswordOtpResponseDto {
   @ApiProperty({ example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' })
   resetToken: string;
 }
+
+/**
+ * Envelope wrapper DTO for successful OTP verification response.
+ */
+export class VerifyResetPasswordOtpResponseEnvelopeDto {
+  @ApiProperty({ example: 200 })
+  statusCode: number;
+
+  @ApiProperty({ example: 'OK' })
+  message: string;
+
+  @ApiProperty({ type: VerifyResetPasswordOtpResponseDto })
+  data: VerifyResetPasswordOtpResponseDto;
+
+  @ApiProperty({
+    example: {
+      timestamp: '2026-07-17T13:30:00.000Z'
+    }
+  })
+  metadata: Record<string, any>;
+}

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { IUserRepository } from '../../../use-cases/auth/user-repository.interface';
-import { UserEntity } from '../../../core/entities/user.entity';
-import { AccountStatusName } from '../../../core/entities/user.entity';
+import { IUserRepository } from '../../../../use-cases/auth/user-repository.interface';
+import { UserEntity } from '../../../../core/entities/user.entity';
+import { AccountStatusName } from '../../../../core/entities/user.entity';
 import { PrismaService } from '../prisma/prisma.service';
 
 /**

@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { IOtpService } from './otp.interface';
-import { OtpEntity } from '../../core/entities/otp.entity';
+import { OtpEntity } from '../../../core/entities/otp.entity';
 
 /**
  * In-memory OTP service implementation.

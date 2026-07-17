@@ -1,6 +1,6 @@
 import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { AccountStatusEntity, AccountStatusName } from '../../../core/entities/user.entity';
+import { AccountStatusEntity, AccountStatusName } from '../../../../core/entities/user.entity';
 
 /**
  * Service that loads account statuses into memory at startup.

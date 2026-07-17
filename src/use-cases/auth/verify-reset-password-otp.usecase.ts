@@ -1,7 +1,7 @@
 import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import { IUserRepository } from './user-repository.interface';
-import { IOtpService } from '../../services/otp/otp.interface';
-import { IJwtService } from '../../services/token/jwt.service';
+import { IOtpService } from '../../infrastructure/services/otp/otp.interface';
+import { IJwtService } from '../../infrastructure/services/token/jwt.service';
 import { UserRole } from '../../core/entities';
 import { ErrorCode } from '../../core/errors';
 

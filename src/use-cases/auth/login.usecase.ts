@@ -1,13 +1,12 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { IUserRepository } from './user-repository.interface';
 import { ISessionRepository } from './session-repository.interface';
-import { ICryptoService } from '../../services/crypto/crypto.interface';
-import { IJwtService } from '../../services/token/jwt.service';
+import { ICryptoService } from '../../infrastructure/services/crypto/crypto.interface';
+import { ITokenService } from '../../infrastructure/services/token/token.service';
 import { UserEntity } from '../../core/entities/user.entity';
 import { SessionEntity } from '../../core/entities/session.entity';
 import { AppException } from '../../core/errors/app-exception';
 import { ErrorCode } from '../../core/errors/error-codes';
-import * as crypto from 'crypto';
 
 export interface LoginResult {
   accessToken: string;
@@ -24,8 +23,8 @@ export class LoginUsecase {
     private readonly sessionRepository: ISessionRepository,
     @Inject('ICryptoService')
     private readonly cryptoService: ICryptoService,
-    @Inject('IJwtService')
-    private readonly jwtService: IJwtService,
+    @Inject('ITokenService')
+    private readonly tokenService: ITokenService,
   ) {}
 
   async execute(email: string, password: string): Promise<LoginResult> {
@@ -46,27 +45,21 @@ export class LoginUsecase {
       throw new AppException(ErrorCode.AUTH_USER_NOT_VERIFIED);
     }
 
-    // 4. Generate JWT token
-    const payload = {
-      sub: user.id,
-      email: user.email,
-      role: user.role,
-    };
-    const accessToken = this.jwtService.signPayload(payload);
+    // 4. Generate access and refresh tokens using TokenService
+    const tokenPair = this.tokenService.createTokenPair(user.id, user.email, user.role);
 
-    // 5. Generate and save opaque refresh token session
-    const refreshToken = crypto.randomBytes(64).toString('hex');
+    // 5. Save opaque refresh token session
     const session = SessionEntity.create({
       userId: user.id,
-      refreshToken,
+      refreshToken: tokenPair.refreshToken,
       expiresInDays: 7,
     });
     await this.sessionRepository.save(session);
 
     const { passwordHash: _, ...userWithoutPassword } = user;
     return {
-      accessToken,
-      refreshToken,
+      accessToken: tokenPair.accessToken,
+      refreshToken: tokenPair.refreshToken,
       user: userWithoutPassword as Omit<UserEntity, 'passwordHash'>,
     };
   }

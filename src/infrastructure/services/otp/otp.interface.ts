@@ -1,4 +1,4 @@
-import { OtpEntity } from '../../core/entities/otp.entity';
+import { OtpEntity } from '../../../core/entities/otp.entity';
 
 /**
  * Interface for OTP service.

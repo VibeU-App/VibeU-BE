@@ -1,5 +1,5 @@
 import { RegisterUsecase } from './register.usecase';
-import { MockUserRepository, MockCryptoService, MockMailService, MockOtpService, MockSessionRepository, MockJwtService } from './test-mocks';
+import { MockUserRepository, MockCryptoService, MockMailService, MockOtpService, MockSessionRepository, MockTokenService } from './test-mocks';
 import { ErrorCode } from '../../core/errors';
 import { UserEntity } from '../../core/entities/user.entity';
 
@@ -10,7 +10,7 @@ describe('RegisterUsecase', () => {
   let mockCryptoService: MockCryptoService;
   let mockMailService: MockMailService;
   let mockOtpService: MockOtpService;
-  let mockJwtService: MockJwtService;
+  let mockTokenService: MockTokenService;
 
   beforeEach(() => {
     mockUserRepository = new MockUserRepository();
@@ -18,14 +18,14 @@ describe('RegisterUsecase', () => {
     mockCryptoService = new MockCryptoService();
     mockMailService = new MockMailService();
     mockOtpService = new MockOtpService();
-    mockJwtService = new MockJwtService();
+    mockTokenService = new MockTokenService();
     usecase = new RegisterUsecase(
       mockUserRepository,
       mockSessionRepository,
       mockCryptoService,
       mockMailService,
       mockOtpService,
-      mockJwtService,
+      mockTokenService,
     );
   });
 

@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { IUserRepository } from './user-repository.interface';
-import { IMailService } from '../../services/mail/mail.interface';
-import { IOtpService } from '../../services/otp/otp.interface';
+import { IMailService } from '../../infrastructure/services/mail/mail.interface';
+import { IOtpService } from '../../infrastructure/services/otp/otp.interface';
 import { randomBytes } from 'crypto';
 import { OtpEntity } from '../../core/entities';
 
