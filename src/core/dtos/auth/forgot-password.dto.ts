@@ -16,7 +16,7 @@ export class ForgotPasswordRequestDto {
  * Always returns success to prevent email enumeration attacks.
  */
 export class ForgotPasswordResponseDto {
-  @ApiProperty({ example: 'If an account exists with this email, you will receive a password reset code.' })
+  @ApiProperty({ example: 'If that email is registered, an OTP has been sent.' })
   message: string;
 }
 
@@ -27,11 +27,11 @@ export class ForgotPasswordResponseEnvelopeDto {
   @ApiProperty({ example: 200 })
   statusCode: number;
 
-  @ApiProperty({ example: 'OK' })
+  @ApiProperty({ example: 'If that email is registered, an OTP has been sent.' })
   message: string;
 
-  @ApiProperty({ type: ForgotPasswordResponseDto })
-  data: ForgotPasswordResponseDto;
+  @ApiProperty({ nullable: true, example: null })
+  data: any;
 
   @ApiProperty({
     example: {

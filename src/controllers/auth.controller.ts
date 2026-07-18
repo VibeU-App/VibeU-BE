@@ -80,15 +80,13 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Request password reset OTP' })
   @ApiResponse({ status: 200, type: ForgotPasswordResponseEnvelopeDto, description: 'Reset code sent if email exists' })
-  async forgotPassword(@Body() dto: ForgotPasswordRequestDto): Promise<Envelope<ForgotPasswordResponseDto>> {
+  async forgotPassword(@Body() dto: ForgotPasswordRequestDto): Promise<Envelope<null>> {
     const result = await this.forgotPasswordUsecase.execute(dto.email);
 
     return {
       statusCode: 200,
-      message: "OK",
-      data: {
-        message: result.message,
-      },
+      message: result.message,
+      data: null,
       metadata: {
         timestamp: new Date().toISOString()
       },
@@ -120,15 +118,13 @@ export class AuthController {
   @ApiOperation({ summary: 'Reset password with reset token' })
   @ApiResponse({ status: 200, type: ResetPasswordResponseEnvelopeDto, description: 'Password reset successfully' })
   @ApiResponse({ status: 400, description: 'Invalid or expired reset token' })
-  async resetPassword(@Body() dto: ResetPasswordRequestDto): Promise<Envelope<ResetPasswordResponseDto>> {
+  async resetPassword(@Body() dto: ResetPasswordRequestDto): Promise<Envelope<null>> {
     const result = await this.resetPasswordUsecase.execute(dto.newPassword, dto.resetToken);
     
     return {
       statusCode: 200,
-      message: "OK",
-      data: {
-        message: result.message,
-      },
+      message: result.message,
+      data: null,
       metadata: {
         timestamp: new Date().toISOString()
       },

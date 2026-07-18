@@ -34,11 +34,11 @@ export class ResetPasswordResponseEnvelopeDto {
   @ApiProperty({ example: 200 })
   statusCode: number;
 
-  @ApiProperty({ example: 'OK' })
+  @ApiProperty({ example: 'Password reset successfully. You can now log in with your new password.' })
   message: string;
 
-  @ApiProperty({ type: ResetPasswordResponseDto })
-  data: ResetPasswordResponseDto;
+  @ApiProperty({ nullable: true, example: null })
+  data: any;
 
   @ApiProperty({
     example: {
