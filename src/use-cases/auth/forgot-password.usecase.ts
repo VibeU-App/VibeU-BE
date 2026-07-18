@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, Logger } from '@nestjs/common';
 import { IUserRepository } from '../../core/abstracts/user-repository.interface';
 import { IMailService } from '../../infrastructure/services/mail/mail.interface';
 import { IOtpRepository } from '../../core/abstracts/otp-repository.interface';
@@ -13,6 +13,8 @@ export interface ForgotPasswordResult {
 
 @Injectable()
 export class ForgotPasswordUsecase {
+  private readonly logger = new Logger(ForgotPasswordUsecase.name);
+
   constructor(
     @Inject('IUserRepository')
     private readonly userRepository: IUserRepository,
@@ -51,7 +53,8 @@ export class ForgotPasswordUsecase {
         otp: otpCode,
         expiryMinutes: 5,
       });
-      await this.mailService.send(email, 'Password Reset Code', emailHtml);
+      this.mailService.send(email, 'Password Reset Code', emailHtml)
+        .catch(err => this.logger.error(`Failed to send password reset email to ${email}: ${err.message}`, err.stack));
     } 
 
     return {

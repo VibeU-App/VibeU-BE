@@ -28,11 +28,15 @@ export class SmtpMailService implements IMailService {
   /**
    * Tests the validity of an email:
    * - Follows standard email format
-   * - Only student emails are allowed (.edu)
+   * - Must contain ".edu" anywhere in the domain name
    */
   isValidEmail(email: string): boolean {
-    const emailRegex = /^\w[+-.\w]*\@[-a-z0-9]+(\.[-a-z0-9]+)*\.edu(\.[a-z]{2})?$/;
-    return emailRegex.test(email.toLowerCase());
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return false;
+    }
+    const domain = email.split('@')[1];
+    return domain.toLowerCase().includes('.edu');
   }
 
   /**
@@ -67,13 +71,15 @@ export class SmtpMailService implements IMailService {
    */
   async send(to: string, subject: string, content: string): Promise<void> {
     const targetEmail : string | null = this.getTargetEmail(to);
-    if (targetEmail !== null) {
-      await this.transporter.sendMail({
-        from: `"VibeU" <${config.smtp.user}>`,
-        to: targetEmail,
-        subject,
-        html: content,
-      });
+    if (targetEmail === null) {
+      throw new Error(`Cannot send email: recipient address '${to}' does not contain '.edu' in the domain.`);
     }
+
+    await this.transporter.sendMail({
+      from: `"VibeU" <${config.smtp.user}>`,
+      to: targetEmail,
+      subject,
+      html: content,
+    });
   }
 }

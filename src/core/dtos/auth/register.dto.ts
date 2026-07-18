@@ -9,14 +9,6 @@ export class RegisterRequestDto {
   @ApiProperty({ example: 'user@example.com' })
   @IsEmail()
   email: string;
-
-  @ApiProperty({ example: 'SecurePass123!' })
-  @IsString()
-  @MinLength(8)
-  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/, {
-    message: 'Password must contain uppercase, lowercase, number and special character',
-  })
-  password: string;
 }
 
 /**
@@ -54,8 +46,8 @@ export class RegisterResponseEnvelopeDto {
   @ApiProperty({ example: 'User registered successfully. Please check your email for verification code.' })
   message: string;
 
-  @ApiProperty({ type: RegisterResponseDto })
-  data: RegisterResponseDto;
+  @ApiProperty({ nullable: true, example: null })
+  data: any;
 
   @ApiProperty({ nullable: true, example: null })
   metadata: any;

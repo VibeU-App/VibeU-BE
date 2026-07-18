@@ -1,5 +1,5 @@
 import { VerifyRegistrationUsecase } from './verify-registration.usecase';
-import { MockUserRepository, MockOtpRepository } from './test-mocks';
+import { MockUserRepository, MockOtpRepository, MockSessionRepository, MockTokenService } from './test-mocks';
 import { ErrorCode } from '../../core/errors';
 import { UserEntity } from '../../core/entities/user.entity';
 import { OtpEntity } from '../../core/entities/otp.entity';
@@ -8,23 +8,33 @@ describe('VerifyRegistrationUsecase', () => {
   let usecase: VerifyRegistrationUsecase;
   let mockUserRepository: MockUserRepository;
   let mockOtpRepository: MockOtpRepository;
+  let mockSessionRepository: MockSessionRepository;
+  let mockTokenService: MockTokenService;
 
   beforeEach(() => {
     mockUserRepository = new MockUserRepository();
     mockOtpRepository = new MockOtpRepository();
-    usecase = new VerifyRegistrationUsecase(mockUserRepository, mockOtpRepository);
+    mockSessionRepository = new MockSessionRepository();
+    mockTokenService = new MockTokenService();
+    usecase = new VerifyRegistrationUsecase(
+      mockUserRepository,
+      mockOtpRepository,
+      mockSessionRepository,
+      mockTokenService,
+    );
   });
 
   afterEach(() => {
     mockUserRepository.clear();
     mockOtpRepository.clear();
+    mockSessionRepository.clear();
   });
 
-  it('should verify user with valid OTP', async () => {
+  it('should verify user with valid OTP and log them in', async () => {
     // Pre-add user and valid OTP
     const user = UserEntity.create({
-      email: 'user@example.com',
-      passwordHash: '$2b$10$hashed_SecurePass123!',
+      email: 'user@example.edu',
+      passwordHash: '',
     });
     mockUserRepository.addUser({ ...user, id: 'user-1' } as UserEntity);
 
@@ -35,20 +45,23 @@ describe('VerifyRegistrationUsecase', () => {
     });
     mockOtpRepository.addOtp(validOtp);
 
-    const result = await usecase.execute('user@example.com', '123456');
-    expect(result.message).toBeDefined();
+    const result = await usecase.execute('user@example.edu', '123456');
+    expect(result.accessToken).toBeDefined();
+    expect(result.refreshToken).toBeDefined();
+    expect(result.user).toBeDefined();
+    expect(result.user.email).toBe('user@example.edu');
   });
 
   it('should reject invalid OTP', async () => {
     // Pre-add user but no OTP
     const user = UserEntity.create({
-      email: 'user@example.com',
-      passwordHash: '$2b$10$hashed_SecurePass123!',
+      email: 'user@example.edu',
+      passwordHash: '',
     });
     mockUserRepository.addUser({ ...user, id: 'user-1' } as UserEntity);
 
     try {
-      await usecase.execute('user@example.com', '000000');
+      await usecase.execute('user@example.edu', '000000');
       fail('Should have thrown an error');
     } catch (error) {
       expect(error.code).toBe(ErrorCode.AUTH_OTP_INVALID);
@@ -58,8 +71,8 @@ describe('VerifyRegistrationUsecase', () => {
   it('should reject expired OTP', async () => {
     // Pre-add user and expired OTP
     const user = UserEntity.create({
-      email: 'user@example.com',
-      passwordHash: '$2b$10$hashed_SecurePass123!',
+      email: 'user@example.edu',
+      passwordHash: '',
     });
     mockUserRepository.addUser({ ...user, id: 'user-1' } as UserEntity);
 
@@ -71,7 +84,7 @@ describe('VerifyRegistrationUsecase', () => {
     mockOtpRepository.addOtp(expiredOtp);
 
     try {
-      await usecase.execute('user@example.com', '999999');
+      await usecase.execute('user@example.edu', '999999');
       fail('Should have thrown an error');
     } catch (error) {
       expect(error.code).toBe(ErrorCode.AUTH_OTP_EXPIRED);
@@ -80,7 +93,7 @@ describe('VerifyRegistrationUsecase', () => {
 
   it('should reject if user not found', async () => {
     try {
-      await usecase.execute('nonexistent@example.com', '123456');
+      await usecase.execute('nonexistent@example.edu', '123456');
       fail('Should have thrown an error');
     } catch (error) {
       expect(error.code).toBe(ErrorCode.AUTH_USER_NOT_FOUND);

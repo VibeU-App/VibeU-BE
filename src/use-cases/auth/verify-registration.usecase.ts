@@ -1,12 +1,18 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { IUserRepository } from '../../core/abstracts/user-repository.interface';
 import { IOtpRepository } from '../../core/abstracts/otp-repository.interface';
+import { ISessionRepository } from '../../core/abstracts/session-repository.interface';
+import { ITokenService } from '../../infrastructure/services/token/token.service';
 import { AppException } from '../../core/errors/app-exception';
 import { ErrorCode } from '../../core/errors/error-codes';
 import { AccountStatusName, UserEntity } from '../../core/entities/user.entity';
+import { SessionEntity } from '../../core/entities/session.entity';
+import { config } from '../../configuration';
 
 export interface VerifyRegistrationResult {
-  message: string;
+  accessToken: string;
+  refreshToken: string;
+  user: Omit<UserEntity, 'passwordHash'>;
 }
 
 @Injectable()
@@ -16,6 +22,10 @@ export class VerifyRegistrationUsecase {
     private readonly userRepository: IUserRepository,
     @Inject('IOtpRepository')
     private readonly otpRepository: IOtpRepository,
+    @Inject('ISessionRepository')
+    private readonly sessionRepository: ISessionRepository,
+    @Inject('ITokenService')
+    private readonly tokenService: ITokenService,
   ) {}
 
   async execute(email: string, otpCode: string): Promise<VerifyRegistrationResult> {
@@ -27,7 +37,7 @@ export class VerifyRegistrationUsecase {
 
     // 2. Check if already verified
     if (user.isVerified) {
-      return { message: 'Email already verified' };
+      throw new AppException(ErrorCode.AUTH_EMAIL_ALREADY_EXISTS);
     }
 
     // 3. Verify OTP
@@ -76,8 +86,22 @@ export class VerifyRegistrationUsecase {
     // 5. Cleanup OTPs
     await this.otpRepository.deleteByUserId(user.id);
 
+    // 6. Generate access and refresh tokens using TokenService
+    const tokenPair = this.tokenService.createTokenPair(updatedUser.id, updatedUser.email, updatedUser.role);
+
+    const expiresAt = new Date(Date.now() + config.jwt.refreshTokenTtl * 1000);
+    const session = SessionEntity.create({
+      userId: updatedUser.id,
+      refreshToken: tokenPair.refreshToken,
+      expiresAt,
+    });
+    await this.sessionRepository.save(session);
+
+    const { passwordHash: _, ...userWithoutPassword } = updatedUser;
     return {
-      message: 'Email verified successfully. You can now log in.',
+      accessToken: tokenPair.accessToken,
+      refreshToken: tokenPair.refreshToken,
+      user: userWithoutPassword as Omit<UserEntity, 'passwordHash'>,
     };
   }
 }

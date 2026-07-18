@@ -14,12 +14,6 @@ import { AppException } from '../../core/errors/app-exception';
 import { ErrorCode } from '../../core/errors/error-codes';
 import { config } from '../../configuration';
 
-export interface RegisterResult {
-  accessToken: string;
-  refreshToken: string;
-  user: Omit<UserEntity, 'passwordHash'>;
-}
-
 @Injectable()
 export class RegisterUsecase {
   private readonly logger = new Logger(RegisterUsecase.name);
@@ -42,7 +36,7 @@ export class RegisterUsecase {
     private readonly templateLoader: TemplateLoaderService,
   ) {}
 
-  async execute(email: string, password: string): Promise<RegisterResult> {
+  async execute(email: string): Promise<void> {
     this.logger.log(`User registration attempt for email: ${email}`);
 
     // 1. Check if email already exists
@@ -60,13 +54,12 @@ export class RegisterUsecase {
         throw new AppException(ErrorCode.AUTH_EMAIL_ALREADY_EXISTS);
       }
 
-      this.logger.log(`Email ${email} has pending registration. Overwriting password and sending new OTP.`);
-      // Hash password and update existing user (overwriting password for pending registration)
-      const passwordHash = await this.cryptoService.hash(password);
+      this.logger.log(`Email ${email} has pending registration. Sending new OTP.`);
+      // Update existing user metadata, keeping empty/existing password until verified
       const updatedUser = new UserEntity(
         existingUser.id,
         existingUser.email,
-        passwordHash,
+        existingUser.passwordHash,
         existingUser.accountStatusId,
         existingUser.role,
         existingUser.isVerified,
@@ -76,11 +69,10 @@ export class RegisterUsecase {
       );
       savedUser = await this.userRepository.update(updatedUser);
     } else {
-      // 2. Hash password and create new user
-      const passwordHash = await this.cryptoService.hash(password);
+      // 2. Create new user with empty password (user will choose password during OTP verification)
       const user = UserEntity.create({
         email,
-        passwordHash,
+        passwordHash: '',
         accountStatusId: pendingStatusId,
       });
       savedUser = await this.userRepository.save(user);
@@ -105,26 +97,9 @@ export class RegisterUsecase {
       otp: otpCode,
       expiryMinutes: 10,
     });
-    await this.mailService.send(savedUser.email, 'Your Verification Code', emailHtml);
-
-    // 6. Generate access and refresh tokens using TokenService
-    const tokenPair = this.tokenService.createTokenPair(savedUser.id, savedUser.email, savedUser.role);
-
-    const expiresAt = new Date(Date.now() + config.jwt.refreshTokenTtl * 1000);
-    const session = SessionEntity.create({
-      userId: savedUser.id,
-      refreshToken: tokenPair.refreshToken,
-      expiresAt,
-    });
-    await this.sessionRepository.save(session);
+    this.mailService.send(savedUser.email, 'Your Verification Code', emailHtml)
+      .catch(err => this.logger.error(`Failed to send verification email to ${savedUser.email}: ${err.message}`, err.stack));
 
     this.logger.log(`User registration process completed successfully for: ${email}`);
-
-    const { passwordHash: _, ...userWithoutPassword } = savedUser;
-    return {
-      accessToken: tokenPair.accessToken,
-      refreshToken: tokenPair.refreshToken,
-      user: userWithoutPassword as Omit<UserEntity, 'passwordHash'>,
-    };
   }
 }

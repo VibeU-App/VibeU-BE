@@ -11,7 +11,7 @@ describe('ResetPasswordUsecase', () => {
 
   const mockToken = {
     sub: 'user-123',
-    email: 'user@example.com',
+    email: 'user@example.edu',
     role: 'user',
   }
 
@@ -28,7 +28,7 @@ describe('ResetPasswordUsecase', () => {
 
   it('should reset password successfully', async () => {
     const testUser : UserEntity = new UserEntity(
-      'user-123', 'user@example.com', 'Examplepassword123!', '0',
+      'user-123', 'user@example.edu', 'Examplepassword123!', '0',
       UserRole.USER,
       false, new Date(Date.now()), new Date(Date.now()), null,
     )
@@ -54,7 +54,7 @@ describe('ResetPasswordUsecase', () => {
 
   it('should hash the new password before saving', async () => {
     const testUser : UserEntity = new UserEntity(
-      'user-123', 'user@example.com', 'Examplepassword123!', '0',
+      'user-123', 'user@example.edu', 'Examplepassword123!', '0',
       UserRole.USER,
       false, new Date(Date.now()), new Date(Date.now()), null,
     )
@@ -70,7 +70,7 @@ describe('ResetPasswordUsecase', () => {
 
   it('should reject weak passwords', async () => {
     const testUser : UserEntity = new UserEntity(
-      'user-123', 'user@example.com', 'Examplepassword123!', '0',
+      'user-123', 'user@example.edu', 'Examplepassword123!', '0',
       UserRole.USER,
       false, new Date(Date.now()), new Date(Date.now()), null,
     )
@@ -89,7 +89,7 @@ describe('ResetPasswordUsecase', () => {
   it('should reject new password matching old password', async () => {
     const passwordHash = await mockCryptoService.hash('Examplepassword123!');
     const testUser : UserEntity = new UserEntity(
-      'user-123', 'user@example.com', passwordHash, '0',
+      'user-123', 'user@example.edu', passwordHash, '0',
       UserRole.USER,
       false, new Date(Date.now()), new Date(Date.now()), null,
     )

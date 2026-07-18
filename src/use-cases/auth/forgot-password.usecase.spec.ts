@@ -37,7 +37,7 @@ describe('ForgotPasswordUsecase', () => {
 
   it('should always return success message even if user not found', async () => {
     // Security: Never reveal if email exists
-    const testResult = await usecase.execute('nonexistent@example.com');
+    const testResult = await usecase.execute('nonexistent@example.edu');
 
     expect(testResult.message).toBe("If that email is registered, an OTP has been sent.");
   });
@@ -73,7 +73,10 @@ describe('ForgotPasswordUsecase', () => {
 
     await usecase.execute("user@notedu.com");
 
-    // Verify that no email is sent if it's not a .edu email
+    // Wait a tick for the background email promise to reject and get caught
+    await new Promise(resolve => setImmediate(resolve));
+
+    // Verify that no email was successfully sent
     expect(mockMailService.sentEmails.length).toEqual(0);
   });
 

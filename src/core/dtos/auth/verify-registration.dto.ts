@@ -1,4 +1,4 @@
-import { IsEmail, IsString, Length } from 'class-validator';
+import { IsEmail, IsString, Length, MinLength, Matches } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 /**
@@ -20,8 +20,24 @@ export class VerifyRegistrationRequestDto {
  * Response DTO for successful registration verification.
  */
 export class VerifyRegistrationResponseDto {
-  @ApiProperty({ example: 'Email verified successfully. You can now log in.' })
-  message: string;
+  @ApiProperty({ example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' })
+  accessToken: string;
+
+  @ApiProperty({ example: 'opaque-refresh-token-string' })
+  refreshToken: string;
+
+  @ApiProperty({
+    example: {
+      id: 'uuid-string',
+      email: 'user@example.com',
+      isVerified: true,
+    },
+  })
+  user: {
+    id: string;
+    email: string;
+    isVerified: boolean;
+  };
 }
 
 /**
@@ -31,11 +47,11 @@ export class VerifyRegistrationResponseEnvelopeDto {
   @ApiProperty({ example: 200 })
   statusCode: number;
 
-  @ApiProperty({ example: 'Email verified successfully. You can now log in.' })
+  @ApiProperty({ example: 'Email verified successfully. You can now join the app.' })
   message: string;
 
-  @ApiProperty({ nullable: true, example: null })
-  data: any;
+  @ApiProperty({ type: VerifyRegistrationResponseDto })
+  data: VerifyRegistrationResponseDto;
 
   @ApiProperty({ nullable: true, example: null })
   metadata: any;

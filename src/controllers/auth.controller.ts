@@ -36,12 +36,12 @@ export class AuthController {
   @ApiOperation({ summary: 'Register a new user' })
   @ApiResponse({ status: 201, type: RegisterResponseEnvelopeDto, description: 'User registered successfully' })
   @ApiResponse({ status: 409, description: 'Email already exists' })
-  async register(@Body() dto: RegisterRequestDto): Promise<Envelope<RegisterResponseDto>> {
-    const result = await this.registerUsecase.execute(dto.email, dto.password);
+  async register(@Body() dto: RegisterRequestDto): Promise<Envelope<null>> {
+    await this.registerUsecase.execute(dto.email);
     return {
       statusCode: HttpStatus.CREATED,
       message: 'User registered successfully. Please check your email for verification code.',
-      data: result,
+      data: null,
       metadata: null,
     };
   }
@@ -55,8 +55,8 @@ export class AuthController {
     const result = await this.verifyRegistrationUsecase.execute(dto.email, dto.otp);
     return {
       statusCode: HttpStatus.OK,
-      message: result.message,
-      data: null,
+      message: 'Email verified successfully. You are now logged in.',
+      data: result,
       metadata: null,
     };
   }

@@ -28,21 +28,21 @@ describe('LoginUsecase', () => {
     const password = 'SecurePass123!';
     const passwordHash = await mockCryptoService.hash(password);
     const user = UserEntity.create({
-      email: 'user@example.com',
+      email: 'user@example.edu',
       passwordHash,
       isVerified: true,
     });
     mockUserRepository.addUser({ ...user, id: 'user-1' } as UserEntity);
 
-    const result = await usecase.execute('user@example.com', password);
+    const result = await usecase.execute('user@example.edu', password);
 
     expect(result.accessToken).toBeDefined();
-    expect(result.user.email).toBe('user@example.com');
+    expect(result.user.email).toBe('user@example.edu');
   });
 
   it('should reject login with non-existent email', async () => {
     try {
-      await usecase.execute('nonexistent@example.com', 'SecurePass123!');
+      await usecase.execute('nonexistent@example.edu', 'SecurePass123!');
       fail('Should have thrown an error');
     } catch (error) {
       expect(error.code).toBe(ErrorCode.AUTH_INVALID_CREDENTIALS);
@@ -53,14 +53,14 @@ describe('LoginUsecase', () => {
     // Pre-add a user
     const passwordHash = await mockCryptoService.hash('CorrectPass123!');
     const user = UserEntity.create({
-      email: 'user@example.com',
+      email: 'user@example.edu',
       passwordHash,
       isVerified: true,
     });
     mockUserRepository.addUser({ ...user, id: 'user-1' } as UserEntity);
 
     try {
-      await usecase.execute('user@example.com', 'WrongPass456!');
+      await usecase.execute('user@example.edu', 'WrongPass456!');
       fail('Should have thrown an error');
     } catch (error) {
       expect(error.code).toBe(ErrorCode.AUTH_INVALID_CREDENTIALS);
@@ -70,14 +70,14 @@ describe('LoginUsecase', () => {
   it('should reject login if user is not verified', async () => {
     // Pre-add an unverified user
     const user = UserEntity.create({
-      email: 'unverified@example.com',
+      email: 'unverified@example.edu',
       passwordHash: await mockCryptoService.hash('SecurePass123!'),
       isVerified: false,
     });
     mockUserRepository.addUser({ ...user, id: 'unverified-user-1' } as UserEntity);
 
     try {
-      await usecase.execute('unverified@example.com', 'SecurePass123!');
+      await usecase.execute('unverified@example.edu', 'SecurePass123!');
       fail('Should have thrown an error');
     } catch (error) {
       expect(error.code).toBe(ErrorCode.AUTH_USER_NOT_VERIFIED);

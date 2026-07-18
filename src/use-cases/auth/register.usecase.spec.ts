@@ -45,22 +45,23 @@ describe('RegisterUsecase', () => {
     mockPolicyRepository.clear();
   });
 
-  it('should register a new user with valid email and password', async () => {
-    const result = await usecase.execute('test@example.com', 'SecurePass123!');
-    expect(result.user).toBeDefined();
-    expect(result.user.email).toBe('test@example.com');
+  it('should register a new user with valid email', async () => {
+    await usecase.execute('test@example.edu');
+    const savedUser = await mockUserRepository.findByEmail('test@example.edu');
+    expect(savedUser).toBeDefined();
+    expect(savedUser?.email).toBe('test@example.edu');
   });
 
   it('should reject registration with duplicate email', async () => {
     // Pre-add a user with this email
     const existingUser = UserEntity.create({
-      email: 'existing@example.com',
+      email: 'existing@example.edu',
       passwordHash: '$2b$10$hashed_ExistingPass123!',
     });
     mockUserRepository.addUser({ ...existingUser, id: 'existing-user-1' } as UserEntity);
 
     try {
-      await usecase.execute('existing@example.com', 'SecurePass123!');
+      await usecase.execute('existing@example.edu');
       fail('Should have thrown an error');
     } catch (error) {
       expect(error.code).toBe(ErrorCode.AUTH_EMAIL_ALREADY_EXISTS);
@@ -71,36 +72,24 @@ describe('RegisterUsecase', () => {
     // Pre-add a user with pending status
     const pendingStatusId = 'mock-pending-status-id';
     const existingUser = UserEntity.create({
-      email: 'pending@example.com',
+      email: 'pending@example.edu',
       passwordHash: '$2b$10$hashed_ExistingPass123!',
       accountStatusId: pendingStatusId,
     });
     mockUserRepository.addUser({ ...existingUser, id: 'pending-user-1' } as UserEntity);
 
-    const result = await usecase.execute('pending@example.com', 'NewSecurePass123!');
-    expect(result.user).toBeDefined();
-    expect(result.user.email).toBe('pending@example.com');
-    
-    const updatedUser = await mockUserRepository.findByEmail('pending@example.com');
-    expect(updatedUser?.passwordHash).not.toBe('$2b$10$hashed_ExistingPass123!');
+    await usecase.execute('pending@example.edu');
+    const updatedUser = await mockUserRepository.findByEmail('pending@example.edu');
+    expect(updatedUser).toBeDefined();
+    expect(updatedUser?.email).toBe('pending@example.edu');
   });
 
   it('should send OTP after successful registration', async () => {
-    const email = 'test@example.com'; // Use a valid email for this test
+    const email = 'test@example.edu'; // Use a valid email for this test
 
     mockMailService = new MockMailService();
-    await usecase.execute(email, 'SecurePass123!');
+    await usecase.execute(email);
     
     expect(mockMailService.sentEmails.length).toBe(0);
-  });
-
-  it('should hash password before saving', async () => {
-    const email = 'test@example.com';
-    const password = 'SecurePass123!';
-    await usecase.execute(email, password);
-    
-    const user = await mockUserRepository.findByEmail(email);
-    expect(user?.passwordHash).not.toBe(password);
-    expect(user?.passwordHash).toContain('hashed_');
   });
 });

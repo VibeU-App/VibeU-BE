@@ -42,7 +42,7 @@ export class MockJwtService implements IJwtService {
     if (token === 'expired-token') {
       throw new Error('Token expired');
     }
-    return { sub: 'user-123', email: 'user@example.com', role: 'user' };
+    return { sub: 'user-123', email: 'user@example.edu', role: 'user' };
   }
 }
 
@@ -62,7 +62,7 @@ export class MockTokenService implements ITokenService {
     if (token === 'expired-token') {
       throw new Error('Token expired');
     }
-    return { sub: 'user-123', email: 'user@example.com', role: 'user' };
+    return { sub: 'user-123', email: 'user@example.edu', role: 'user' };
   }
 
   generateRefreshToken(): string {
@@ -75,8 +75,12 @@ export class MockMailService implements IMailService {
   public sentEmails: Array<{ email: string; subject: string; content: string }> = [];
 
   isValidEmail(email: string): boolean {
-    const emailRegex = /^\w[+-.\w]*\@[-a-z0-9]+(\.[-a-z0-9]+)*\.edu(\.[a-z]{2})?$/;
-    return emailRegex.test(email.toLowerCase());
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return false;
+    }
+    const domain = email.split('@')[1];
+    return domain.toLowerCase().includes('.edu');
   }
 
   getTargetEmail(email: string): string | null {
@@ -103,9 +107,10 @@ export class MockMailService implements IMailService {
   async send(to: string, subject: string, content: string): Promise<void> {
     const targetEmail : string | null = this.getTargetEmail(to);
     
-    if (targetEmail !== null) {
-      this.sentEmails.push({ email: targetEmail, subject, content });
+    if (targetEmail === null) {
+      throw new Error(`Cannot send email: recipient address '${to}' does not contain '.edu' in the domain.`);
     }
+    this.sentEmails.push({ email: targetEmail, subject, content });
   }
 
   clear(): void {
