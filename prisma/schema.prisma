@@ -78,3 +78,13 @@ model Session {
 
 // OTP is stored in memory (not database)
 // See: src/frameworks/database/postgres/otp-cache.service.ts
+
+model Policy {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("policies")
+}

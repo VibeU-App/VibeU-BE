@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { PrismaModule } from '../prisma/prisma.module';
 import { PrismaUserRepository } from './user.repository';
 import { PrismaSessionRepository } from './session.repository';
+import { PrismaPolicyRepository } from './policy.repository';
 import { AccountStatusLoaderService } from './account-status-loader.service';
 import { DatabasePrewarmService } from './database-prewarm.service';
 import { OtpCacheService } from '../../../services/otp/otp-cache.service';
@@ -17,6 +18,7 @@ import { OtpCacheService } from '../../../services/otp/otp-cache.service';
  * Exported tokens:
  * - IUserRepository: User data access
  * - ISessionRepository: Session data access
+ * - IPolicyRepository: Policies configuration access
  * - IOtpService: OTP generation and verification (in-memory cache)
  * - AccountStatusLoaderService: Account status lookups
  */
@@ -33,6 +35,11 @@ import { OtpCacheService } from '../../../services/otp/otp-cache.service';
       provide: 'ISessionRepository',
       useClass: PrismaSessionRepository,
     },
+    PrismaPolicyRepository,
+    {
+      provide: 'IPolicyRepository',
+      useClass: PrismaPolicyRepository,
+    },
     OtpCacheService,
     {
       provide: 'IOtpService',
@@ -44,6 +51,7 @@ import { OtpCacheService } from '../../../services/otp/otp-cache.service';
   exports: [
     'IUserRepository',
     'ISessionRepository',
+    'IPolicyRepository',
     'IOtpService',
     AccountStatusLoaderService,
     DatabasePrewarmService,

@@ -2,6 +2,7 @@ import { ICryptoService } from '../../infrastructure/services/crypto/crypto.inte
 import { IJwtService } from '../../infrastructure/services/token/jwt.service';
 import { ITokenService, TokenPair, AccessTokenPayload } from '../../infrastructure/services/token/token.service';
 import { IMailService } from '../../infrastructure/services/mail/mail.interface';
+import { IPolicyRepository } from './policy-repository.interface';
 import { IUserRepository } from './user-repository.interface';
 import { IOtpService } from '../../infrastructure/services/otp/otp.interface';
 import { ISessionRepository } from './session-repository.interface';
@@ -263,5 +264,24 @@ export class MockSessionRepository implements ISessionRepository {
 
   clear(): void {
     this.sessions.clear();
+  }
+}
+
+export class MockPolicyRepository implements IPolicyRepository {
+  private policies: Map<string, string> = new Map([
+    ['MAX_OTP_ATTEMPTS', '5'],
+  ]);
+
+  async findValueByKey(key: string): Promise<string | null> {
+    return this.policies.get(key) ?? null;
+  }
+
+  setPolicy(key: string, value: string): void {
+    this.policies.set(key, value);
+  }
+
+  clear(): void {
+    this.policies.clear();
+    this.policies.set('MAX_OTP_ATTEMPTS', '5');
   }
 }

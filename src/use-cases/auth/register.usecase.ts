@@ -5,6 +5,7 @@ import { ICryptoService } from '../../infrastructure/services/crypto/crypto.inte
 import { IMailService } from '../../infrastructure/services/mail/mail.interface';
 import { IOtpService } from '../../infrastructure/services/otp/otp.interface';
 import { ITokenService } from '../../infrastructure/services/token/token.service';
+import { IPolicyRepository } from './policy-repository.interface';
 import { TemplateLoaderService } from '../../infrastructure/services/template/template-loader.service';
 import { UserEntity } from '../../core/entities/user.entity';
 import { SessionEntity } from '../../core/entities/session.entity';
@@ -33,6 +34,8 @@ export class RegisterUsecase {
     private readonly otpService: IOtpService,
     @Inject('ITokenService')
     private readonly tokenService: ITokenService,
+    @Inject('IPolicyRepository')
+    private readonly policyRepository: IPolicyRepository,
     private readonly templateLoader: TemplateLoaderService,
   ) {}
 
@@ -56,10 +59,14 @@ export class RegisterUsecase {
 
     // 4. Generate and save OTP
     const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const maxAttemptsVal = await this.policyRepository.findValueByKey('MAX_OTP_ATTEMPTS');
+    const maxAttempts = maxAttemptsVal ? parseInt(maxAttemptsVal, 10) : 5;
+
     const otp = OtpEntity.create({
       userId: savedUser.id,
       code: otpCode,
       expiryMinutes: 10,
+      maxAttempts,
     });
     await this.otpService.save(otp);
 

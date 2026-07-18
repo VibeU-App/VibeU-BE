@@ -1,5 +1,5 @@
 import { RegisterUsecase } from './register.usecase';
-import { MockUserRepository, MockCryptoService, MockMailService, MockOtpService, MockSessionRepository, MockTokenService } from './test-mocks';
+import { MockUserRepository, MockCryptoService, MockMailService, MockOtpService, MockSessionRepository, MockTokenService, MockPolicyRepository } from './test-mocks';
 import { ErrorCode } from '../../core/errors';
 import { UserEntity } from '../../core/entities/user.entity';
 
@@ -11,6 +11,7 @@ describe('RegisterUsecase', () => {
   let mockMailService: MockMailService;
   let mockOtpService: MockOtpService;
   let mockTokenService: MockTokenService;
+  let mockPolicyRepository: MockPolicyRepository;
   let mockTemplateLoader: any;
 
   beforeEach(() => {
@@ -20,6 +21,7 @@ describe('RegisterUsecase', () => {
     mockMailService = new MockMailService();
     mockOtpService = new MockOtpService();
     mockTokenService = new MockTokenService();
+    mockPolicyRepository = new MockPolicyRepository();
     mockTemplateLoader = {
       render: jest.fn().mockImplementation((name, vars) => JSON.stringify(vars)),
     };
@@ -30,6 +32,7 @@ describe('RegisterUsecase', () => {
       mockMailService,
       mockOtpService,
       mockTokenService,
+      mockPolicyRepository,
       mockTemplateLoader,
     );
   });
@@ -39,6 +42,7 @@ describe('RegisterUsecase', () => {
     mockSessionRepository.clear();
     mockMailService.clear();
     mockOtpService.clear();
+    mockPolicyRepository.clear();
   });
 
   it('should register a new user with valid email and password', async () => {

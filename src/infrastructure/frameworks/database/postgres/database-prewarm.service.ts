@@ -36,6 +36,7 @@ export class DatabasePrewarmService implements OnModuleInit {
     'users',
     'account_statuses',
     'sessions',
+    'policies',
   ];
 
   constructor(private readonly prisma: PrismaService) {}

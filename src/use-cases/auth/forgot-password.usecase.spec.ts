@@ -1,5 +1,5 @@
 import { ForgotPasswordUsecase } from './forgot-password.usecase';
-import { MockUserRepository, MockMailService, MockOtpService } from './test-mocks';
+import { MockUserRepository, MockMailService, MockOtpService, MockPolicyRepository } from './test-mocks';
 import { ErrorCode } from '../../core/errors';
 import { UserEntity } from '../../core/entities';
 
@@ -8,22 +8,31 @@ describe('ForgotPasswordUsecase', () => {
   let mockUserRepository: MockUserRepository;
   let mockMailService: MockMailService;
   let mockOtpService: MockOtpService;
+  let mockPolicyRepository: MockPolicyRepository;
   let mockTemplateLoader: any;
 
   beforeEach(() => {
     mockUserRepository = new MockUserRepository();
     mockMailService = new MockMailService();
     mockOtpService = new MockOtpService();
+    mockPolicyRepository = new MockPolicyRepository();
     mockTemplateLoader = {
       render: jest.fn().mockImplementation((name, vars) => JSON.stringify(vars)),
     };
-    usecase = new ForgotPasswordUsecase(mockUserRepository, mockMailService, mockOtpService, mockTemplateLoader);
+    usecase = new ForgotPasswordUsecase(
+      mockUserRepository,
+      mockMailService,
+      mockOtpService,
+      mockPolicyRepository,
+      mockTemplateLoader,
+    );
   });
 
   afterEach(() => {
     mockUserRepository.clear();
     mockMailService.clear();
     mockOtpService.clear();
+    mockPolicyRepository.clear();
   });
 
   it('should always return success message even if user not found', async () => {
