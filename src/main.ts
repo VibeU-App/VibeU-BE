@@ -5,9 +5,15 @@ import { apiReference } from '@scalar/nestjs-api-reference';
 import { AppModule } from './app.module';
 import { EnvelopeInterceptor } from './core/envelope/envelope.interceptor';
 import { EnvelopeExceptionFilter } from './core/envelope/envelope.filter';
+import { JsonLogger } from './infrastructure/services/logger/json-logger.service';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: new JsonLogger(),
+  });
+
+  // Enable graceful shutdown hooks
+  app.enableShutdownHooks();
 
   // Register global validation pipe
   app.useGlobalPipes(

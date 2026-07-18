@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { IUserRepository } from '../../core/abstracts/user-repository.interface';
-import { IOtpService } from '../../infrastructure/services/otp/otp.interface';
+import { IOtpRepository } from '../../core/abstracts/otp-repository.interface';
 import { AppException } from '../../core/errors/app-exception';
 import { ErrorCode } from '../../core/errors/error-codes';
 import { AccountStatusName, UserEntity } from '../../core/entities/user.entity';
@@ -14,8 +14,8 @@ export class VerifyRegistrationUsecase {
   constructor(
     @Inject('IUserRepository')
     private readonly userRepository: IUserRepository,
-    @Inject('IOtpService')
-    private readonly otpService: IOtpService,
+    @Inject('IOtpRepository')
+    private readonly otpRepository: IOtpRepository,
   ) {}
 
   async execute(email: string, otpCode: string): Promise<VerifyRegistrationResult> {
@@ -31,20 +31,25 @@ export class VerifyRegistrationUsecase {
     }
 
     // 3. Verify OTP
-    const otp = await this.otpService.findByUserId(user.id);
+    const otp = await this.otpRepository.findByUserId(user.id);
     if (!otp) {
+      throw new AppException(ErrorCode.AUTH_OTP_INVALID);
+    }
+
+    if (otp.code !== otpCode) {
+      await this.otpRepository.incrementAttempts(user.id);
       throw new AppException(ErrorCode.AUTH_OTP_INVALID);
     }
 
     // Check if expired
     if (otp.isExpired()) {
-      await this.otpService.deleteByUserId(user.id);
+      await this.otpRepository.deleteByUserId(user.id);
       throw new AppException(ErrorCode.AUTH_OTP_EXPIRED);
     }
 
     // Check max attempts
     if (otp.isMaxAttemptsReached()) {
-      await this.otpService.deleteByUserId(user.id);
+      await this.otpRepository.deleteByUserId(user.id);
       throw new AppException(ErrorCode.AUTH_OTP_INVALID);
     }
 
@@ -69,7 +74,7 @@ export class VerifyRegistrationUsecase {
     await this.userRepository.update(updatedUser);
 
     // 5. Cleanup OTPs
-    await this.otpService.deleteByUserId(user.id);
+    await this.otpRepository.deleteByUserId(user.id);
 
     return {
       message: 'Email verified successfully. You can now log in.',

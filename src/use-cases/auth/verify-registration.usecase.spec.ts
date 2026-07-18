@@ -1,5 +1,5 @@
 import { VerifyRegistrationUsecase } from './verify-registration.usecase';
-import { MockUserRepository, MockOtpService } from './test-mocks';
+import { MockUserRepository, MockOtpRepository } from './test-mocks';
 import { ErrorCode } from '../../core/errors';
 import { UserEntity } from '../../core/entities/user.entity';
 import { OtpEntity } from '../../core/entities/otp.entity';
@@ -7,17 +7,17 @@ import { OtpEntity } from '../../core/entities/otp.entity';
 describe('VerifyRegistrationUsecase', () => {
   let usecase: VerifyRegistrationUsecase;
   let mockUserRepository: MockUserRepository;
-  let mockOtpService: MockOtpService;
+  let mockOtpRepository: MockOtpRepository;
 
   beforeEach(() => {
     mockUserRepository = new MockUserRepository();
-    mockOtpService = new MockOtpService();
-    usecase = new VerifyRegistrationUsecase(mockUserRepository, mockOtpService);
+    mockOtpRepository = new MockOtpRepository();
+    usecase = new VerifyRegistrationUsecase(mockUserRepository, mockOtpRepository);
   });
 
   afterEach(() => {
     mockUserRepository.clear();
-    mockOtpService.clear();
+    mockOtpRepository.clear();
   });
 
   it('should verify user with valid OTP', async () => {
@@ -33,7 +33,7 @@ describe('VerifyRegistrationUsecase', () => {
       code: '123456',
       expiryMinutes: 10,
     });
-    mockOtpService.addOtp(validOtp);
+    mockOtpRepository.addOtp(validOtp);
 
     const result = await usecase.execute('user@example.com', '123456');
     expect(result.message).toBeDefined();
@@ -68,7 +68,7 @@ describe('VerifyRegistrationUsecase', () => {
       code: '999999',
       expiryMinutes: -1, // Already expired
     });
-    mockOtpService.addOtp(expiredOtp);
+    mockOtpRepository.addOtp(expiredOtp);
 
     try {
       await usecase.execute('user@example.com', '999999');

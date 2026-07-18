@@ -51,6 +51,7 @@ model User {
   // Relations
   accountStatus AccountStatus @relation(fields: [accountStatusId], references: [id])
   sessions      Session[]
+  otp           Otp?
 
   // Soft delete index
   @@index([deletedAt])
@@ -76,8 +77,20 @@ model Session {
   @@map("sessions")
 }
 
-// OTP is stored in memory (not database)
-// See: src/frameworks/database/postgres/otp-cache.service.ts
+// OTP model - stores user One-Time Passwords in database
+model Otp {
+  id        String   @id @default(uuid())
+  userId    String   @unique @map("user_id")
+  code      String
+  expiresAt DateTime @map("expires_at")
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("otps")
+}
 
 model Policy {
   id        String   @id @default(uuid())

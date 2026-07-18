@@ -1,24 +1,24 @@
 import { VerifyResetPasswordOtpUsecase } from './verify-reset-password-otp.usecase';
-import { MockOtpService, MockJwtService, MockUserRepository } from './test-mocks';
+import { MockOtpRepository, MockJwtService, MockUserRepository } from './test-mocks';
 import { ErrorCode } from '../../core/errors';
 import { OtpEntity } from '../../core/entities/otp.entity';
 import { UserEntity, UserRole } from '../../core/entities';
 
 describe('VerifyResetPasswordOtpUsecase', () => {
   let usecase: VerifyResetPasswordOtpUsecase;
-  let mockOtpService: MockOtpService;
+  let mockOtpRepository: MockOtpRepository;
   let mockJwtService: MockJwtService;
   let mockUserRepository: MockUserRepository;
 
   beforeEach(() => {
-    mockOtpService = new MockOtpService();
+    mockOtpRepository = new MockOtpRepository();
     mockJwtService = new MockJwtService();
     mockUserRepository = new MockUserRepository();
-    usecase = new VerifyResetPasswordOtpUsecase(mockOtpService, mockJwtService, mockUserRepository);
+    usecase = new VerifyResetPasswordOtpUsecase(mockOtpRepository, mockJwtService, mockUserRepository);
   });
 
   afterEach(() => {
-    mockOtpService.clear();
+    mockOtpRepository.clear();
     mockUserRepository.clear();
   });
 
@@ -28,7 +28,7 @@ describe('VerifyResetPasswordOtpUsecase', () => {
       code: '123456',
       expiryMinutes: 10,
     });
-    mockOtpService.addOtp(validOtp);
+    mockOtpRepository.addOtp(validOtp);
 
     const testUser : UserEntity = new UserEntity(
       'user-123', 'user@example.com', 'Examplepassword123!', '0',
@@ -52,7 +52,7 @@ describe('VerifyResetPasswordOtpUsecase', () => {
       code: '123456',
       expiryMinutes: 10,
     });
-    mockOtpService.addOtp(validOtp);
+    mockOtpRepository.addOtp(validOtp);
 
     const testUser : UserEntity = new UserEntity(
       'user-123', 'user@example.com', 'Examplepassword123!', '0',
@@ -75,7 +75,7 @@ describe('VerifyResetPasswordOtpUsecase', () => {
       code: '999999',
       expiryMinutes: -1, // Already expired
     });
-    mockOtpService.addOtp(expiredOtp);
+    mockOtpRepository.addOtp(expiredOtp);
 
     const testUser : UserEntity = new UserEntity(
       'user-123', 'user@example.com', 'Examplepassword123!', '0',

@@ -1,5 +1,5 @@
 import { ForgotPasswordUsecase } from './forgot-password.usecase';
-import { MockUserRepository, MockMailService, MockOtpService, MockPolicyRepository } from './test-mocks';
+import { MockUserRepository, MockMailService, MockOtpRepository, MockPolicyRepository } from './test-mocks';
 import { ErrorCode } from '../../core/errors';
 import { UserEntity } from '../../core/entities';
 
@@ -7,14 +7,14 @@ describe('ForgotPasswordUsecase', () => {
   let usecase: ForgotPasswordUsecase;
   let mockUserRepository: MockUserRepository;
   let mockMailService: MockMailService;
-  let mockOtpService: MockOtpService;
+  let mockOtpRepository: MockOtpRepository;
   let mockPolicyRepository: MockPolicyRepository;
   let mockTemplateLoader: any;
 
   beforeEach(() => {
     mockUserRepository = new MockUserRepository();
     mockMailService = new MockMailService();
-    mockOtpService = new MockOtpService();
+    mockOtpRepository = new MockOtpRepository();
     mockPolicyRepository = new MockPolicyRepository();
     mockTemplateLoader = {
       render: jest.fn().mockImplementation((name, vars) => JSON.stringify(vars)),
@@ -22,7 +22,7 @@ describe('ForgotPasswordUsecase', () => {
     usecase = new ForgotPasswordUsecase(
       mockUserRepository,
       mockMailService,
-      mockOtpService,
+      mockOtpRepository,
       mockPolicyRepository,
       mockTemplateLoader,
     );
@@ -31,7 +31,7 @@ describe('ForgotPasswordUsecase', () => {
   afterEach(() => {
     mockUserRepository.clear();
     mockMailService.clear();
-    mockOtpService.clear();
+    mockOtpRepository.clear();
     mockPolicyRepository.clear();
   });
 

@@ -1,5 +1,5 @@
 import { RegisterUsecase } from './register.usecase';
-import { MockUserRepository, MockCryptoService, MockMailService, MockOtpService, MockSessionRepository, MockTokenService, MockPolicyRepository } from './test-mocks';
+import { MockUserRepository, MockCryptoService, MockMailService, MockOtpRepository, MockSessionRepository, MockTokenService, MockPolicyRepository } from './test-mocks';
 import { ErrorCode } from '../../core/errors';
 import { UserEntity } from '../../core/entities/user.entity';
 
@@ -9,7 +9,7 @@ describe('RegisterUsecase', () => {
   let mockSessionRepository: MockSessionRepository;
   let mockCryptoService: MockCryptoService;
   let mockMailService: MockMailService;
-  let mockOtpService: MockOtpService;
+  let mockOtpRepository: MockOtpRepository;
   let mockTokenService: MockTokenService;
   let mockPolicyRepository: MockPolicyRepository;
   let mockTemplateLoader: any;
@@ -19,7 +19,7 @@ describe('RegisterUsecase', () => {
     mockSessionRepository = new MockSessionRepository();
     mockCryptoService = new MockCryptoService();
     mockMailService = new MockMailService();
-    mockOtpService = new MockOtpService();
+    mockOtpRepository = new MockOtpRepository();
     mockTokenService = new MockTokenService();
     mockPolicyRepository = new MockPolicyRepository();
     mockTemplateLoader = {
@@ -30,7 +30,7 @@ describe('RegisterUsecase', () => {
       mockSessionRepository,
       mockCryptoService,
       mockMailService,
-      mockOtpService,
+      mockOtpRepository,
       mockTokenService,
       mockPolicyRepository,
       mockTemplateLoader,
@@ -41,7 +41,7 @@ describe('RegisterUsecase', () => {
     mockUserRepository.clear();
     mockSessionRepository.clear();
     mockMailService.clear();
-    mockOtpService.clear();
+    mockOtpRepository.clear();
     mockPolicyRepository.clear();
   });
 
@@ -65,6 +65,24 @@ describe('RegisterUsecase', () => {
     } catch (error) {
       expect(error.code).toBe(ErrorCode.AUTH_EMAIL_ALREADY_EXISTS);
     }
+  });
+
+  it('should allow re-registering an account if status is pending', async () => {
+    // Pre-add a user with pending status
+    const pendingStatusId = 'mock-pending-status-id';
+    const existingUser = UserEntity.create({
+      email: 'pending@example.com',
+      passwordHash: '$2b$10$hashed_ExistingPass123!',
+      accountStatusId: pendingStatusId,
+    });
+    mockUserRepository.addUser({ ...existingUser, id: 'pending-user-1' } as UserEntity);
+
+    const result = await usecase.execute('pending@example.com', 'NewSecurePass123!');
+    expect(result.user).toBeDefined();
+    expect(result.user.email).toBe('pending@example.com');
+    
+    const updatedUser = await mockUserRepository.findByEmail('pending@example.com');
+    expect(updatedUser?.passwordHash).not.toBe('$2b$10$hashed_ExistingPass123!');
   });
 
   it('should send OTP after successful registration', async () => {

@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { IUserRepository } from '../../core/abstracts/user-repository.interface';
 import { IMailService } from '../../infrastructure/services/mail/mail.interface';
-import { IOtpService } from '../../infrastructure/services/otp/otp.interface';
+import { IOtpRepository } from '../../core/abstracts/otp-repository.interface';
 import { IPolicyRepository } from '../../core/abstracts/policy-repository.interface';
 import { TemplateLoaderService } from '../../infrastructure/services/template/template-loader.service';
 import { randomBytes } from 'crypto';
@@ -18,8 +18,8 @@ export class ForgotPasswordUsecase {
     private readonly userRepository: IUserRepository,
     @Inject('IMailService')
     private readonly mailService: IMailService,
-    @Inject('IOtpService')
-    private readonly otpService: IOtpService,
+    @Inject('IOtpRepository')
+    private readonly otpRepository: IOtpRepository,
     @Inject('IPolicyRepository')
     private readonly policyRepository: IPolicyRepository,
     private readonly templateLoader: TemplateLoaderService,
@@ -43,7 +43,7 @@ export class ForgotPasswordUsecase {
         maxAttempts,
       });
 
-      await this.otpService.save(otpObject);
+      await this.otpRepository.save(otpObject);
 
       // Render template and send OTP
       const emailHtml = this.templateLoader.render('password-reset', {

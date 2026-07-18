@@ -4,7 +4,7 @@ import { ITokenService, TokenPair, AccessTokenPayload } from '../../infrastructu
 import { IMailService } from '../../infrastructure/services/mail/mail.interface';
 import { IPolicyRepository } from '../../core/abstracts/policy-repository.interface';
 import { IUserRepository } from '../../core/abstracts/user-repository.interface';
-import { IOtpService } from '../../infrastructure/services/otp/otp.interface';
+import { IOtpRepository } from '../../core/abstracts/otp-repository.interface';
 import { ISessionRepository } from '../../core/abstracts/session-repository.interface';
 import { UserEntity, AccountStatusEntity, AccountStatusName } from '../../core/entities/user.entity';
 import { OtpEntity } from '../../core/entities/otp.entity';
@@ -168,8 +168,8 @@ export class MockUserRepository implements IUserRepository {
   }
 }
 
-// Mock OTP service with in-memory storage and attempt tracking
-export class MockOtpService implements IOtpService {
+// Mock OTP repository with in-memory storage and attempt tracking
+export class MockOtpRepository implements IOtpRepository {
   private otps: Map<string, OtpEntity> = new Map();
 
   async save(otp: OtpEntity): Promise<OtpEntity> {

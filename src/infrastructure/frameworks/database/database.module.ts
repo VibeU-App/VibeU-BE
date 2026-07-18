@@ -3,9 +3,9 @@ import { PrismaService } from './prisma.service';
 import { PrismaUserRepository } from './user.repository';
 import { PrismaSessionRepository } from './session.repository';
 import { PrismaPolicyRepository } from './policy.repository';
+import { PrismaOtpRepository } from './otp.repository';
 import { AccountStatusLoaderService } from './account-status-loader.service';
 import { DatabasePrewarmService } from './database-prewarm.service';
-import { OtpCacheService } from '../../services/otp/otp-cache.service';
 
 /**
  * Database module for VibeU.
@@ -31,10 +31,10 @@ import { OtpCacheService } from '../../services/otp/otp-cache.service';
       provide: 'IPolicyRepository',
       useClass: PrismaPolicyRepository,
     },
-    OtpCacheService,
+    PrismaOtpRepository,
     {
-      provide: 'IOtpService',
-      useClass: OtpCacheService,
+      provide: 'IOtpRepository',
+      useClass: PrismaOtpRepository,
     },
     AccountStatusLoaderService,
     DatabasePrewarmService,
@@ -43,7 +43,7 @@ import { OtpCacheService } from '../../services/otp/otp-cache.service';
     'IUserRepository',
     'ISessionRepository',
     'IPolicyRepository',
-    'IOtpService',
+    'IOtpRepository',
     AccountStatusLoaderService,
     DatabasePrewarmService,
   ],
