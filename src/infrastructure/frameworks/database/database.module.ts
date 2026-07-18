@@ -1,30 +1,21 @@
 import { Module } from '@nestjs/common';
-import { PrismaModule } from '../prisma/prisma.module';
+import { PrismaService } from './prisma.service';
 import { PrismaUserRepository } from './user.repository';
 import { PrismaSessionRepository } from './session.repository';
 import { PrismaPolicyRepository } from './policy.repository';
 import { AccountStatusLoaderService } from './account-status-loader.service';
 import { DatabasePrewarmService } from './database-prewarm.service';
-import { OtpCacheService } from '../../../services/otp/otp-cache.service';
+import { OtpCacheService } from '../../services/otp/otp-cache.service';
 
 /**
- * PostgreSQL module for NestJS.
+ * Database module for VibeU.
  *
- * Exports only interfaces (tokens) - implementations are private to this module.
- * This follows the Dependency Inversion Principle:
- * - Use-cases depend on interfaces (tokens)
- * - Module provides concrete implementations
- *
- * Exported tokens:
- * - IUserRepository: User data access
- * - ISessionRepository: Session data access
- * - IPolicyRepository: Policies configuration access
- * - IOtpService: OTP generation and verification (in-memory cache)
- * - AccountStatusLoaderService: Account status lookups
+ * Consolidates repositories and database services under a single module.
+ * Exports repository interfaces (tokens) to adhere to Dependency Inversion Principle.
  */
 @Module({
-  imports: [PrismaModule],
   providers: [
+    PrismaService,
     PrismaUserRepository,
     {
       provide: 'IUserRepository',
@@ -57,4 +48,4 @@ import { OtpCacheService } from '../../../services/otp/otp-cache.service';
     DatabasePrewarmService,
   ],
 })
-export class PostgresModule {}
+export class DatabaseModule {}

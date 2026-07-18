@@ -1,5 +1,5 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { IUserRepository } from './user-repository.interface';
+import { IUserRepository } from '../../core/abstracts/user-repository.interface';
 import { ICryptoService } from '../../infrastructure/services/crypto/crypto.interface';
 import { IJwtService } from '../../infrastructure/services/token';
 import { UserEntity } from '../../core/entities';

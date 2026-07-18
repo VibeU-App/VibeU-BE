@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { IPolicyRepository } from '../../../../use-cases/auth/policy-repository.interface';
-import { PrismaService } from '../prisma/prisma.service';
+import { IPolicyRepository } from '../../../core/abstracts/policy-repository.interface';
+import { PrismaService } from './prisma.service';
 
 /**
  * Prisma implementation of the policy repository.

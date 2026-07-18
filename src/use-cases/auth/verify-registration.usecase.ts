@@ -1,5 +1,5 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { IUserRepository } from './user-repository.interface';
+import { IUserRepository } from '../../core/abstracts/user-repository.interface';
 import { IOtpService } from '../../infrastructure/services/otp/otp.interface';
 import { AppException } from '../../core/errors/app-exception';
 import { ErrorCode } from '../../core/errors/error-codes';

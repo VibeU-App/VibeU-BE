@@ -51,3 +51,35 @@ if (fs.existsSync(distDir)) {
   copyDirSync(srcDir, distDir);
   console.log('Patched and copied Prisma CJS files to dist/generated/prisma/');
 }
+
+// Copy schema, migrations, seed, sql from prisma/ to dist/generated/prisma/
+const rootPrismaDir = path.join(__dirname, '..', 'prisma');
+const distGeneratedPrismaDir = path.join(__dirname, '..', 'dist', 'generated', 'prisma');
+
+if (fs.existsSync(rootPrismaDir)) {
+  fs.mkdirSync(distGeneratedPrismaDir, { recursive: true });
+  // copy schema.prisma
+  if (fs.existsSync(path.join(rootPrismaDir, 'schema.prisma'))) {
+    fs.copyFileSync(
+      path.join(rootPrismaDir, 'schema.prisma'),
+      path.join(distGeneratedPrismaDir, 'schema.prisma')
+    );
+  }
+  // copy seed.ts
+  if (fs.existsSync(path.join(rootPrismaDir, 'seed.ts'))) {
+    fs.copyFileSync(
+      path.join(rootPrismaDir, 'seed.ts'),
+      path.join(distGeneratedPrismaDir, 'seed.ts')
+    );
+  }
+  // copy migrations/
+  if (fs.existsSync(path.join(rootPrismaDir, 'migrations'))) {
+    copyDirSync(path.join(rootPrismaDir, 'migrations'), path.join(distGeneratedPrismaDir, 'migrations'));
+  }
+  // copy sql/
+  if (fs.existsSync(path.join(rootPrismaDir, 'sql'))) {
+    copyDirSync(path.join(rootPrismaDir, 'sql'), path.join(distGeneratedPrismaDir, 'sql'));
+  }
+  console.log('Copied database schema, migrations, seed scripts, SQL to dist/generated/prisma/');
+}
+

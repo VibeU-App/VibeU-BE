@@ -2,10 +2,10 @@ import { ICryptoService } from '../../infrastructure/services/crypto/crypto.inte
 import { IJwtService } from '../../infrastructure/services/token/jwt.service';
 import { ITokenService, TokenPair, AccessTokenPayload } from '../../infrastructure/services/token/token.service';
 import { IMailService } from '../../infrastructure/services/mail/mail.interface';
-import { IPolicyRepository } from './policy-repository.interface';
-import { IUserRepository } from './user-repository.interface';
+import { IPolicyRepository } from '../../core/abstracts/policy-repository.interface';
+import { IUserRepository } from '../../core/abstracts/user-repository.interface';
 import { IOtpService } from '../../infrastructure/services/otp/otp.interface';
-import { ISessionRepository } from './session-repository.interface';
+import { ISessionRepository } from '../../core/abstracts/session-repository.interface';
 import { UserEntity, AccountStatusEntity, AccountStatusName } from '../../core/entities/user.entity';
 import { OtpEntity } from '../../core/entities/otp.entity';
 import { SessionEntity } from '../../core/entities/session.entity';

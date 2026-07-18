@@ -1,5 +1,5 @@
 import { Injectable, Inject, BadRequestException } from '@nestjs/common';
-import { IUserRepository } from './user-repository.interface';
+import { IUserRepository } from '../../core/abstracts/user-repository.interface';
 import { IOtpService } from '../../infrastructure/services/otp/otp.interface';
 import { IJwtService } from '../../infrastructure/services/token/jwt.service';
 import { UserRole } from '../../core/entities';

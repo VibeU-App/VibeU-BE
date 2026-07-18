@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { IUserRepository } from './user-repository.interface';
-import { ISessionRepository } from './session-repository.interface';
+import { IUserRepository } from '../../core/abstracts/user-repository.interface';
+import { ISessionRepository } from '../../core/abstracts/session-repository.interface';
 import { ITokenService } from '../../infrastructure/services/token/token.service';
 import { SessionEntity } from '../../core/entities/session.entity';
 import { UserEntity } from '../../core/entities/user.entity';

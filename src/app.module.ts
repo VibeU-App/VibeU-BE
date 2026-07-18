@@ -1,13 +1,11 @@
 import { Module } from '@nestjs/common';
-import { PrismaModule } from './infrastructure/frameworks/database/prisma/prisma.module';
-import { PostgresModule } from './infrastructure/frameworks/database/postgres/postgres.module';
+import { DatabaseModule } from './infrastructure/frameworks/database/database.module';
 import { GlobalServicesModule } from './infrastructure/global-services.module';
 import { AuthModule } from './controllers/auth.module';
 
 @Module({
   imports: [
-    PrismaModule,
-    PostgresModule,
+    DatabaseModule,
     GlobalServicesModule,
     AuthModule,
   ],

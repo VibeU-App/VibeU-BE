@@ -1,22 +1,9 @@
 import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { AccountStatusEntity, AccountStatusName } from '../../../../core/entities/user.entity';
+import { PrismaService } from './prisma.service';
+import { AccountStatusEntity, AccountStatusName } from '../../../core/entities/user.entity';
 
 /**
  * Service that loads account statuses into memory at startup.
- *
- * Uses PostgreSQL's shared_buffers (via pg_prewarm) for fast DB queries.
- * Keeps a small HashMap in memory for O(1) lookups by name or ID.
- *
- * Why this approach:
- * - Account statuses are a small, fixed lookup table (PENDING, ACTIVE, INACTIVE, TERMINATED)
- * - They rarely change (only via migrations)
- * - O(1) lookups avoid even the fastest DB queries
- * - Database is prewarmed by DatabasePrewarmService on startup
- *
- * Usage:
- *   const status = accountStatusLoader.getByName(AccountStatusName.ACTIVE);
- *   const status = accountStatusLoader.getById('some-uuid');
  */
 @Injectable()
 export class AccountStatusLoaderService implements OnModuleInit {
@@ -31,7 +18,6 @@ export class AccountStatusLoaderService implements OnModuleInit {
   /**
    * Called automatically when the NestJS module initializes.
    * Loads all account statuses from the database into memory.
-   * DB queries are fast because pg_prewarm preloaded the table.
    */
   async onModuleInit() {
     await this.loadStatuses();
@@ -39,7 +25,6 @@ export class AccountStatusLoaderService implements OnModuleInit {
 
   /**
    * Fetches all account statuses from DB and indexes them in memory.
-   * Logs each loaded status for debugging.
    */
   private async loadStatuses() {
     const statuses = await this.prisma.accountStatus.findMany();
@@ -79,8 +64,6 @@ export class AccountStatusLoaderService implements OnModuleInit {
 
   /**
    * Gets the ID for a status name.
-   * Convenience method to avoid null checks when you just need the ID.
-   * Throws if the status doesn't exist (should never happen if DB is seeded).
    */
   getStatusId(name: AccountStatusName): string {
     const status = this.statusByName.get(name);

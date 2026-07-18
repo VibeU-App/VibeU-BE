@@ -1,9 +1,7 @@
-import { SessionEntity } from '../../core/entities/session.entity';
+import { SessionEntity } from '../entities/session.entity';
 
 /**
- * Interface for session repository.
- * 
- * Defines the contract for session (refresh token) data access.
+ * Interface for Session Repository.
  */
 export interface ISessionRepository {
   save(session: SessionEntity): Promise<SessionEntity>;

@@ -1,11 +1,11 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { IUserRepository } from './user-repository.interface';
-import { ISessionRepository } from './session-repository.interface';
+import { IUserRepository } from '../../core/abstracts/user-repository.interface';
+import { ISessionRepository } from '../../core/abstracts/session-repository.interface';
 import { ICryptoService } from '../../infrastructure/services/crypto/crypto.interface';
 import { IMailService } from '../../infrastructure/services/mail/mail.interface';
 import { IOtpService } from '../../infrastructure/services/otp/otp.interface';
 import { ITokenService } from '../../infrastructure/services/token/token.service';
-import { IPolicyRepository } from './policy-repository.interface';
+import { IPolicyRepository } from '../../core/abstracts/policy-repository.interface';
 import { TemplateLoaderService } from '../../infrastructure/services/template/template-loader.service';
 import { UserEntity } from '../../core/entities/user.entity';
 import { SessionEntity } from '../../core/entities/session.entity';

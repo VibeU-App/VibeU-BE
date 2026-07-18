@@ -7,10 +7,10 @@ import { ForgotPasswordUsecase } from '../use-cases/auth/forgot-password.usecase
 import { VerifyResetPasswordOtpUsecase } from '../use-cases/auth/verify-reset-password-otp.usecase';
 import { ResetPasswordUsecase } from '../use-cases/auth/reset-password.usecase';
 import { RefreshUsecase } from '../use-cases/auth/refresh.usecase';
-import { PostgresModule } from '../infrastructure/frameworks/database/postgres/postgres.module';
+import { DatabaseModule } from '../infrastructure/frameworks/database/database.module';
 
 @Module({
-  imports: [PostgresModule],
+  imports: [DatabaseModule],
   controllers: [AuthController],
   providers: [
     // Use cases

@@ -1,13 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { ISessionRepository } from '../../../../use-cases/auth/session-repository.interface';
-import { SessionEntity } from '../../../../core/entities/session.entity';
-import { PrismaService } from '../prisma/prisma.service';
+import { ISessionRepository } from '../../../core/abstracts/session-repository.interface';
+import { SessionEntity } from '../../../core/entities/session.entity';
+import { PrismaService } from './prisma.service';
 
 /**
  * Prisma implementation of the session repository.
- *
- * Manages refresh tokens for user authentication.
- * Sessions are soft-deleted to maintain audit trail.
  */
 @Injectable()
 export class PrismaSessionRepository implements ISessionRepository {
@@ -65,7 +62,6 @@ export class PrismaSessionRepository implements ISessionRepository {
 
   /**
    * Finds all active sessions for a user.
-   * Used to list active sessions or invalidate all user sessions.
    */
   async findByUserId(userId: string): Promise<SessionEntity[]> {
     const sessions = await this.prisma.session.findMany({
@@ -80,7 +76,6 @@ export class PrismaSessionRepository implements ISessionRepository {
 
   /**
    * Soft-deletes all sessions for a user.
-   * Used for logout-all or when password is changed.
    */
   async deleteByUserId(userId: string): Promise<void> {
     await this.prisma.session.updateMany({
