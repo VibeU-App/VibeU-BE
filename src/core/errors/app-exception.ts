@@ -28,8 +28,8 @@ const ErrorCodeToHttpStatus: Record<ErrorCode, HttpStatus> = {
 export class AppException extends HttpException {
   public readonly code: ErrorCode;
 
-  constructor(code: ErrorCode, statusCode?: HttpStatus) {
-    const message = ErrorMessage[code];
+  constructor(code: ErrorCode, statusCode?: HttpStatus, customMessage?: string) {
+    const message = customMessage ?? ErrorMessage[code];
     const status = statusCode ?? ErrorCodeToHttpStatus[code] ?? HttpStatus.INTERNAL_SERVER_ERROR;
 
     super(message, status);

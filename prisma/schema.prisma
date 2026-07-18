@@ -21,6 +21,7 @@ enum AccountStatusName {
 enum UserRole {
   USER
   ADMIN
+  MODERATOR
 }
 
 // Account status lookup table

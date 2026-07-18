@@ -114,10 +114,14 @@ export class PrismaUserRepository implements IUserRepository {
   }
 
   private mapToPrismaRole(role: UserRole): PrismaUserRole {
-    return role === UserRole.ADMIN ? PrismaUserRole.ADMIN : PrismaUserRole.USER;
+    if (role === UserRole.ADMIN) return PrismaUserRole.ADMIN;
+    if (role === UserRole.MODERATOR) return PrismaUserRole.MODERATOR;
+    return PrismaUserRole.USER;
   }
 
   private mapToDomainRole(role: PrismaUserRole): UserRole {
-    return role === PrismaUserRole.ADMIN ? UserRole.ADMIN : UserRole.USER;
+    if (role === PrismaUserRole.ADMIN) return UserRole.ADMIN;
+    if (role === PrismaUserRole.MODERATOR) return UserRole.MODERATOR;
+    return UserRole.USER;
   }
 }

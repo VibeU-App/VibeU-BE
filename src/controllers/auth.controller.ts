@@ -1,34 +1,42 @@
-import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Controller, Post, Body, HttpCode, HttpStatus, UseGuards, Req } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { RegisterRequestDto, RegisterResponseEnvelopeDto } from '../core/dtos/auth/register.dto';
+import { VerifyRegistrationRequestDto, VerifyRegistrationResponseEnvelopeDto, VerifyRegistrationResponseDto } from '../core/dtos/auth/verify-registration.dto';
+import { LoginRequestDto, LoginResponseEnvelopeDto, LoginResponseDto } from '../core/dtos/auth/login.dto';
+import { ForgotPasswordRequestDto, ForgotPasswordResponseEnvelopeDto, ForgotPasswordResponseDto } from '../core/dtos/auth/forgot-password.dto';
+import { VerifyResetPasswordOtpRequestDto, VerifyResetPasswordOtpResponseEnvelopeDto, VerifyResetPasswordOtpResponseDto } from '../core/dtos/auth/verify-reset-password-otp.dto';
+import { ResetPasswordRequestDto, ResetPasswordResponseEnvelopeDto, ResetPasswordResponseDto } from '../core/dtos/auth/reset-password.dto';
+import { RefreshRequestDto, RefreshResponseEnvelopeDto, RefreshResponseDto } from '../core/dtos/auth/refresh.dto';
+import { CreatePasswordDto, CreatePasswordResponseEnvelopeDto, CreatePasswordResponseDto } from '../core/dtos/auth/create-password.dto';
+import { ChangePasswordDto, ChangePasswordResponseEnvelopeDto, ChangePasswordResponseDto } from '../core/dtos/auth/change-password.dto';
 import { Envelope } from '../core/envelope/envelope.interface';
-import { 
-  RegisterRequestDto, RegisterResponseDto, RegisterResponseEnvelopeDto,
-  LoginRequestDto, LoginResponseDto, LoginResponseEnvelopeDto,
-  VerifyRegistrationRequestDto, VerifyRegistrationResponseDto, VerifyRegistrationResponseEnvelopeDto,
-  ForgotPasswordRequestDto, ForgotPasswordResponseDto, ForgotPasswordResponseEnvelopeDto,
-  VerifyResetPasswordOtpRequestDto, VerifyResetPasswordOtpResponseDto, VerifyResetPasswordOtpResponseEnvelopeDto,
-  ResetPasswordRequestDto, ResetPasswordResponseDto, ResetPasswordResponseEnvelopeDto,
-  RefreshRequestDto, RefreshResponseDto, RefreshResponseEnvelopeDto
-} from '../core/dtos/auth';
 import { RegisterUsecase } from '../use-cases/auth/register.usecase';
-import { LoginUsecase } from '../use-cases/auth/login.usecase';
 import { VerifyRegistrationUsecase } from '../use-cases/auth/verify-registration.usecase';
+import { LoginUsecase } from '../use-cases/auth/login.usecase';
 import { ForgotPasswordUsecase } from '../use-cases/auth/forgot-password.usecase';
 import { VerifyResetPasswordOtpUsecase } from '../use-cases/auth/verify-reset-password-otp.usecase';
 import { ResetPasswordUsecase } from '../use-cases/auth/reset-password.usecase';
 import { RefreshUsecase } from '../use-cases/auth/refresh.usecase';
+import { CreatePasswordUsecase } from '../use-cases/auth/create-password.usecase';
+import { ChangePasswordUsecase } from '../use-cases/auth/change-password.usecase';
+import { JwtAuthGuard } from '../middleware/jwt-auth.guard';
+import { RolesGuard } from '../middleware/roles.guard';
+import { Roles } from '../middleware/roles.decorator';
+import { UserRole } from '../core/entities/user.entity';
 
-@ApiTags('Auth')
-@Controller('api/v1/auth')
+@ApiTags('Authentication')
+@Controller('auth')
 export class AuthController {
   constructor(
     private readonly registerUsecase: RegisterUsecase,
-    private readonly loginUsecase: LoginUsecase,
     private readonly verifyRegistrationUsecase: VerifyRegistrationUsecase,
+    private readonly loginUsecase: LoginUsecase,
     private readonly forgotPasswordUsecase: ForgotPasswordUsecase,
     private readonly verifyResetPasswordOtpUsecase: VerifyResetPasswordOtpUsecase,
     private readonly resetPasswordUsecase: ResetPasswordUsecase,
     private readonly refreshUsecase: RefreshUsecase,
+    private readonly createPasswordUsecase: CreatePasswordUsecase,
+    private readonly changePasswordUsecase: ChangePasswordUsecase,
   ) {}
 
   @Post('register')
@@ -142,6 +150,42 @@ export class AuthController {
     return {
       statusCode: HttpStatus.OK,
       message: 'Token refreshed successfully',
+      data: result,
+      metadata: null,
+    };
+  }
+
+  @Post('create-password')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.USER, UserRole.MODERATOR)
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Create user password for the first time' })
+  @ApiResponse({ status: 200, type: CreatePasswordResponseEnvelopeDto, description: 'Password created successfully' })
+  @ApiResponse({ status: 400, description: 'Password already set or invalid input' })
+  async createPassword(@Req() req: any, @Body() dto: CreatePasswordDto): Promise<Envelope<CreatePasswordResponseDto>> {
+    const result = await this.createPasswordUsecase.execute(req.user.sub, dto.password);
+    return {
+      statusCode: HttpStatus.OK,
+      message: result.message,
+      data: result,
+      metadata: null,
+    };
+  }
+
+  @Post('change-password')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.USER, UserRole.MODERATOR)
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Change existing password' })
+  @ApiResponse({ status: 200, type: ChangePasswordResponseEnvelopeDto, description: 'Password changed successfully' })
+  @ApiResponse({ status: 400, description: 'Incorrect old password or invalid input' })
+  async changePassword(@Req() req: any, @Body() dto: ChangePasswordDto): Promise<Envelope<ChangePasswordResponseDto>> {
+    const result = await this.changePasswordUsecase.execute(req.user.sub, dto.oldPassword, dto.newPassword);
+    return {
+      statusCode: HttpStatus.OK,
+      message: result.message,
       data: result,
       metadata: null,
     };
