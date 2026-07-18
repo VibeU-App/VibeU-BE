@@ -2,6 +2,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import { IUserRepository } from './user-repository.interface';
 import { IMailService } from '../../infrastructure/services/mail/mail.interface';
 import { IOtpService } from '../../infrastructure/services/otp/otp.interface';
+import { TemplateLoaderService } from '../../infrastructure/services/template/template-loader.service';
 import { randomBytes } from 'crypto';
 import { OtpEntity } from '../../core/entities';
 
@@ -18,6 +19,7 @@ export class ForgotPasswordUsecase {
     private readonly mailService: IMailService,
     @Inject('IOtpService')
     private readonly otpService: IOtpService,
+    private readonly templateLoader: TemplateLoaderService,
   ) {}
 
   async execute(email: string): Promise<ForgotPasswordResult> {
@@ -35,8 +37,15 @@ export class ForgotPasswordUsecase {
         new Date(Date.now()),
       )
 
-      this.otpService.save(otpObject);
-      this.mailService.sendPasswordResetOtp(email, otpCode);
+      await this.otpService.save(otpObject);
+
+      // Render template and send OTP
+      const emailHtml = this.templateLoader.render('password-reset', {
+        appName: 'VibeU',
+        otp: otpCode,
+        expiryMinutes: 5,
+      });
+      await this.mailService.send(email, 'Password Reset Code', emailHtml);
     } 
 
     return {

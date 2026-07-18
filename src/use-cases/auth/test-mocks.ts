@@ -71,7 +71,7 @@ export class MockTokenService implements ITokenService {
 
 // Mock email service that records sent emails for verification
 export class MockMailService implements IMailService {
-  public sentEmails: Array<{ email: string; otp: string; type: string }> = [];
+  public sentEmails: Array<{ email: string; subject: string; content: string }> = [];
 
   isValidEmail(email: string): boolean {
     const emailRegex = /^\w[+-.\w]*\@[-a-z0-9]+(\.[-a-z0-9]+)*\.edu(\.[a-z]{2})?$/;
@@ -99,27 +99,11 @@ export class MockMailService implements IMailService {
     }
   }
 
-  async sendOtp(email: string, otp: string): Promise<void> {
-    const targetEmail : string | null = this.getTargetEmail(email);
+  async send(to: string, subject: string, content: string): Promise<void> {
+    const targetEmail : string | null = this.getTargetEmail(to);
     
     if (targetEmail !== null) {
-      this.sentEmails.push({ email: targetEmail, otp, type: 'verification' });
-    }
-  }
-
-  async sendPasswordResetOtp(email: string, otp: string): Promise<void> {
-    const targetEmail : string | null = this.getTargetEmail(email);
-    
-    if (targetEmail !== null) {
-      this.sentEmails.push({ email: targetEmail, otp, type: 'password-reset' });
-    }
-  }
-
-  async sendWelcomeEmail(email: string): Promise<void> {
-    const targetEmail : string | null = this.getTargetEmail(email);
-    
-    if (targetEmail !== null) {
-      this.sentEmails.push({ email: targetEmail, otp: '', type: 'welcome' });
+      this.sentEmails.push({ email: targetEmail, subject, content });
     }
   }
 
@@ -241,6 +225,17 @@ export class MockSessionRepository implements ISessionRepository {
     );
     this.sessions.set(savedSession.refreshToken, savedSession);
     return savedSession;
+  }
+
+  async update(session: SessionEntity): Promise<SessionEntity> {
+    for (const [key, value] of this.sessions.entries()) {
+      if (value.id === session.id) {
+        this.sessions.delete(key);
+        break;
+      }
+    }
+    this.sessions.set(session.refreshToken, session);
+    return session;
   }
 
   async findByRefreshToken(refreshToken: string): Promise<SessionEntity | null> {

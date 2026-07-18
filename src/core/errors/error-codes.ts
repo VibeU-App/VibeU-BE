@@ -12,6 +12,7 @@ export enum ErrorCode {
   AUTH_FORBIDDEN = 'AUTH_1010',
   AUTH_USER_NOT_VERIFIED = 'AUTH_1011',
   AUTH_MATCHING_OLD_PASSWORD = 'AUTH_1012',
+  AUTH_SESSION_EXPIRED = 'AUTH_1013',
 
   // Validation Errors (2xxx)
   VALIDATION_FAILED = 'VAL_2001',
@@ -33,6 +34,7 @@ export const ErrorMessage: Record<ErrorCode, string> = {
   [ErrorCode.AUTH_FORBIDDEN]: 'You do not have permission to access this resource',
   [ErrorCode.AUTH_USER_NOT_VERIFIED]: 'Please verify your email before logging in',
   [ErrorCode.AUTH_MATCHING_OLD_PASSWORD]: 'New password must be different from old password',
+  [ErrorCode.AUTH_SESSION_EXPIRED]: 'Session has expired, please log in again',
   [ErrorCode.VALIDATION_FAILED]: 'Request validation failed',
   [ErrorCode.INTERNAL_SERVER_ERROR]: 'An unexpected error occurred',
 };

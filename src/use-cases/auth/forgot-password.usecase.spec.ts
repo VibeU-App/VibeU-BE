@@ -8,12 +8,16 @@ describe('ForgotPasswordUsecase', () => {
   let mockUserRepository: MockUserRepository;
   let mockMailService: MockMailService;
   let mockOtpService: MockOtpService;
+  let mockTemplateLoader: any;
 
   beforeEach(() => {
     mockUserRepository = new MockUserRepository();
     mockMailService = new MockMailService();
     mockOtpService = new MockOtpService();
-    usecase = new ForgotPasswordUsecase(mockUserRepository, mockMailService, mockOtpService);
+    mockTemplateLoader = {
+      render: jest.fn().mockImplementation((name, vars) => JSON.stringify(vars)),
+    };
+    usecase = new ForgotPasswordUsecase(mockUserRepository, mockMailService, mockOtpService, mockTemplateLoader);
   });
 
   afterEach(() => {
@@ -46,7 +50,8 @@ describe('ForgotPasswordUsecase', () => {
     expect(mockMailService.sentEmails[0].email).toEqual(user.email);
 
     // Verify that the OTP is truthy
-    expect(mockMailService.sentEmails[0].otp).toBeTruthy();
+    const content = JSON.parse(mockMailService.sentEmails[0].content);
+    expect(content.otp).toBeTruthy();
   });
 
   it('should reject if not a .edu email', async () => {

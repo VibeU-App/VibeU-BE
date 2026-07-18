@@ -11,6 +11,7 @@ describe('RegisterUsecase', () => {
   let mockMailService: MockMailService;
   let mockOtpService: MockOtpService;
   let mockTokenService: MockTokenService;
+  let mockTemplateLoader: any;
 
   beforeEach(() => {
     mockUserRepository = new MockUserRepository();
@@ -19,6 +20,9 @@ describe('RegisterUsecase', () => {
     mockMailService = new MockMailService();
     mockOtpService = new MockOtpService();
     mockTokenService = new MockTokenService();
+    mockTemplateLoader = {
+      render: jest.fn().mockImplementation((name, vars) => JSON.stringify(vars)),
+    };
     usecase = new RegisterUsecase(
       mockUserRepository,
       mockSessionRepository,
@@ -26,6 +30,7 @@ describe('RegisterUsecase', () => {
       mockMailService,
       mockOtpService,
       mockTokenService,
+      mockTemplateLoader,
     );
   });
 

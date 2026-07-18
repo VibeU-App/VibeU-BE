@@ -4,3 +4,4 @@ export * from './auth/forgot-password.usecase';
 export * from './auth/verify-reset-password-otp.usecase';
 export * from './auth/verify-registration.usecase';
 export * from './auth/reset-password.usecase';
+export * from './auth/refresh.usecase';

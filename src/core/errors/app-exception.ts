@@ -14,6 +14,7 @@ const ErrorCodeToHttpStatus: Record<ErrorCode, HttpStatus> = {
   [ErrorCode.AUTH_FORBIDDEN]: HttpStatus.FORBIDDEN,
   [ErrorCode.AUTH_USER_NOT_VERIFIED]: HttpStatus.UNAUTHORIZED,
   [ErrorCode.AUTH_MATCHING_OLD_PASSWORD]: HttpStatus.BAD_REQUEST,
+  [ErrorCode.AUTH_SESSION_EXPIRED]: HttpStatus.UNAUTHORIZED,
   [ErrorCode.VALIDATION_FAILED]: HttpStatus.BAD_REQUEST,
   [ErrorCode.INTERNAL_SERVER_ERROR]: HttpStatus.INTERNAL_SERVER_ERROR,
 };

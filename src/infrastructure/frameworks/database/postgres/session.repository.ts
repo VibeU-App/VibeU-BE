@@ -29,6 +29,22 @@ export class PrismaSessionRepository implements ISessionRepository {
   }
 
   /**
+   * Updates an existing session (refresh token rotation / expiry update).
+   */
+  async update(session: SessionEntity): Promise<SessionEntity> {
+    const updated = await this.prisma.session.update({
+      where: { id: session.id },
+      data: {
+        refreshToken: session.refreshToken,
+        expiresAt: session.expiresAt,
+        deletedAt: session.deletedAt,
+      },
+    });
+
+    return this.mapToEntity(updated);
+  }
+
+  /**
    * Finds a session by its refresh token.
    * Returns null if not found or soft-deleted.
    */

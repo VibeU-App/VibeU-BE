@@ -5,6 +5,7 @@ import { ICryptoService } from '../../infrastructure/services/crypto/crypto.inte
 import { IMailService } from '../../infrastructure/services/mail/mail.interface';
 import { IOtpService } from '../../infrastructure/services/otp/otp.interface';
 import { ITokenService } from '../../infrastructure/services/token/token.service';
+import { TemplateLoaderService } from '../../infrastructure/services/template/template-loader.service';
 import { UserEntity } from '../../core/entities/user.entity';
 import { SessionEntity } from '../../core/entities/session.entity';
 import { OtpEntity } from '../../core/entities/otp.entity';
@@ -32,6 +33,7 @@ export class RegisterUsecase {
     private readonly otpService: IOtpService,
     @Inject('ITokenService')
     private readonly tokenService: ITokenService,
+    private readonly templateLoader: TemplateLoaderService,
   ) {}
 
   async execute(email: string, password: string): Promise<RegisterResult> {
@@ -61,8 +63,13 @@ export class RegisterUsecase {
     });
     await this.otpService.save(otp);
 
-    // 5. Send verification email
-    await this.mailService.sendOtp(savedUser.email, otpCode);
+    // 5. Render template and send verification email
+    const emailHtml = this.templateLoader.render('otp-verification', {
+      appName: 'VibeU',
+      otp: otpCode,
+      expiryMinutes: 10,
+    });
+    await this.mailService.send(savedUser.email, 'Your Verification Code', emailHtml);
 
     // 6. Generate access and refresh tokens using TokenService
     const tokenPair = this.tokenService.createTokenPair(savedUser.id, savedUser.email, savedUser.role);

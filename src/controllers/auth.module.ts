@@ -6,6 +6,7 @@ import { VerifyRegistrationUsecase } from '../use-cases/auth/verify-registration
 import { ForgotPasswordUsecase } from '../use-cases/auth/forgot-password.usecase';
 import { VerifyResetPasswordOtpUsecase } from '../use-cases/auth/verify-reset-password-otp.usecase';
 import { ResetPasswordUsecase } from '../use-cases/auth/reset-password.usecase';
+import { RefreshUsecase } from '../use-cases/auth/refresh.usecase';
 import { PostgresModule } from '../infrastructure/frameworks/database/postgres/postgres.module';
 
 @Module({
@@ -19,6 +20,7 @@ import { PostgresModule } from '../infrastructure/frameworks/database/postgres/p
     ForgotPasswordUsecase,
     VerifyResetPasswordOtpUsecase,
     ResetPasswordUsecase,
+    RefreshUsecase,
   ],
   exports: [
     RegisterUsecase,
@@ -27,6 +29,7 @@ import { PostgresModule } from '../infrastructure/frameworks/database/postgres/p
     ForgotPasswordUsecase,
     VerifyResetPasswordOtpUsecase,
     ResetPasswordUsecase,
+    RefreshUsecase,
   ],
 })
 export class AuthModule {}

@@ -7,7 +7,8 @@ import {
   VerifyRegistrationRequestDto, VerifyRegistrationResponseDto, VerifyRegistrationResponseEnvelopeDto,
   ForgotPasswordRequestDto, ForgotPasswordResponseDto, ForgotPasswordResponseEnvelopeDto,
   VerifyResetPasswordOtpRequestDto, VerifyResetPasswordOtpResponseDto, VerifyResetPasswordOtpResponseEnvelopeDto,
-  ResetPasswordRequestDto, ResetPasswordResponseDto, ResetPasswordResponseEnvelopeDto
+  ResetPasswordRequestDto, ResetPasswordResponseDto, ResetPasswordResponseEnvelopeDto,
+  RefreshRequestDto, RefreshResponseDto, RefreshResponseEnvelopeDto
 } from '../core/dtos/auth';
 import { RegisterUsecase } from '../use-cases/auth/register.usecase';
 import { LoginUsecase } from '../use-cases/auth/login.usecase';
@@ -15,6 +16,7 @@ import { VerifyRegistrationUsecase } from '../use-cases/auth/verify-registration
 import { ForgotPasswordUsecase } from '../use-cases/auth/forgot-password.usecase';
 import { VerifyResetPasswordOtpUsecase } from '../use-cases/auth/verify-reset-password-otp.usecase';
 import { ResetPasswordUsecase } from '../use-cases/auth/reset-password.usecase';
+import { RefreshUsecase } from '../use-cases/auth/refresh.usecase';
 
 @ApiTags('Auth')
 @Controller('api/v1/auth')
@@ -26,6 +28,7 @@ export class AuthController {
     private readonly forgotPasswordUsecase: ForgotPasswordUsecase,
     private readonly verifyResetPasswordOtpUsecase: VerifyResetPasswordOtpUsecase,
     private readonly resetPasswordUsecase: ResetPasswordUsecase,
+    private readonly refreshUsecase: RefreshUsecase,
   ) {}
 
   @Post('register')
@@ -130,5 +133,21 @@ export class AuthController {
         timestamp: new Date().toISOString()
       },
     }
+  }
+
+  @Post('refresh')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Rotate access and refresh tokens' })
+  @ApiResponse({ status: 200, type: RefreshResponseEnvelopeDto, description: 'Token refreshed successfully' })
+  @ApiResponse({ status: 401, description: 'Invalid or expired refresh token' })
+  async refresh(@Body() dto: RefreshRequestDto): Promise<Envelope<RefreshResponseDto>> {
+    const result = await this.refreshUsecase.execute(dto.refreshToken);
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Token refreshed successfully',
+      data: result,
+      metadata: null,
+    };
   }
 }
