@@ -1,5 +1,6 @@
 import { IsEmail } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsEduEmail } from '../../decorators/is-edu-email.decorator';
 
 /**
  * Request DTO for forgot password.
@@ -8,5 +9,6 @@ import { ApiProperty } from '@nestjs/swagger';
 export class ForgotPasswordRequestDto {
   @ApiProperty({ example: 'user@example.com' })
   @IsEmail()
+  @IsEduEmail()
   email: string;
 }

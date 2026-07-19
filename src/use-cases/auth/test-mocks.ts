@@ -32,7 +32,7 @@ export class MockCryptoService implements ICryptoService {
 // Mock JWT service that simulates token creation/verification
 export class MockJwtService implements IJwtService {
   signPayload(payload: Record<string, any>): string {
-    return 'mock-jwt-token';
+    return `mock-jwt-token-${JSON.stringify(payload)}`;
   }
 
   verifyToken(token: string): Record<string, any> {
@@ -41,6 +41,13 @@ export class MockJwtService implements IJwtService {
     }
     if (token === 'expired-token') {
       throw new Error('Token expired');
+    }
+    if (token.startsWith('mock-jwt-token-')) {
+      try {
+        return JSON.parse(token.replace('mock-jwt-token-', ''));
+      } catch (e) {
+        // Fallback
+      }
     }
     return { sub: 'user-123', email: 'user@example.edu', role: 'user' };
   }
@@ -172,9 +179,9 @@ export class MockUserRepository implements IUserRepository {
     return user;
   }
 
-  async findStatusByName(name: string): Promise<string | null> {
-    if (name === AccountStatusName.ACTIVE) return 'mock-active-status-id';
-    if (name === AccountStatusName.PENDING) return 'mock-pending-status-id';
+  async findStatusByName(name: string): Promise<number | null> {
+    if (name === AccountStatusName.ACTIVE) return 2;
+    if (name === AccountStatusName.PENDING) return 1;
     return null;
   }
 
@@ -218,6 +225,17 @@ export class MockOtpRepository implements IOtpRepository {
       return false;
     }
     return otp.incrementAttempts();
+  }
+
+  async deleteExpiredOtps(): Promise<number> {
+    let count = 0;
+    for (const [key, otp] of this.otps.entries()) {
+      if (otp.isExpired()) {
+        this.otps.delete(key);
+        count++;
+      }
+    }
+    return count;
   }
 
   addOtp(otp: OtpEntity): void {

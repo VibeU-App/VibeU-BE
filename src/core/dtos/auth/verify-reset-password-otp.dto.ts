@@ -1,5 +1,6 @@
 import { IsEmail, IsString, Length } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsEduEmail } from '../../decorators/is-edu-email.decorator';
 
 /**
  * Request DTO for verifying OTP during password reset.
@@ -8,6 +9,7 @@ import { ApiProperty } from '@nestjs/swagger';
 export class VerifyResetPasswordOtpRequestDto {
   @ApiProperty({ example: 'user@example.com' })
   @IsEmail()
+  @IsEduEmail()
   email: string;
 
   @ApiProperty({ example: '123456' })

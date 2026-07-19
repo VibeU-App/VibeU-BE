@@ -11,7 +11,7 @@ export class AccountStatusLoaderService implements OnModuleInit {
 
   // Two indexes for O(1) lookup by either name or ID
   private statusByName = new Map<AccountStatusName, AccountStatusEntity>();
-  private statusById = new Map<string, AccountStatusEntity>();
+  private statusById = new Map<number, AccountStatusEntity>();
 
   constructor(private readonly prisma: PrismaService) {}
 
@@ -55,17 +55,17 @@ export class AccountStatusLoaderService implements OnModuleInit {
   }
 
   /**
-   * Gets an account status by its UUID.
+   * Gets an account status by its integer ID.
    * Returns null if not found.
    */
-  getById(id: string): AccountStatusEntity | null {
+  getById(id: number): AccountStatusEntity | null {
     return this.statusById.get(id) ?? null;
   }
 
   /**
    * Gets the ID for a status name.
    */
-  getStatusId(name: AccountStatusName): string {
+  getStatusId(name: AccountStatusName): number {
     const status = this.statusByName.get(name);
     if (!status) {
       throw new Error(`Account status '${name}' not found. Was the database seeded?`);

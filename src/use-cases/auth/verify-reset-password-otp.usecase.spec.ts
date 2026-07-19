@@ -31,7 +31,7 @@ describe('VerifyResetPasswordOtpUsecase', () => {
     mockOtpRepository.addOtp(validOtp);
 
     const testUser : UserEntity = new UserEntity(
-      'user-123', 'user@example.edu', 'Examplepassword123!', '0',
+      'user-123', 'user@example.edu', 'Examplepassword123!', 1,
       UserRole.USER,
       false, new Date(Date.now()), new Date(Date.now()), null,
     )
@@ -42,7 +42,9 @@ describe('VerifyResetPasswordOtpUsecase', () => {
     expect(mockJwtService.verifyToken(testResult.resetToken)).toEqual({
       sub: testUser.id,
       email: testUser.email,
-      role: 'user',
+      role: UserRole.USER,
+      purpose: 'password_reset',
+      hash: testUser.passwordHash,
     });
   });
 
@@ -55,7 +57,7 @@ describe('VerifyResetPasswordOtpUsecase', () => {
     mockOtpRepository.addOtp(validOtp);
 
     const testUser : UserEntity = new UserEntity(
-      'user-123', 'user@example.edu', 'Examplepassword123!', '0',
+      'user-123', 'user@example.edu', 'Examplepassword123!', 1,
       UserRole.USER,
       false, new Date(Date.now()), new Date(Date.now()), null,
     )
@@ -78,7 +80,7 @@ describe('VerifyResetPasswordOtpUsecase', () => {
     mockOtpRepository.addOtp(expiredOtp);
 
     const testUser : UserEntity = new UserEntity(
-      'user-123', 'user@example.edu', 'Examplepassword123!', '0',
+      'user-123', 'user@example.edu', 'Examplepassword123!', 1,
       UserRole.USER,
       false, new Date(Date.now()), new Date(Date.now()), null,
     )

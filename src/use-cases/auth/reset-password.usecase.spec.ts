@@ -28,13 +28,13 @@ describe('ResetPasswordUsecase', () => {
 
   it('should reset password successfully', async () => {
     const testUser : UserEntity = new UserEntity(
-      'user-123', 'user@example.edu', 'Examplepassword123!', '0',
+      'user-123', 'user@example.edu', 'Examplepassword123!', 1,
       UserRole.USER,
       false, new Date(Date.now()), new Date(Date.now()), null,
     )
 
     mockUserRepository.addUser(testUser);
-    const testToken = mockJwtService.signPayload(mockToken);
+    const testToken = mockJwtService.signPayload({ ...mockToken, hash: testUser.passwordHash });
 
     const newPass = "NewSecurePass456!";
     await usecase.execute(newPass, testToken);
@@ -54,13 +54,13 @@ describe('ResetPasswordUsecase', () => {
 
   it('should hash the new password before saving', async () => {
     const testUser : UserEntity = new UserEntity(
-      'user-123', 'user@example.edu', 'Examplepassword123!', '0',
+      'user-123', 'user@example.edu', 'Examplepassword123!', 1,
       UserRole.USER,
       false, new Date(Date.now()), new Date(Date.now()), null,
     )
 
     mockUserRepository.addUser(testUser);
-    const testToken = mockJwtService.signPayload(mockToken);
+    const testToken = mockJwtService.signPayload({ ...mockToken, hash: testUser.passwordHash });
 
     const newPass = "NewSecurePass456!";
     await usecase.execute(newPass, testToken);
@@ -70,13 +70,13 @@ describe('ResetPasswordUsecase', () => {
 
   it('should reject weak passwords', async () => {
     const testUser : UserEntity = new UserEntity(
-      'user-123', 'user@example.edu', 'Examplepassword123!', '0',
+      'user-123', 'user@example.edu', 'Examplepassword123!', 1,
       UserRole.USER,
       false, new Date(Date.now()), new Date(Date.now()), null,
     )
 
     mockUserRepository.addUser(testUser);
-    const testToken = mockJwtService.signPayload(mockToken);
+    const testToken = mockJwtService.signPayload({ ...mockToken, hash: testUser.passwordHash });
     
     try {
       await usecase.execute("weakpassword", testToken);
@@ -89,19 +89,42 @@ describe('ResetPasswordUsecase', () => {
   it('should reject new password matching old password', async () => {
     const passwordHash = await mockCryptoService.hash('Examplepassword123!');
     const testUser : UserEntity = new UserEntity(
-      'user-123', 'user@example.edu', passwordHash, '0',
+      'user-123', 'user@example.edu', passwordHash, 1,
       UserRole.USER,
       false, new Date(Date.now()), new Date(Date.now()), null,
     )
 
     mockUserRepository.addUser(testUser);
-    const testToken = mockJwtService.signPayload(mockToken);
+    const testToken = mockJwtService.signPayload({ ...mockToken, hash: testUser.passwordHash });
     
     try {
       await usecase.execute("Examplepassword123!", testToken);
       fail('Should have thrown an error');
     } catch (error) {
       expect(error.getResponse().code).toBe(ErrorCode.AUTH_MATCHING_OLD_PASSWORD);
+    }
+  });
+
+  it('should make reset token invalid after being used once', async () => {
+    const passwordHash = await mockCryptoService.hash('Examplepassword123!');
+    const testUser : UserEntity = new UserEntity(
+      'user-123', 'user@example.edu', passwordHash, 1,
+      UserRole.USER,
+      false, new Date(Date.now()), new Date(Date.now()), null,
+    )
+
+    mockUserRepository.addUser(testUser);
+    const testToken = mockJwtService.signPayload({ ...mockToken, hash: testUser.passwordHash });
+
+    // First reset succeeds
+    await usecase.execute('NewSecurePass123!', testToken);
+
+    // Second reset with the same token should fail since user.passwordHash changed
+    try {
+      await usecase.execute('AnotherPass123!', testToken);
+      fail('Should have thrown an error');
+    } catch (error) {
+      expect(error.getResponse().code).toBe(ErrorCode.AUTH_INVALID_TOKEN);
     }
   });
 });

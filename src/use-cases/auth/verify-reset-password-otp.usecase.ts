@@ -55,6 +55,7 @@ export class VerifyResetPasswordOtpUsecase {
           email: user.email,
           role: UserRole.USER,
           purpose: "password_reset",
+          hash: user.passwordHash,
         }
 
         return {

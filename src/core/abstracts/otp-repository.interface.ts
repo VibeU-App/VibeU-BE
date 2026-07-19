@@ -8,4 +8,5 @@ export interface IOtpRepository {
   findByUserId(userId: string): Promise<OtpEntity | null>;
   deleteByUserId(userId: string): Promise<void>;
   incrementAttempts(userId: string): Promise<boolean>;
+  deleteExpiredOtps(): Promise<number>;
 }

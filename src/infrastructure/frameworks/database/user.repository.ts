@@ -113,7 +113,7 @@ export class PrismaUserRepository implements IUserRepository {
   /**
    * Finds an account status ID by its name.
    */
-  async findStatusByName(name: string): Promise<string | null> {
+  async findStatusByName(name: string): Promise<number | null> {
     const prismaStatus = await this.prisma.accountStatus.findFirst({
       where: { name: name as any },
     });

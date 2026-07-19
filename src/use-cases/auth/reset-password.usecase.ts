@@ -33,19 +33,29 @@ export class ResetPasswordUsecase {
 
     const tokenData = this.jwtService.verifyToken(resetToken);
     const userId = tokenData?.sub;
+    const tokenHash = tokenData?.hash;
     
     if (!!userId) {
       const user = await this.userRepository.findById(userId);
 
       if (!!user) {
-        const passwordHash = await this.cryptoService.hash(newPassword);
-        
-        if (user.passwordHash === passwordHash) {
+        // Enforce single-use reset token
+        if (user.passwordHash !== tokenHash) {
+          throw new BadRequestException({
+            code: ErrorCode.AUTH_INVALID_TOKEN,
+            message: "Reset token is invalid or has already been used",
+          });
+        }
+
+        const isSamePassword = await this.cryptoService.compare(newPassword, user.passwordHash);
+        if (isSamePassword) {
           throw new BadRequestException({
             code: ErrorCode.AUTH_MATCHING_OLD_PASSWORD,
             message: "New password must be different from old password",
           });
         }
+
+        const passwordHash = await this.cryptoService.hash(newPassword);
 
         const newUser = new UserEntity(
           userId,

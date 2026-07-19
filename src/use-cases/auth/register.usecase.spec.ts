@@ -57,6 +57,7 @@ describe('RegisterUsecase', () => {
     const existingUser = UserEntity.create({
       email: 'existing@example.edu',
       passwordHash: '$2b$10$hashed_ExistingPass123!',
+      accountStatusId: 2, // Active status ID
     });
     mockUserRepository.addUser({ ...existingUser, id: 'existing-user-1' } as UserEntity);
 
@@ -70,7 +71,7 @@ describe('RegisterUsecase', () => {
 
   it('should allow re-registering an account if status is pending', async () => {
     // Pre-add a user with pending status
-    const pendingStatusId = 'mock-pending-status-id';
+    const pendingStatusId = 1;
     const existingUser = UserEntity.create({
       email: 'pending@example.edu',
       passwordHash: '$2b$10$hashed_ExistingPass123!',

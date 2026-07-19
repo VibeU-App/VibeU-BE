@@ -13,7 +13,20 @@ const adapter = new PrismaPg({ connectionString });
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  console.log('Seeding policies...');
+  console.log('Seeding essential lookups...');
+
+  // Seed Account Statuses
+  const statuses = ['PENDING', 'ACTIVE', 'INACTIVE', 'TERMINATED'];
+  for (const status of statuses) {
+    await prisma.accountStatus.upsert({
+      where: { name: status as any },
+      update: {},
+      create: {
+        name: status as any,
+      },
+    });
+  }
+  console.log('Account statuses seeded successfully.');
 
   // Seed default MAX_OTP_ATTEMPTS policy
   const maxAttemptsPolicy = await prisma.policy.upsert({
@@ -36,7 +49,7 @@ async function main() {
     },
   });
   console.log(`OTP_EXPIRY_MINUTES policy seeded: ${expiryMinutesPolicy.value}`);
-  console.log('Seeding completed successfully.');
+  console.log('All essential lookups seeded successfully.');
 }
 
 main()

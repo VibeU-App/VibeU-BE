@@ -9,5 +9,5 @@ export interface IUserRepository {
   findById(id: string): Promise<UserEntity | null>;
   save(user: UserEntity): Promise<UserEntity>;
   update(user: UserEntity): Promise<UserEntity>;
-  findStatusByName(name: string): Promise<string | null>;
+  findStatusByName(name: string): Promise<number | null>;
 }

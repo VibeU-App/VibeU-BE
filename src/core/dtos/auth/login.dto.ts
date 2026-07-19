@@ -1,5 +1,6 @@
 import { IsEmail, IsString, IsOptional, IsEnum } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsEduEmail } from '../../decorators/is-edu-email.decorator';
 
 export enum LoginType {
   PASSWORD = 'password',
@@ -13,6 +14,7 @@ export enum LoginType {
 export class LoginRequestDto {
   @ApiProperty({ example: 'user@example.com' })
   @IsEmail()
+  @IsEduEmail()
   email: string;
 
   @ApiProperty({ example: 'password', enum: LoginType, required: false })

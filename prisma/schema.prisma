@@ -26,7 +26,7 @@ enum UserRole {
 
 // Account status lookup table
 model AccountStatus {
-  id        String            @id @default(uuid())
+  id        Int               @id @default(autoincrement())
   name      AccountStatusName @unique
   createdAt DateTime          @default(now()) @map("created_at")
   updatedAt DateTime          @updatedAt @map("updated_at")
@@ -43,7 +43,7 @@ model User {
   email            String    @unique
   recoveryEmail    String?   @unique @map("recovery_email")
   passwordHash     String    @map("password_hash")
-  accountStatusId  String    @map("account_status_id")
+  accountStatusId  Int       @map("account_status_id")
   role             UserRole  @default(USER)
   isVerified       Boolean   @default(false) @map("is_verified")
   createdAt        DateTime  @default(now()) @map("created_at")
@@ -95,7 +95,7 @@ model Otp {
 }
 
 model Policy {
-  id        String   @id @default(uuid())
+  id        Int      @id @default(autoincrement())
   key       String   @unique
   value     String
   createdAt DateTime @default(now()) @map("created_at")

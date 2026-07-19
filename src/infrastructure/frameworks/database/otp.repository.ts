@@ -82,6 +82,20 @@ export class PrismaOtpRepository implements IOtpRepository {
   }
 
   /**
+   * Deletes all expired OTPs from the database.
+   */
+  async deleteExpiredOtps(): Promise<number> {
+    const result = await this.prisma.otp.deleteMany({
+      where: {
+        expiresAt: {
+          lt: new Date(),
+        },
+      },
+    });
+    return result.count;
+  }
+
+  /**
    * Maps database record to OtpEntity.
    */
   private mapToEntity(record: any): OtpEntity {

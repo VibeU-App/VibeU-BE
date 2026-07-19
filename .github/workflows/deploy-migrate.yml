@@ -40,6 +40,11 @@ jobs:
           # Use DIRECT_URL for migrations (bypasses PgBouncer)
           DATABASE_URL: ${{ secrets.DIRECT_URL }}
 
+      - name: Seed database lookups
+        run: npx ts-node prisma/seed.ts
+        env:
+          DATABASE_URL: ${{ secrets.DIRECT_URL }}
+
       - name: Verify migration success
         run: |
           echo "✅ Migrations applied successfully"
