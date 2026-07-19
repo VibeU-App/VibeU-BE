@@ -1,18 +1,34 @@
-import { IsEmail, IsString } from 'class-validator';
+import { IsEmail, IsString, IsOptional, IsEnum } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+
+export enum LoginType {
+  PASSWORD = 'password',
+  OTP = 'otp',
+}
 
 /**
  * Request DTO for user login.
- * Validates the email and password fields.
+ * Validates email and authentication credentials.
  */
 export class LoginRequestDto {
   @ApiProperty({ example: 'user@example.com' })
   @IsEmail()
   email: string;
 
-  @ApiProperty({ example: 'SecurePass123!' })
+  @ApiProperty({ example: 'password', enum: LoginType, required: false })
+  @IsEnum(LoginType)
+  @IsOptional()
+  type?: LoginType;
+
+  @ApiProperty({ example: 'SecurePass123!', required: false })
   @IsString()
-  password: string;
+  @IsOptional()
+  password?: string;
+
+  @ApiProperty({ example: '123456', required: false })
+  @IsString()
+  @IsOptional()
+  otp?: string;
 }
 
 /**

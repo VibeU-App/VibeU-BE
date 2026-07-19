@@ -9,6 +9,7 @@ import { ResetPasswordUsecase } from '../use-cases/auth/reset-password.usecase';
 import { RefreshUsecase } from '../use-cases/auth/refresh.usecase';
 import { CreatePasswordUsecase } from '../use-cases/auth/create-password.usecase';
 import { ChangePasswordUsecase } from '../use-cases/auth/change-password.usecase';
+import { RequestLoginOtpUsecase } from '../use-cases/auth/request-login-otp.usecase';
 import { JwtAuthGuard } from '../middleware/jwt-auth.guard';
 import { DatabaseModule } from '../infrastructure/frameworks/database/database.module';
 
@@ -26,6 +27,7 @@ import { DatabaseModule } from '../infrastructure/frameworks/database/database.m
     RefreshUsecase,
     CreatePasswordUsecase,
     ChangePasswordUsecase,
+    RequestLoginOtpUsecase,
     JwtAuthGuard,
   ],
   exports: [
@@ -38,6 +40,7 @@ import { DatabaseModule } from '../infrastructure/frameworks/database/database.m
     RefreshUsecase,
     CreatePasswordUsecase,
     ChangePasswordUsecase,
+    RequestLoginOtpUsecase,
     JwtAuthGuard,
   ],
 })

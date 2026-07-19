@@ -18,6 +18,7 @@ import {
 import { RegisterUsecase } from '../use-cases/auth/register.usecase';
 import { VerifyRegistrationUsecase } from '../use-cases/auth/verify-registration.usecase';
 import { LoginUsecase } from '../use-cases/auth/login.usecase';
+import { RequestLoginOtpUsecase } from '../use-cases/auth/request-login-otp.usecase';
 import { ForgotPasswordUsecase } from '../use-cases/auth/forgot-password.usecase';
 import { VerifyResetPasswordOtpUsecase } from '../use-cases/auth/verify-reset-password-otp.usecase';
 import { ResetPasswordUsecase } from '../use-cases/auth/reset-password.usecase';
@@ -36,6 +37,7 @@ export class AuthController {
     private readonly registerUsecase: RegisterUsecase,
     private readonly verifyRegistrationUsecase: VerifyRegistrationUsecase,
     private readonly loginUsecase: LoginUsecase,
+    private readonly requestLoginOtpUsecase: RequestLoginOtpUsecase,
     private readonly forgotPasswordUsecase: ForgotPasswordUsecase,
     private readonly verifyResetPasswordOtpUsecase: VerifyResetPasswordOtpUsecase,
     private readonly resetPasswordUsecase: ResetPasswordUsecase,
@@ -74,13 +76,28 @@ export class AuthController {
     };
   }
 
+  @Post('request-login-otp')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Request OTP for passwordless login' })
+  @ApiOkResponseEnvelopeNull({ description: 'OTP sent successfully' })
+  @ApiResponse({ status: 400, description: 'User not found or unverified' })
+  async requestLoginOtp(@Body() dto: RegisterRequestDto): Promise<Envelope<null>> {
+    const result = await this.requestLoginOtpUsecase.execute(dto.email);
+    return {
+      statusCode: HttpStatus.OK,
+      message: result.message,
+      data: null,
+      metadata: null,
+    };
+  }
+
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'User login' })
+  @ApiOperation({ summary: 'User login (Password or OTP)' })
   @ApiOkResponseEnvelope(LoginResponseDto, { description: 'Login successful' })
-  @ApiResponse({ status: 401, description: 'Invalid credentials' })
+  @ApiResponse({ status: 401, description: 'Invalid credentials or OTP' })
   async login(@Body() dto: LoginRequestDto): Promise<Envelope<LoginResponseDto>> {
-    const result = await this.loginUsecase.execute(dto.email, dto.password);
+    const result = await this.loginUsecase.execute(dto.email, dto);
     return {
       statusCode: HttpStatus.OK,
       message: 'Login successful',
