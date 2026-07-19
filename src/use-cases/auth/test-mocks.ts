@@ -132,6 +132,19 @@ export class MockUserRepository implements IUserRepository {
     return null;
   }
 
+  async findByEmailOrRecoveryEmail(email: string): Promise<UserEntity | null> {
+    const normalizedEmail = email.toLowerCase();
+    for (const user of this.users.values()) {
+      if (
+        (user.email === normalizedEmail || user.recoveryEmail === normalizedEmail) &&
+        user.deletedAt === null
+      ) {
+        return user;
+      }
+    }
+    return null;
+  }
+
   async findById(id: string): Promise<UserEntity | null> {
     const user = this.users.get(id);
     return user && user.deletedAt === null ? user : null;
@@ -148,6 +161,7 @@ export class MockUserRepository implements IUserRepository {
       user.createdAt,
       user.updatedAt,
       user.deletedAt,
+      user.recoveryEmail,
     );
     this.users.set(savedUser.id, savedUser);
     return savedUser;

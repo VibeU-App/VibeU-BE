@@ -1,6 +1,5 @@
 import { IsString, MinLength, Matches } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { Envelope } from '../../envelope/envelope.interface';
 
 export class ChangePasswordDto {
   @ApiProperty({ example: 'SecurePass123!' })
@@ -14,23 +13,4 @@ export class ChangePasswordDto {
     message: 'Password must contain uppercase, lowercase, number and special character',
   })
   newPassword: string;
-}
-
-export class ChangePasswordResponseDto {
-  @ApiProperty({ example: 'Password changed successfully.' })
-  message: string;
-}
-
-export class ChangePasswordResponseEnvelopeDto implements Envelope<ChangePasswordResponseDto> {
-  @ApiProperty({ example: 200 })
-  statusCode: number;
-
-  @ApiProperty({ example: 'Password changed successfully.' })
-  message: string;
-
-  @ApiProperty({ type: ChangePasswordResponseDto })
-  data: ChangePasswordResponseDto;
-
-  @ApiProperty({ example: null, nullable: true })
-  metadata: any;
 }

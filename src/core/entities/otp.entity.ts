@@ -23,17 +23,18 @@ export class OtpEntity {
    */
   static create(props: {
     userId: string;
-    code: string;
+    code?: string;
     expiryMinutes?: number;
     maxAttempts?: number;
   }): OtpEntity {
+    const code = props.code ?? Math.floor(100000 + Math.random() * 900000).toString();
     const now = new Date();
     const expiresAt = new Date(now);
-    expiresAt.setMinutes(expiresAt.getMinutes() + (props.expiryMinutes ?? 10)); // Default 10 minutes
+    expiresAt.setMinutes(expiresAt.getMinutes() + (props.expiryMinutes ?? 15)); // Default 15 minutes
 
     return new OtpEntity(
       props.userId,
-      props.code,
+      code,
       expiresAt,
       now,
       0, // Initial attempts

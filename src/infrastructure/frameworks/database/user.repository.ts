@@ -31,6 +31,29 @@ export class PrismaUserRepository implements IUserRepository {
   }
 
   /**
+   * Finds a user by their primary or recovery email address.
+   * Excludes soft-deleted users.
+   */
+  async findByEmailOrRecoveryEmail(email: string): Promise<UserEntity | null> {
+    const normalizedEmail = email.toLowerCase();
+    const user = await this.prisma.user.findFirst({
+      where: {
+        OR: [
+          { email: normalizedEmail },
+          { recoveryEmail: normalizedEmail },
+        ],
+        deletedAt: null,
+      },
+    });
+
+    if (!user) {
+      return null;
+    }
+
+    return this.mapToEntity(user);
+  }
+
+  /**
    * Finds a user by their ID.
    * Excludes soft-deleted users.
    */
@@ -56,6 +79,7 @@ export class PrismaUserRepository implements IUserRepository {
     const created = await this.prisma.user.create({
       data: {
         email: user.email,
+        recoveryEmail: user.recoveryEmail,
         passwordHash: user.passwordHash,
         accountStatusId: user.accountStatusId,
         role: this.mapToPrismaRole(user.role),
@@ -74,6 +98,7 @@ export class PrismaUserRepository implements IUserRepository {
       where: { id: user.id },
       data: {
         email: user.email,
+        recoveryEmail: user.recoveryEmail,
         passwordHash: user.passwordHash,
         accountStatusId: user.accountStatusId,
         role: this.mapToPrismaRole(user.role),
@@ -110,6 +135,7 @@ export class PrismaUserRepository implements IUserRepository {
       prismaUser.createdAt,
       prismaUser.updatedAt,
       prismaUser.deletedAt,
+      prismaUser.recoveryEmail,
     );
   }
 

@@ -39,20 +39,3 @@ export class LoginResponseDto {
     isVerified: boolean;
   };
 }
-
-/**
- * Envelope wrapper DTO for successful login response.
- */
-export class LoginResponseEnvelopeDto {
-  @ApiProperty({ example: 200 })
-  statusCode: number;
-
-  @ApiProperty({ example: 'Login successful' })
-  message: string;
-
-  @ApiProperty({ type: LoginResponseDto })
-  data: LoginResponseDto;
-
-  @ApiProperty({ nullable: true, example: null })
-  metadata: any;
-}

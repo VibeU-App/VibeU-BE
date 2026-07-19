@@ -18,32 +18,3 @@ export class ResetPasswordRequestDto {
   })
   newPassword: string;
 }
-
-/**
- * Response DTO for successful password reset.
- */
-export class ResetPasswordResponseDto {
-  @ApiProperty({ example: 'Password reset successfully. You can now log in with your new password.' })
-  message: string;
-}
-
-/**
- * Envelope wrapper DTO for successful password reset response.
- */
-export class ResetPasswordResponseEnvelopeDto {
-  @ApiProperty({ example: 200 })
-  statusCode: number;
-
-  @ApiProperty({ example: 'Password reset successfully. You can now log in with your new password.' })
-  message: string;
-
-  @ApiProperty({ nullable: true, example: null })
-  data: any;
-
-  @ApiProperty({
-    example: {
-      timestamp: '2026-07-17T13:30:00.000Z'
-    }
-  })
-  metadata: Record<string, any>;
-}

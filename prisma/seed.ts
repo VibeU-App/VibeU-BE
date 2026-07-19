@@ -1,25 +1,18 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
-import { Client } from 'pg';
 import * as dotenv from 'dotenv';
 
 // Load environment variables
 dotenv.config();
 
-let client: Client;
-let prisma: PrismaClient;
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+  throw new Error('DATABASE_URL is missing');
+}
+const adapter = new PrismaPg({ connectionString });
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  const connectionString = process.env.DIRECT_URL || process.env.DATABASE_URL;
-  if (!connectionString) {
-    throw new Error('DIRECT_URL or DATABASE_URL environment variable is missing.');
-  }
-
-  client = new Client({ connectionString });
-  await client.connect();
-  const adapter = new PrismaPg(client);
-  prisma = new PrismaClient({ adapter });
-
   console.log('Seeding policies...');
 
   // Seed default MAX_OTP_ATTEMPTS policy
@@ -31,8 +24,18 @@ async function main() {
       value: '5',
     },
   });
-
   console.log(`MAX_OTP_ATTEMPTS policy seeded: ${maxAttemptsPolicy.value}`);
+
+  // Seed default OTP_EXPIRY_MINUTES policy
+  const expiryMinutesPolicy = await prisma.policy.upsert({
+    where: { key: 'OTP_EXPIRY_MINUTES' },
+    update: {},
+    create: {
+      key: 'OTP_EXPIRY_MINUTES',
+      value: '15',
+    },
+  });
+  console.log(`OTP_EXPIRY_MINUTES policy seeded: ${expiryMinutesPolicy.value}`);
   console.log('Seeding completed successfully.');
 }
 
@@ -44,8 +47,5 @@ main()
   .finally(async () => {
     if (prisma) {
       await prisma.$disconnect();
-    }
-    if (client) {
-      await client.end();
     }
   });

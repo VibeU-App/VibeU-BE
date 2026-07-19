@@ -1,15 +1,20 @@
 import { Controller, Post, Body, HttpCode, HttpStatus, UseGuards, Req } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
-import { RegisterRequestDto, RegisterResponseEnvelopeDto } from '../core/dtos/auth/register.dto';
-import { VerifyRegistrationRequestDto, VerifyRegistrationResponseEnvelopeDto, VerifyRegistrationResponseDto } from '../core/dtos/auth/verify-registration.dto';
-import { LoginRequestDto, LoginResponseEnvelopeDto, LoginResponseDto } from '../core/dtos/auth/login.dto';
-import { ForgotPasswordRequestDto, ForgotPasswordResponseEnvelopeDto, ForgotPasswordResponseDto } from '../core/dtos/auth/forgot-password.dto';
-import { VerifyResetPasswordOtpRequestDto, VerifyResetPasswordOtpResponseEnvelopeDto, VerifyResetPasswordOtpResponseDto } from '../core/dtos/auth/verify-reset-password-otp.dto';
-import { ResetPasswordRequestDto, ResetPasswordResponseEnvelopeDto, ResetPasswordResponseDto } from '../core/dtos/auth/reset-password.dto';
-import { RefreshRequestDto, RefreshResponseEnvelopeDto, RefreshResponseDto } from '../core/dtos/auth/refresh.dto';
-import { CreatePasswordDto, CreatePasswordResponseEnvelopeDto, CreatePasswordResponseDto } from '../core/dtos/auth/create-password.dto';
-import { ChangePasswordDto, ChangePasswordResponseEnvelopeDto, ChangePasswordResponseDto } from '../core/dtos/auth/change-password.dto';
+import { RegisterRequestDto } from '../core/dtos/auth/register.dto';
+import { VerifyRegistrationRequestDto, VerifyRegistrationResponseDto } from '../core/dtos/auth/verify-registration.dto';
+import { LoginRequestDto, LoginResponseDto } from '../core/dtos/auth/login.dto';
+import { ForgotPasswordRequestDto } from '../core/dtos/auth/forgot-password.dto';
+import { VerifyResetPasswordOtpRequestDto, VerifyResetPasswordOtpResponseDto } from '../core/dtos/auth/verify-reset-password-otp.dto';
+import { ResetPasswordRequestDto } from '../core/dtos/auth/reset-password.dto';
+import { RefreshRequestDto, RefreshResponseDto } from '../core/dtos/auth/refresh.dto';
+import { CreatePasswordDto } from '../core/dtos/auth/create-password.dto';
+import { ChangePasswordDto } from '../core/dtos/auth/change-password.dto';
 import { Envelope } from '../core/envelope/envelope.interface';
+import {
+  ApiOkResponseEnvelope,
+  ApiOkResponseEnvelopeNull,
+  ApiCreatedResponseEnvelopeNull,
+} from '../core/envelope/envelope.decorator';
 import { RegisterUsecase } from '../use-cases/auth/register.usecase';
 import { VerifyRegistrationUsecase } from '../use-cases/auth/verify-registration.usecase';
 import { LoginUsecase } from '../use-cases/auth/login.usecase';
@@ -42,7 +47,7 @@ export class AuthController {
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Register a new user' })
-  @ApiResponse({ status: 201, type: RegisterResponseEnvelopeDto, description: 'User registered successfully' })
+  @ApiCreatedResponseEnvelopeNull({ description: 'User registered successfully' })
   @ApiResponse({ status: 409, description: 'Email already exists' })
   async register(@Body() dto: RegisterRequestDto): Promise<Envelope<null>> {
     await this.registerUsecase.execute(dto.email);
@@ -57,7 +62,7 @@ export class AuthController {
   @Post('verify-registration')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Verify registration OTP' })
-  @ApiResponse({ status: 200, type: VerifyRegistrationResponseEnvelopeDto, description: 'Email verified successfully' })
+  @ApiOkResponseEnvelope(VerifyRegistrationResponseDto, { description: 'Email verified successfully' })
   @ApiResponse({ status: 400, description: 'Invalid or expired OTP' })
   async verifyRegistration(@Body() dto: VerifyRegistrationRequestDto): Promise<Envelope<VerifyRegistrationResponseDto>> {
     const result = await this.verifyRegistrationUsecase.execute(dto.email, dto.otp);
@@ -72,7 +77,7 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'User login' })
-  @ApiResponse({ status: 200, type: LoginResponseEnvelopeDto, description: 'Login successful' })
+  @ApiOkResponseEnvelope(LoginResponseDto, { description: 'Login successful' })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
   async login(@Body() dto: LoginRequestDto): Promise<Envelope<LoginResponseDto>> {
     const result = await this.loginUsecase.execute(dto.email, dto.password);
@@ -87,7 +92,7 @@ export class AuthController {
   @Post('forgot-password')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Request password reset OTP' })
-  @ApiResponse({ status: 200, type: ForgotPasswordResponseEnvelopeDto, description: 'Reset code sent if email exists' })
+  @ApiOkResponseEnvelopeNull({ description: 'Reset code sent if email exists' })
   async forgotPassword(@Body() dto: ForgotPasswordRequestDto): Promise<Envelope<null>> {
     const result = await this.forgotPasswordUsecase.execute(dto.email);
 
@@ -104,7 +109,7 @@ export class AuthController {
   @Post('verify-reset-password-otp')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Verify reset OTP and get reset token' })
-  @ApiResponse({ status: 200, type: VerifyResetPasswordOtpResponseEnvelopeDto, description: 'Reset token generated' })
+  @ApiOkResponseEnvelope(VerifyResetPasswordOtpResponseDto, { description: 'Reset token generated' })
   @ApiResponse({ status: 400, description: 'Invalid or expired OTP' })
   async verifyResetOtp(@Body() dto: VerifyResetPasswordOtpRequestDto): Promise<Envelope<VerifyResetPasswordOtpResponseDto>> {
     const result = await this.verifyResetPasswordOtpUsecase.execute(dto.email, dto.otp);
@@ -124,7 +129,7 @@ export class AuthController {
   @Post('reset-password')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Reset password with reset token' })
-  @ApiResponse({ status: 200, type: ResetPasswordResponseEnvelopeDto, description: 'Password reset successfully' })
+  @ApiOkResponseEnvelopeNull({ description: 'Password reset successfully' })
   @ApiResponse({ status: 400, description: 'Invalid or expired reset token' })
   async resetPassword(@Body() dto: ResetPasswordRequestDto): Promise<Envelope<null>> {
     const result = await this.resetPasswordUsecase.execute(dto.newPassword, dto.resetToken);
@@ -142,7 +147,7 @@ export class AuthController {
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Rotate access and refresh tokens' })
-  @ApiResponse({ status: 200, type: RefreshResponseEnvelopeDto, description: 'Token refreshed successfully' })
+  @ApiOkResponseEnvelope(RefreshResponseDto, { description: 'Token refreshed successfully' })
   @ApiResponse({ status: 401, description: 'Invalid or expired refresh token' })
   async refresh(@Body() dto: RefreshRequestDto): Promise<Envelope<RefreshResponseDto>> {
     const result = await this.refreshUsecase.execute(dto.refreshToken);
@@ -161,14 +166,14 @@ export class AuthController {
   @ApiBearerAuth()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Create user password for the first time' })
-  @ApiResponse({ status: 200, type: CreatePasswordResponseEnvelopeDto, description: 'Password created successfully' })
+  @ApiOkResponseEnvelopeNull({ description: 'Password created successfully' })
   @ApiResponse({ status: 400, description: 'Password already set or invalid input' })
-  async createPassword(@Req() req: any, @Body() dto: CreatePasswordDto): Promise<Envelope<CreatePasswordResponseDto>> {
+  async createPassword(@Req() req: any, @Body() dto: CreatePasswordDto): Promise<Envelope<null>> {
     const result = await this.createPasswordUsecase.execute(req.user.sub, dto.password);
     return {
       statusCode: HttpStatus.OK,
       message: result.message,
-      data: result,
+      data: null,
       metadata: null,
     };
   }
@@ -179,14 +184,14 @@ export class AuthController {
   @ApiBearerAuth()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Change existing password' })
-  @ApiResponse({ status: 200, type: ChangePasswordResponseEnvelopeDto, description: 'Password changed successfully' })
+  @ApiOkResponseEnvelopeNull({ description: 'Password changed successfully' })
   @ApiResponse({ status: 400, description: 'Incorrect old password or invalid input' })
-  async changePassword(@Req() req: any, @Body() dto: ChangePasswordDto): Promise<Envelope<ChangePasswordResponseDto>> {
+  async changePassword(@Req() req: any, @Body() dto: ChangePasswordDto): Promise<Envelope<null>> {
     const result = await this.changePasswordUsecase.execute(req.user.sub, dto.oldPassword, dto.newPassword);
     return {
       statusCode: HttpStatus.OK,
       message: result.message,
-      data: result,
+      data: null,
       metadata: null,
     };
   }

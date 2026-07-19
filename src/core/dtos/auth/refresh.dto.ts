@@ -33,20 +33,3 @@ export class RefreshResponseDto {
     isVerified: boolean;
   };
 }
-
-/**
- * Envelope wrapper DTO for successful token refresh response.
- */
-export class RefreshResponseEnvelopeDto {
-  @ApiProperty({ example: 200 })
-  statusCode: number;
-
-  @ApiProperty({ example: 'Token refreshed successfully' })
-  message: string;
-
-  @ApiProperty({ type: RefreshResponseDto })
-  data: RefreshResponseDto;
-
-  @ApiProperty({ nullable: true, example: null })
-  metadata: any;
-}

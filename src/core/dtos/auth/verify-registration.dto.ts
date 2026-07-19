@@ -39,20 +39,3 @@ export class VerifyRegistrationResponseDto {
     isVerified: boolean;
   };
 }
-
-/**
- * Envelope wrapper DTO for successful registration verification response.
- */
-export class VerifyRegistrationResponseEnvelopeDto {
-  @ApiProperty({ example: 200 })
-  statusCode: number;
-
-  @ApiProperty({ example: 'Email verified successfully. You can now join the app.' })
-  message: string;
-
-  @ApiProperty({ type: VerifyRegistrationResponseDto })
-  data: VerifyRegistrationResponseDto;
-
-  @ApiProperty({ nullable: true, example: null })
-  metadata: any;
-}

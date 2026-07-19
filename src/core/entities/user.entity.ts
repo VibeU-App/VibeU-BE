@@ -43,6 +43,7 @@ export class UserEntity {
     public readonly createdAt: Date,
     public readonly updatedAt: Date,
     public readonly deletedAt: Date | null,
+    public readonly recoveryEmail: string | null = null,
   ) {}
 
   /**
@@ -54,6 +55,7 @@ export class UserEntity {
     accountStatusId?: string;
     role?: UserRole;
     isVerified?: boolean;
+    recoveryEmail?: string | null;
   }): UserEntity {
     const now = new Date();
     return new UserEntity(
@@ -66,6 +68,7 @@ export class UserEntity {
       now,
       now,
       null, // Not deleted
+      props.recoveryEmail ? props.recoveryEmail.toLowerCase() : null,
     );
   }
 

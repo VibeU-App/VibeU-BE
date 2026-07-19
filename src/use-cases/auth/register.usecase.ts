@@ -79,14 +79,14 @@ export class RegisterUsecase {
     }
 
     // 4. Generate and save OTP
-    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
     const maxAttemptsVal = await this.policyRepository.findValueByKey('MAX_OTP_ATTEMPTS');
     const maxAttempts = maxAttemptsVal ? parseInt(maxAttemptsVal, 10) : 5;
+    const expiryMinutesVal = await this.policyRepository.findValueByKey('OTP_EXPIRY_MINUTES');
+    const expiryMinutes = expiryMinutesVal ? parseInt(expiryMinutesVal, 10) : 15;
 
     const otp = OtpEntity.create({
       userId: savedUser.id,
-      code: otpCode,
-      expiryMinutes: 10,
+      expiryMinutes,
       maxAttempts,
     });
     await this.otpRepository.save(otp);
@@ -94,8 +94,8 @@ export class RegisterUsecase {
     // 5. Render template and send verification email
     const emailHtml = this.templateLoader.render('otp-verification', {
       appName: 'VibeU',
-      otp: otpCode,
-      expiryMinutes: 10,
+      otp: otp.code,
+      expiryMinutes,
     });
     this.mailService.send(savedUser.email, 'Your Verification Code', emailHtml)
       .catch(err => this.logger.error(`Failed to send verification email to ${savedUser.email}: ${err.message}`, err.stack));

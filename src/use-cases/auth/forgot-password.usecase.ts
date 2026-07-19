@@ -4,7 +4,6 @@ import { IMailService } from '../../infrastructure/services/mail/mail.interface'
 import { IOtpRepository } from '../../core/abstracts/otp-repository.interface';
 import { IPolicyRepository } from '../../core/abstracts/policy-repository.interface';
 import { TemplateLoaderService } from '../../infrastructure/services/template/template-loader.service';
-import { randomBytes } from 'crypto';
 import { OtpEntity } from '../../core/entities';
 
 export interface ForgotPasswordResult {
@@ -28,20 +27,17 @@ export class ForgotPasswordUsecase {
   ) {}
 
   async execute(email: string): Promise<ForgotPasswordResult> {
-    const user = await this.userRepository.findByEmail(email);
+    const user = await this.userRepository.findByEmailOrRecoveryEmail(email);
 
     if (!!user) {
-      const buffer = randomBytes(4);
-      const rawOtp = buffer.readUInt32BE(0) % 1000000;
-      const otpCode = rawOtp.toString().padStart(6, '0');
-      
       const maxAttemptsVal = await this.policyRepository.findValueByKey('MAX_OTP_ATTEMPTS');
       const maxAttempts = maxAttemptsVal ? parseInt(maxAttemptsVal, 10) : 5;
+      const expiryMinutesVal = await this.policyRepository.findValueByKey('OTP_EXPIRY_MINUTES');
+      const expiryMinutes = expiryMinutesVal ? parseInt(expiryMinutesVal, 10) : 15;
 
       const otpObject = OtpEntity.create({
         userId: user.id,
-        code: otpCode,
-        expiryMinutes: 5,
+        expiryMinutes,
         maxAttempts,
       });
 
@@ -50,8 +46,8 @@ export class ForgotPasswordUsecase {
       // Render template and send OTP
       const emailHtml = this.templateLoader.render('password-reset', {
         appName: 'VibeU',
-        otp: otpCode,
-        expiryMinutes: 5,
+        otp: otpObject.code,
+        expiryMinutes,
       });
       this.mailService.send(email, 'Password Reset Code', emailHtml)
         .catch(err => this.logger.error(`Failed to send password reset email to ${email}: ${err.message}`, err.stack));

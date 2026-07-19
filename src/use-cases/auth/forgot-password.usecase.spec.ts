@@ -63,6 +63,22 @@ describe('ForgotPasswordUsecase', () => {
     expect(content.otp).toBeTruthy();
   });
 
+  it('should send OTP if recovery email matches', async () => {
+    const user : UserEntity = UserEntity.create({
+      email: "user@example.edu.vn",
+      passwordHash: "i3hr92hr9ebfusboc",
+      recoveryEmail: "recovery@example.edu.vn",
+    });
+
+    mockUserRepository.addUser(user);
+
+    await usecase.execute('recovery@example.edu.vn');
+    
+    // Verify that an email is sent to the recovery email address directly
+    expect(mockMailService.sentEmails.length).toBe(1);
+    expect(mockMailService.sentEmails[0].email).toEqual("recovery@example.edu.vn");
+  });
+
   it('should reject if not a .edu email', async () => {
     const user : UserEntity = UserEntity.create({
       email: "user@notedu.com",
