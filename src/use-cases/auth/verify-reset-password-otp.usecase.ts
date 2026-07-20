@@ -21,7 +21,7 @@ export class VerifyResetPasswordOtpUsecase {
   ) {}
 
   async execute(email: string, otp: string): Promise<VerifyResetPasswordOtpResult> {
-    const user = await this.userRepository.findByEmail(email);
+    const user = await this.userRepository.findByEmailOrRecoveryEmail(email);
     
     if (!!user) {
       const userOtp = await this.otpRepository.findByUserId(user.id);

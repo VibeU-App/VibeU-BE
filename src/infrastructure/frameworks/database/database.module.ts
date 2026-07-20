@@ -4,6 +4,10 @@ import { PrismaUserRepository } from './user.repository';
 import { PrismaSessionRepository } from './session.repository';
 import { PrismaPolicyRepository } from './policy.repository';
 import { PrismaOtpRepository } from './otp.repository';
+import { PrismaProfileRepository } from './profile.repository';
+import { PrismaHobbyRepository } from './hobby.repository';
+import { PrismaPersonalityArchetypeRepository } from './personality-archetype.repository';
+import { PrismaQuestionnaireRepository } from './questionnaire.repository';
 import { AccountStatusLoaderService } from './account-status-loader.service';
 import { DatabasePrewarmService } from './database-prewarm.service';
 
@@ -36,6 +40,26 @@ import { DatabasePrewarmService } from './database-prewarm.service';
       provide: 'IOtpRepository',
       useClass: PrismaOtpRepository,
     },
+    PrismaProfileRepository,
+    {
+      provide: 'IProfileRepository',
+      useClass: PrismaProfileRepository,
+    },
+    PrismaHobbyRepository,
+    {
+      provide: 'IHobbyRepository',
+      useClass: PrismaHobbyRepository,
+    },
+    PrismaPersonalityArchetypeRepository,
+    {
+      provide: 'IPersonalityArchetypeRepository',
+      useClass: PrismaPersonalityArchetypeRepository,
+    },
+    PrismaQuestionnaireRepository,
+    {
+      provide: 'IQuestionnaireRepository',
+      useClass: PrismaQuestionnaireRepository,
+    },
     AccountStatusLoaderService,
     DatabasePrewarmService,
   ],
@@ -44,6 +68,10 @@ import { DatabasePrewarmService } from './database-prewarm.service';
     'ISessionRepository',
     'IPolicyRepository',
     'IOtpRepository',
+    'IProfileRepository',
+    'IHobbyRepository',
+    'IPersonalityArchetypeRepository',
+    'IQuestionnaireRepository',
     AccountStatusLoaderService,
     DatabasePrewarmService,
   ],

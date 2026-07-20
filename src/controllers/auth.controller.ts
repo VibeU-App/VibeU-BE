@@ -111,7 +111,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Request password reset OTP' })
   @ApiOkResponseEnvelopeNull({ description: 'Reset code sent if email exists' })
   async forgotPassword(@Body() dto: ForgotPasswordRequestDto): Promise<Envelope<null>> {
-    const result = await this.forgotPasswordUsecase.execute(dto.email);
+    const result = await this.forgotPasswordUsecase.execute(dto.email, dto.isRecovery);
 
     return {
       statusCode: 200,

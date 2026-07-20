@@ -54,6 +54,7 @@ model User {
   accountStatus AccountStatus @relation(fields: [accountStatusId], references: [id])
   sessions      Session[]
   otp           Otp?
+  profile       Profile?
 
   // Soft delete index
   @@index([deletedAt])
@@ -102,4 +103,121 @@ model Policy {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("policies")
+}
+
+model Profile {
+  id                     Int       @id @default(autoincrement())
+  userId                 String    @unique @map("user_id")
+  fullName               String    @map("full_name")
+  gender                 String
+  university             String?
+  bio                    String?
+  avatarSeed             String    @map("avatar_seed")
+  birthday               DateTime
+  personalityArchetypeId String?   @map("personality_archetype_id")
+  isCompleted            Boolean   @default(false) @map("is_completed")
+  createdAt              DateTime  @default(now()) @map("created_at")
+  updatedAt              DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  personalityArchetype PersonalityArchetype? @relation(fields: [personalityArchetypeId], references: [id])
+  hobbies              ProfileHobby[]
+  photos               ProfilePhoto[]
+  answers              UserQuestionnaireAnswer[]
+
+  @@map("profiles")
+}
+
+model PersonalityArchetype {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  description String
+  traits      String[]
+  imageUrl    String?   @map("image_url")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  profiles    Profile[]
+
+  @@map("personality_archetypes")
+}
+
+model Hobby {
+  id        Int            @id @default(autoincrement())
+  name      String         @unique
+  category  String
+  createdAt DateTime       @default(now()) @map("created_at")
+  updatedAt DateTime       @updatedAt @map("updated_at")
+  profiles  ProfileHobby[]
+
+  @@map("hobbies")
+}
+
+model ProfileHobby {
+  profileId Int @map("profile_id")
+  hobbyId   Int @map("hobby_id")
+
+  // Relations
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  hobby   Hobby   @relation(fields: [hobbyId], references: [id], onDelete: Cascade)
+
+  @@id([profileId, hobbyId])
+  @@map("profile_hobbies")
+}
+
+model ProfilePhoto {
+  id        Int      @id @default(autoincrement())
+  profileId Int      @map("profile_id")
+  url       String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@map("photos")
+}
+
+model QuestionnaireQuestion {
+  id        String   @id @default(uuid())
+  text      String
+  order     Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  options QuestionnaireOption[]
+  answers UserQuestionnaireAnswer[]
+
+  @@map("questionnaire_questions")
+}
+
+model QuestionnaireOption {
+  id         String   @id @default(uuid())
+  questionId String   @map("question_id")
+  text       String
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  question QuestionnaireQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  answers  UserQuestionnaireAnswer[]
+
+  @@map("questionnaire_options")
+}
+
+model UserQuestionnaireAnswer {
+  id               String   @id @default(uuid())
+  profileId        Int      @map("profile_id")
+  questionId       String   @map("question_id")
+  selectedOptionId String   @map("selected_option_id")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  // Relations
+  profile        Profile               @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  question       QuestionnaireQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  selectedOption QuestionnaireOption   @relation(fields: [selectedOptionId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, questionId])
+  @@map("user_questionnaire_answers")
 }

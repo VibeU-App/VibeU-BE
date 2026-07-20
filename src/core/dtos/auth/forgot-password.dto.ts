@@ -1,4 +1,4 @@
-import { IsEmail } from 'class-validator';
+import { IsEmail, ValidateIf, IsOptional, IsBoolean } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEduEmail } from '../../decorators/is-edu-email.decorator';
 
@@ -9,6 +9,12 @@ import { IsEduEmail } from '../../decorators/is-edu-email.decorator';
 export class ForgotPasswordRequestDto {
   @ApiProperty({ example: 'user@example.com' })
   @IsEmail()
+  @ValidateIf((o) => !o.isRecovery)
   @IsEduEmail()
   email: string;
+
+  @ApiProperty({ example: false, required: false, description: 'True if checking the recovery email, false for primary email' })
+  @IsOptional()
+  @IsBoolean()
+  isRecovery?: boolean;
 }

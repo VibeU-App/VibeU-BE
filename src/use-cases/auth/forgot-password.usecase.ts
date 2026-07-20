@@ -26,8 +26,10 @@ export class ForgotPasswordUsecase {
     private readonly templateLoader: TemplateLoaderService,
   ) {}
 
-  async execute(email: string): Promise<ForgotPasswordResult> {
-    const user = await this.userRepository.findByEmailOrRecoveryEmail(email);
+  async execute(email: string, isRecovery: boolean = false): Promise<ForgotPasswordResult> {
+    const user = isRecovery
+      ? await this.userRepository.findByRecoveryEmail(email)
+      : await this.userRepository.findByEmail(email);
 
     if (!!user) {
       const maxAttemptsVal = await this.policyRepository.findValueByKey('MAX_OTP_ATTEMPTS');

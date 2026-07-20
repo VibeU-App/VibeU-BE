@@ -54,6 +54,26 @@ export class PrismaUserRepository implements IUserRepository {
   }
 
   /**
+   * Finds a user by their recovery email address.
+   * Excludes soft-deleted users.
+   */
+  async findByRecoveryEmail(email: string): Promise<UserEntity | null> {
+    const normalizedEmail = email.toLowerCase();
+    const user = await this.prisma.user.findFirst({
+      where: {
+        recoveryEmail: normalizedEmail,
+        deletedAt: null,
+      },
+    });
+
+    if (!user) {
+      return null;
+    }
+
+    return this.mapToEntity(user);
+  }
+
+  /**
    * Finds a user by their ID.
    * Excludes soft-deleted users.
    */
