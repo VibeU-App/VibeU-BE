@@ -1,19 +1,25 @@
 -- Drop foreign key constraint if it exists
 ALTER TABLE "users" DROP CONSTRAINT IF EXISTS "users_account_status_id_fkey";
 
+-- Update users.account_status_id to string integers first, by joining with account_statuses table
+UPDATE "users"
+SET "account_status_id" = CASE
+  WHEN a."name" = 'PENDING' THEN '1'
+  WHEN a."name" = 'ACTIVE' THEN '2'
+  WHEN a."name" = 'INACTIVE' THEN '3'
+  WHEN a."name" = 'TERMINATED' THEN '4'
+  ELSE '1'
+END
+FROM "account_statuses" a
+WHERE "users"."account_status_id" = a."id";
+
+-- Fallback for any records that might already be numeric but still formatted as text
+UPDATE "users"
+SET "account_status_id" = '1'
+WHERE "account_status_id" NOT IN ('1', '2', '3', '4');
+
 -- Alter users table: change type of account_status_id to integer
--- Since some DBs might have string UUIDs in users.account_status_id, we map them conditionally
-ALTER TABLE "users" ALTER COLUMN "account_status_id" TYPE INTEGER USING (
-  CASE
-    WHEN "account_status_id" IN (SELECT "id" FROM "account_statuses" WHERE "name" = 'PENDING') THEN 1
-    WHEN "account_status_id" IN (SELECT "id" FROM "account_statuses" WHERE "name" = 'ACTIVE') THEN 2
-    WHEN "account_status_id" IN (SELECT "id" FROM "account_statuses" WHERE "name" = 'INACTIVE') THEN 3
-    WHEN "account_status_id" IN (SELECT "id" FROM "account_statuses" WHERE "name" = 'TERMINATED') THEN 4
-    -- Fallback if it is already an integer or a string castable as integer
-    WHEN "account_status_id" ~ '^[0-9]+$' THEN "account_status_id"::integer
-    ELSE 1
-  END
-);
+ALTER TABLE "users" ALTER COLUMN "account_status_id" TYPE INTEGER USING "account_status_id"::integer;
 
 -- Truncate account_statuses table and recreate it with integer id
 TRUNCATE TABLE "account_statuses" CASCADE;
