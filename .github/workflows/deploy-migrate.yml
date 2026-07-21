@@ -2,10 +2,7 @@ name: Deploy & Migrate to Production
 
 on:
   push:
-    branches: [main]
-    paths:
-      - 'prisma/schema.prisma'
-      - 'prisma/migrations/**'
+    branches: [main, develop]
 
 jobs:
   deploy-migrate:
