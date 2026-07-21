@@ -2,5 +2,5 @@ import { PersonalityArchetypeEntity } from '../entities/personality-archetype.en
 
 export interface IPersonalityArchetypeRepository {
   findAll(): Promise<PersonalityArchetypeEntity[]>;
-  findById(id: string): Promise<PersonalityArchetypeEntity | null>;
+  findById(id: number): Promise<PersonalityArchetypeEntity | null>;
 }

@@ -13,7 +13,7 @@ export class PrismaPersonalityArchetypeRepository implements IPersonalityArchety
     return list.map(this.mapToEntity);
   }
 
-  async findById(id: string): Promise<PersonalityArchetypeEntity | null> {
+  async findById(id: number): Promise<PersonalityArchetypeEntity | null> {
     const arch = await this.prisma.personalityArchetype.findUnique({
       where: { id },
     });

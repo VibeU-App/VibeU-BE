@@ -114,7 +114,7 @@ model Profile {
   bio                    String?
   avatarSeed             String    @map("avatar_seed")
   birthday               DateTime
-  personalityArchetypeId String?   @map("personality_archetype_id")
+  personalityArchetypeId Int?      @map("personality_archetype_id")
   isCompleted            Boolean   @default(false) @map("is_completed")
   createdAt              DateTime  @default(now()) @map("created_at")
   updatedAt              DateTime  @updatedAt @map("updated_at")
@@ -130,7 +130,7 @@ model Profile {
 }
 
 model PersonalityArchetype {
-  id          String    @id @default(uuid())
+  id          Int       @id @default(autoincrement())
   name        String    @unique
   description String
   traits      String[]
@@ -179,7 +179,7 @@ model ProfilePhoto {
 }
 
 model QuestionnaireQuestion {
-  id        String   @id @default(uuid())
+  id        Int      @id @default(autoincrement())
   text      String
   order     Int      @default(0)
   createdAt DateTime @default(now()) @map("created_at")
@@ -193,8 +193,8 @@ model QuestionnaireQuestion {
 }
 
 model QuestionnaireOption {
-  id         String   @id @default(uuid())
-  questionId String   @map("question_id")
+  id         Int      @id @default(autoincrement())
+  questionId Int      @map("question_id")
   text       String
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
@@ -209,8 +209,8 @@ model QuestionnaireOption {
 model UserQuestionnaireAnswer {
   id               String   @id @default(uuid())
   profileId        Int      @map("profile_id")
-  questionId       String   @map("question_id")
-  selectedOptionId String   @map("selected_option_id")
+  questionId       Int      @map("question_id")
+  selectedOptionId Int      @map("selected_option_id")
   createdAt        DateTime @default(now()) @map("created_at")
 
   // Relations

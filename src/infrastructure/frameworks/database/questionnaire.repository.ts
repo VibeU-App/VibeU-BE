@@ -20,7 +20,7 @@ export class PrismaQuestionnaireRepository implements IQuestionnaireRepository {
     );
   }
 
-  async findOptionsByQuestionIds(questionIds: string[]): Promise<QuestionnaireOptionEntity[]> {
+  async findOptionsByQuestionIds(questionIds: number[]): Promise<QuestionnaireOptionEntity[]> {
     const list = await this.prisma.questionnaireOption.findMany({
       where: { questionId: { in: questionIds } },
     });
@@ -31,7 +31,6 @@ export class PrismaQuestionnaireRepository implements IQuestionnaireRepository {
 
   async saveAnswers(answers: UserQuestionnaireAnswerEntity[]): Promise<void> {
     await this.prisma.$transaction(async (tx) => {
-      // Upsert each answer using transactions
       for (const ans of answers) {
         await tx.userQuestionnaireAnswer.upsert({
           where: {

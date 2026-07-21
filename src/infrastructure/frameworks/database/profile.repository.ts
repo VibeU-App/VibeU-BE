@@ -59,7 +59,6 @@ export class PrismaProfileRepository implements IProfileRepository {
   }
 
   async getProfilePostAndMatchCounts(profileId: number): Promise<{ outpostCount: number; matchlistCount: number }> {
-    // These will be aggregated from other schemas. Temporarily return mocks to avoid compile errors.
     return {
       outpostCount: 0,
       matchlistCount: 0,

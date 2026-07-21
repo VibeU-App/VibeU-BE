@@ -85,7 +85,7 @@ export class MockPersonalityArchetypeRepository implements IPersonalityArchetype
     return this.archetypes;
   }
 
-  async findById(id: string): Promise<PersonalityArchetypeEntity | null> {
+  async findById(id: number): Promise<PersonalityArchetypeEntity | null> {
     return this.archetypes.find((a) => a.id === id) || null;
   }
 }
@@ -99,7 +99,7 @@ export class MockQuestionnaireRepository implements IQuestionnaireRepository {
     return this.questions;
   }
 
-  async findOptionsByQuestionIds(questionIds: string[]): Promise<QuestionnaireOptionEntity[]> {
+  async findOptionsByQuestionIds(questionIds: number[]): Promise<QuestionnaireOptionEntity[]> {
     return this.options.filter((o) => questionIds.includes(o.questionId));
   }
 
@@ -113,13 +113,13 @@ export class MockQuestionnaireRepository implements IQuestionnaireRepository {
 }
 
 export class MockAIService implements IAIService {
-  public mockArchetypeId = 'lotus-id';
+  public mockArchetypeId = 1;
 
   async classifyPersonality(
     answers: { questionText: string; answerText: string }[],
     hobbies: string[],
-    archetypes: { id: string; name: string; description: string }[],
-  ): Promise<string> {
+    archetypes: { id: number; name: string; description: string }[],
+  ): Promise<number> {
     return this.mockArchetypeId;
   }
 }

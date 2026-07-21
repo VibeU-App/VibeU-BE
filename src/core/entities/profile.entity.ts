@@ -11,7 +11,7 @@ export class ProfileEntity {
     public readonly updatedAt: Date,
     public readonly university: string | null = null,
     public readonly bio: string | null = null,
-    public readonly personalityArchetypeId: string | null = null,
+    public readonly personalityArchetypeId: number | null = null,
   ) {}
 
   static create(props: {
@@ -22,7 +22,7 @@ export class ProfileEntity {
     birthday: Date;
     university?: string | null;
     bio?: string | null;
-    personalityArchetypeId?: string | null;
+    personalityArchetypeId?: number | null;
   }): ProfileEntity {
     const now = new Date();
     return new ProfileEntity(
