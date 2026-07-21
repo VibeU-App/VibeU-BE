@@ -34,6 +34,11 @@ jobs:
       - name: Generate Prisma Client
         run: pnpm prisma generate
 
+      - name: Resolve failed migration
+        run: pnpm prisma migrate resolve --rolled-back 20260721010000_profile_and_account_status_id_to_int || true
+        env:
+          DATABASE_URL: ${{ secrets.DIRECT_URL }}
+
       - name: Run production migrations
         run: pnpm prisma migrate deploy
         env:
