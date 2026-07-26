@@ -14,6 +14,10 @@ export enum ErrorCode {
   AUTH_MATCHING_OLD_PASSWORD = 'AUTH_1012',
   AUTH_SESSION_EXPIRED = 'AUTH_1013',
 
+  // Profile Errors (1xxx)
+  PROFILE_USER_NOT_FOUND = 'PROFILE_1001',
+  PROFILE_USER_NOT_OLD_ENOUGH = 'PROFILE_1002',
+
   // Validation Errors (2xxx)
   VALIDATION_FAILED = 'VAL_2001',
 
@@ -35,6 +39,8 @@ export const ErrorMessage: Record<ErrorCode, string> = {
   [ErrorCode.AUTH_USER_NOT_VERIFIED]: 'Please verify your email before logging in',
   [ErrorCode.AUTH_MATCHING_OLD_PASSWORD]: 'New password must be different from old password',
   [ErrorCode.AUTH_SESSION_EXPIRED]: 'Session has expired, please log in again',
+  [ErrorCode.PROFILE_USER_NOT_FOUND]: 'No profile was found with this user',
+  [ErrorCode.PROFILE_USER_NOT_OLD_ENOUGH]: 'User must be 18 or older',
   [ErrorCode.VALIDATION_FAILED]: 'Request validation failed',
   [ErrorCode.INTERNAL_SERVER_ERROR]: 'An unexpected error occurred',
 };

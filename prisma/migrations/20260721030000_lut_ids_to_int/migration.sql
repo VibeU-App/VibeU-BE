@@ -36,7 +36,7 @@ CREATE TABLE "hobbies" (
 CREATE TABLE "profiles" (
     "id" SERIAL NOT NULL,
     "user_id" TEXT NOT NULL,
-    "full_name" TEXT NOT NULL,
+    "nickname" TEXT NOT NULL,
     "gender" TEXT NOT NULL,
     "university" TEXT,
     "bio" TEXT,

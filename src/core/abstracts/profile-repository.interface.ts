@@ -6,4 +6,6 @@ export interface IProfileRepository {
   save(profile: ProfileEntity): Promise<ProfileEntity>;
   update(profile: ProfileEntity): Promise<ProfileEntity>;
   getProfilePostAndMatchCounts(profileId: number): Promise<{ outpostCount: number; matchlistCount: number }>;
+  getAge(birthday: Date): number;
+  getZodiacSign(birthday: Date): string;
 }

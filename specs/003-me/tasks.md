@@ -46,7 +46,7 @@
 
 ## Phase 3: User Story 1 - Profile Dashboard Viewing (Priority: P1) 🎯 MVP
 
-**Goal**: Retrieve the user's dashboard profile summary (fullName, avatar, bio, zodiac, age, vibe testing archetype, post count, match count).
+**Goal**: Retrieve the user's dashboard profile summary (nickname, avatar, bio, zodiac, age, vibe testing archetype, post count, match count).
 
 **Independent Test**: Send GET to `/api/v1/profile/me` and confirm dynamic calculations (age/zodiac) and aggregated statistics return successfully.
 
@@ -63,7 +63,7 @@
 
 ## Phase 4: User Story 2 - Profile Details Editing (Priority: P1)
 
-**Goal**: Update biography, fullName, avatar, birthday, university, and prevent updating read-only Sex/Archetype fields.
+**Goal**: Update biography, nickname, avatar, birthday, university, and prevent updating read-only Sex/Archetype fields.
 
 **Independent Test**: Update fields using PATCH `/api/v1/profile/me` and confirm changes persist in the database.
 

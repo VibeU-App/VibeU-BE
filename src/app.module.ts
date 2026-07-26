@@ -3,6 +3,7 @@ import { DatabaseModule } from './infrastructure/frameworks/database/database.mo
 import { GlobalServicesModule } from './infrastructure/services/global-services.module';
 import { AuthModule } from './controllers/auth.module';
 import { SchedulingModule } from './infrastructure/schedulers/scheduling.module';
+import { ProfileModule } from './controllers/profile.module';
 
 @Module({
   imports: [
@@ -10,6 +11,7 @@ import { SchedulingModule } from './infrastructure/schedulers/scheduling.module'
     GlobalServicesModule,
     AuthModule,
     SchedulingModule,
+    ProfileModule,
   ],
   controllers: [],
   providers: [],
