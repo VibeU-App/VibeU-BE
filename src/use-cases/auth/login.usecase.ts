@@ -34,7 +34,10 @@ export class LoginUsecase {
     private readonly tokenService: ITokenService,
   ) {}
 
-  async execute(email: string, credentials: { type?: LoginType; password?: string; otp?: string }): Promise<LoginResult> {
+  async execute(
+    email: string,
+    credentials: { type?: LoginType; password?: string; otp?: string },
+  ): Promise<LoginResult> {
     this.logger.log(`User login attempt for email: ${email}`);
 
     // 1. Find user by email
@@ -45,12 +48,18 @@ export class LoginUsecase {
     }
 
     // 2. Select login mechanism (default to PASSWORD if type is not specified or if password is provided)
-    const loginType = credentials.type ?? (credentials.otp ? LoginType.OTP : LoginType.PASSWORD);
+    const loginType =
+      credentials.type ??
+      (credentials.otp ? LoginType.OTP : LoginType.PASSWORD);
 
     if (loginType === LoginType.OTP) {
       // Passwordless Verification Logic
       if (!credentials.otp) {
-        throw new AppException(ErrorCode.AUTH_OTP_INVALID, undefined, 'OTP is required');
+        throw new AppException(
+          ErrorCode.AUTH_OTP_INVALID,
+          undefined,
+          'OTP is required',
+        );
       }
 
       const otp = await this.otpRepository.findByUserId(user.id);
@@ -78,10 +87,17 @@ export class LoginUsecase {
     } else {
       // Traditional Password Verification Logic
       if (!credentials.password) {
-        throw new AppException(ErrorCode.AUTH_INVALID_CREDENTIALS, undefined, 'Password is required');
+        throw new AppException(
+          ErrorCode.AUTH_INVALID_CREDENTIALS,
+          undefined,
+          'Password is required',
+        );
       }
 
-      const isPasswordValid = await this.cryptoService.compare(credentials.password, user.passwordHash);
+      const isPasswordValid = await this.cryptoService.compare(
+        credentials.password,
+        user.passwordHash,
+      );
       if (!isPasswordValid) {
         this.logger.warn(`Login failed: Invalid password for email ${email}`);
         throw new AppException(ErrorCode.AUTH_INVALID_CREDENTIALS);
@@ -95,7 +111,11 @@ export class LoginUsecase {
     }
 
     // 4. Generate access and refresh tokens using TokenService
-    const tokenPair = this.tokenService.createTokenPair(user.id, user.email, user.role);
+    const tokenPair = this.tokenService.createTokenPair(
+      user.id,
+      user.email,
+      user.role,
+    );
 
     // 5. Save opaque refresh token session
     const expiresAt = new Date(Date.now() + config.jwt.refreshTokenTtl * 1000);

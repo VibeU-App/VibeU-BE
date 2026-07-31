@@ -1,5 +1,11 @@
 import { LoginUsecase } from './login.usecase';
-import { MockUserRepository, MockCryptoService, MockTokenService, MockSessionRepository, MockOtpRepository } from './test-mocks';
+import {
+  MockUserRepository,
+  MockCryptoService,
+  MockTokenService,
+  MockSessionRepository,
+  MockOtpRepository,
+} from './test-mocks';
 import { ErrorCode } from '../../core/errors';
 import { UserEntity } from '../../core/entities/user.entity';
 import { LoginType } from '../../core/dtos/auth/login.dto';
@@ -54,7 +60,9 @@ describe('LoginUsecase', () => {
 
   it('should reject login with non-existent email', async () => {
     try {
-      await usecase.execute('nonexistent@example.edu', { password: 'SecurePass123!' });
+      await usecase.execute('nonexistent@example.edu', {
+        password: 'SecurePass123!',
+      });
       fail('Should have thrown an error');
     } catch (error) {
       expect(error.code).toBe(ErrorCode.AUTH_INVALID_CREDENTIALS);
@@ -86,10 +94,15 @@ describe('LoginUsecase', () => {
       passwordHash: await mockCryptoService.hash('SecurePass123!'),
       isVerified: false,
     });
-    mockUserRepository.addUser({ ...user, id: 'unverified-user-1' } as UserEntity);
+    mockUserRepository.addUser({
+      ...user,
+      id: 'unverified-user-1',
+    } as UserEntity);
 
     try {
-      await usecase.execute('unverified@example.edu', { password: 'SecurePass123!' });
+      await usecase.execute('unverified@example.edu', {
+        password: 'SecurePass123!',
+      });
       fail('Should have thrown an error');
     } catch (error) {
       expect(error.code).toBe(ErrorCode.AUTH_USER_NOT_VERIFIED);
@@ -111,7 +124,10 @@ describe('LoginUsecase', () => {
     });
     await mockOtpRepository.save(otp);
 
-    const result = await usecase.execute('otpuser@example.edu', { otp: '123456', type: LoginType.OTP });
+    const result = await usecase.execute('otpuser@example.edu', {
+      otp: '123456',
+      type: LoginType.OTP,
+    });
 
     expect(result.accessToken).toBeDefined();
     expect(result.user.email).toBe('otpuser@example.edu');
@@ -133,7 +149,10 @@ describe('LoginUsecase', () => {
     await mockOtpRepository.save(otp);
 
     try {
-      await usecase.execute('otpuser@example.edu', { otp: 'wrong-otp', type: LoginType.OTP });
+      await usecase.execute('otpuser@example.edu', {
+        otp: 'wrong-otp',
+        type: LoginType.OTP,
+      });
       fail('Should have thrown an error');
     } catch (error) {
       expect(error.code).toBe(ErrorCode.AUTH_OTP_INVALID);

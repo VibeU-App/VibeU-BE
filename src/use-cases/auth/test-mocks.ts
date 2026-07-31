@@ -1,12 +1,20 @@
 import { ICryptoService } from '../../infrastructure/services/crypto/crypto.interface';
 import { IJwtService } from '../../infrastructure/services/token/jwt.service';
-import { ITokenService, TokenPair, AccessTokenPayload } from '../../infrastructure/services/token/token.service';
+import {
+  ITokenService,
+  TokenPair,
+  AccessTokenPayload,
+} from '../../infrastructure/services/token/token.service';
 import { IMailService } from '../../infrastructure/services/mail/mail.interface';
 import { IPolicyRepository } from '../../core/abstracts/policy-repository.interface';
 import { IUserRepository } from '../../core/abstracts/user-repository.interface';
 import { IOtpRepository } from '../../core/abstracts/otp-repository.interface';
 import { ISessionRepository } from '../../core/abstracts/session-repository.interface';
-import { UserEntity, AccountStatusEntity, AccountStatusName } from '../../core/entities/user.entity';
+import {
+  UserEntity,
+  AccountStatusEntity,
+  AccountStatusName,
+} from '../../core/entities/user.entity';
 import { OtpEntity } from '../../core/entities/otp.entity';
 import { SessionEntity } from '../../core/entities/session.entity';
 
@@ -79,7 +87,11 @@ export class MockTokenService implements ITokenService {
 
 // Mock email service that records sent emails for verification
 export class MockMailService implements IMailService {
-  public sentEmails: Array<{ email: string; subject: string; content: string }> = [];
+  public sentEmails: Array<{
+    email: string;
+    subject: string;
+    content: string;
+  }> = [];
 
   isValidEmail(email: string): boolean {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -92,17 +104,18 @@ export class MockMailService implements IMailService {
 
   getTargetEmail(email: string): string | null {
     if (this.isValidEmail(email)) {
-      const emailParts = email.split("@");
+      const emailParts = email.split('@');
       const identifier = emailParts[0];
       const domains = emailParts[1];
       let targetEmail = email;
 
-      if (identifier.includes("+")) {
-        targetEmail = targetEmail.split("+")[0] + "@" + domains;
+      if (identifier.includes('+')) {
+        targetEmail = targetEmail.split('+')[0] + '@' + domains;
       }
 
-      if (identifier.includes(".") && domains.split(".")[0] == "gmail") {
-        targetEmail = targetEmail.split("@")[0].replaceAll(".", "") + "@" + domains;
+      if (identifier.includes('.') && domains.split('.')[0] == 'gmail') {
+        targetEmail =
+          targetEmail.split('@')[0].replaceAll('.', '') + '@' + domains;
       }
 
       return targetEmail.toLowerCase();
@@ -112,10 +125,12 @@ export class MockMailService implements IMailService {
   }
 
   async send(to: string, subject: string, content: string): Promise<void> {
-    const targetEmail : string | null = this.getTargetEmail(to);
-    
+    const targetEmail: string | null = this.getTargetEmail(to);
+
     if (targetEmail === null) {
-      throw new Error(`Cannot send email: recipient address '${to}' does not contain '.edu' in the domain.`);
+      throw new Error(
+        `Cannot send email: recipient address '${to}' does not contain '.edu' in the domain.`,
+      );
     }
     this.sentEmails.push({ email: targetEmail, subject, content });
   }
@@ -143,7 +158,8 @@ export class MockUserRepository implements IUserRepository {
     const normalizedEmail = email.toLowerCase();
     for (const user of this.users.values()) {
       if (
-        (user.email === normalizedEmail || user.recoveryEmail === normalizedEmail) &&
+        (user.email === normalizedEmail ||
+          user.recoveryEmail === normalizedEmail) &&
         user.deletedAt === null
       ) {
         return user;
@@ -155,10 +171,7 @@ export class MockUserRepository implements IUserRepository {
   async findByRecoveryEmail(email: string): Promise<UserEntity | null> {
     const normalizedEmail = email.toLowerCase();
     for (const user of this.users.values()) {
-      if (
-        user.recoveryEmail === normalizedEmail &&
-        user.deletedAt === null
-      ) {
+      if (user.recoveryEmail === normalizedEmail && user.deletedAt === null) {
         return user;
       }
     }
@@ -289,7 +302,9 @@ export class MockSessionRepository implements ISessionRepository {
     return session;
   }
 
-  async findByRefreshToken(refreshToken: string): Promise<SessionEntity | null> {
+  async findByRefreshToken(
+    refreshToken: string,
+  ): Promise<SessionEntity | null> {
     const session = this.sessions.get(refreshToken);
     return session && session.deletedAt === null ? session : null;
   }
@@ -318,9 +333,7 @@ export class MockSessionRepository implements ISessionRepository {
 }
 
 export class MockPolicyRepository implements IPolicyRepository {
-  private policies: Map<string, string> = new Map([
-    ['MAX_OTP_ATTEMPTS', '5'],
-  ]);
+  private policies: Map<string, string> = new Map([['MAX_OTP_ATTEMPTS', '5']]);
 
   async findValueByKey(key: string): Promise<string | null> {
     return this.policies.get(key) ?? null;

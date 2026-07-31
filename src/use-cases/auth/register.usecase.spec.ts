@@ -1,5 +1,13 @@
 import { RegisterUsecase } from './register.usecase';
-import { MockUserRepository, MockCryptoService, MockMailService, MockOtpRepository, MockSessionRepository, MockTokenService, MockPolicyRepository } from './test-mocks';
+import {
+  MockUserRepository,
+  MockCryptoService,
+  MockMailService,
+  MockOtpRepository,
+  MockSessionRepository,
+  MockTokenService,
+  MockPolicyRepository,
+} from './test-mocks';
 import { ErrorCode } from '../../core/errors';
 import { UserEntity } from '../../core/entities/user.entity';
 
@@ -23,7 +31,9 @@ describe('RegisterUsecase', () => {
     mockTokenService = new MockTokenService();
     mockPolicyRepository = new MockPolicyRepository();
     mockTemplateLoader = {
-      render: jest.fn().mockImplementation((name, vars) => JSON.stringify(vars)),
+      render: jest
+        .fn()
+        .mockImplementation((name, vars) => JSON.stringify(vars)),
     };
     usecase = new RegisterUsecase(
       mockUserRepository,
@@ -59,7 +69,10 @@ describe('RegisterUsecase', () => {
       passwordHash: '$2b$10$hashed_ExistingPass123!',
       accountStatusId: 2, // Active status ID
     });
-    mockUserRepository.addUser({ ...existingUser, id: 'existing-user-1' } as UserEntity);
+    mockUserRepository.addUser({
+      ...existingUser,
+      id: 'existing-user-1',
+    } as UserEntity);
 
     try {
       await usecase.execute('existing@example.edu');
@@ -77,10 +90,15 @@ describe('RegisterUsecase', () => {
       passwordHash: '$2b$10$hashed_ExistingPass123!',
       accountStatusId: pendingStatusId,
     });
-    mockUserRepository.addUser({ ...existingUser, id: 'pending-user-1' } as UserEntity);
+    mockUserRepository.addUser({
+      ...existingUser,
+      id: 'pending-user-1',
+    } as UserEntity);
 
     await usecase.execute('pending@example.edu');
-    const updatedUser = await mockUserRepository.findByEmail('pending@example.edu');
+    const updatedUser = await mockUserRepository.findByEmail(
+      'pending@example.edu',
+    );
     expect(updatedUser).toBeDefined();
     expect(updatedUser?.email).toBe('pending@example.edu');
   });
@@ -90,7 +108,7 @@ describe('RegisterUsecase', () => {
 
     mockMailService = new MockMailService();
     await usecase.execute(email);
-    
+
     expect(mockMailService.sentEmails.length).toBe(0);
   });
 });

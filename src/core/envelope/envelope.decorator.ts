@@ -22,7 +22,10 @@ export class BaseEnvelopeDto<T> implements Envelope<T> {
 /**
  * Swagger helper for successful requests (200 OK) returning data.
  */
-export const ApiOkResponseEnvelope = <TModel extends Type<any>>(model: TModel, options?: { description?: string }) => {
+export const ApiOkResponseEnvelope = <TModel extends Type<any>>(
+  model: TModel,
+  options?: { description?: string },
+) => {
   return applyDecorators(
     ApiExtraModels(BaseEnvelopeDto, model),
     ApiResponse({
@@ -45,7 +48,9 @@ export const ApiOkResponseEnvelope = <TModel extends Type<any>>(model: TModel, o
 /**
  * Swagger helper for successful requests (200 OK) returning data: null.
  */
-export const ApiOkResponseEnvelopeNull = (options?: { description?: string }) => {
+export const ApiOkResponseEnvelopeNull = (options?: {
+  description?: string;
+}) => {
   return applyDecorators(
     ApiExtraModels(BaseEnvelopeDto),
     ApiResponse({
@@ -68,7 +73,10 @@ export const ApiOkResponseEnvelopeNull = (options?: { description?: string }) =>
 /**
  * Swagger helper for created requests (201 Created) returning data.
  */
-export const ApiCreatedResponseEnvelope = <TModel extends Type<any>>(model: TModel, options?: { description?: string }) => {
+export const ApiCreatedResponseEnvelope = <TModel extends Type<any>>(
+  model: TModel,
+  options?: { description?: string },
+) => {
   return applyDecorators(
     ApiExtraModels(BaseEnvelopeDto, model),
     ApiResponse({
@@ -91,7 +99,9 @@ export const ApiCreatedResponseEnvelope = <TModel extends Type<any>>(model: TMod
 /**
  * Swagger helper for created requests (201 Created) returning data: null.
  */
-export const ApiCreatedResponseEnvelopeNull = (options?: { description?: string }) => {
+export const ApiCreatedResponseEnvelopeNull = (options?: {
+  description?: string;
+}) => {
   return applyDecorators(
     ApiExtraModels(BaseEnvelopeDto),
     ApiResponse({

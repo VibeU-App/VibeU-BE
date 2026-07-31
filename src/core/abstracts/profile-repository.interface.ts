@@ -5,5 +5,7 @@ export interface IProfileRepository {
   findById(id: number): Promise<ProfileEntity | null>;
   save(profile: ProfileEntity): Promise<ProfileEntity>;
   update(profile: ProfileEntity): Promise<ProfileEntity>;
-  getProfilePostAndMatchCounts(profileId: number): Promise<{ outpostCount: number; matchlistCount: number }>;
+  getProfilePostAndMatchCounts(
+    profileId: number,
+  ): Promise<{ outpostCount: number; matchlistCount: number }>;
 }

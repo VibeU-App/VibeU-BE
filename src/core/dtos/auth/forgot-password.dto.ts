@@ -13,7 +13,11 @@ export class ForgotPasswordRequestDto {
   @IsEduEmail()
   email: string;
 
-  @ApiProperty({ example: false, required: false, description: 'True if checking the recovery email, false for primary email' })
+  @ApiProperty({
+    example: false,
+    required: false,
+    description: 'True if checking the recovery email, false for primary email',
+  })
   @IsOptional()
   @IsBoolean()
   isRecovery?: boolean;

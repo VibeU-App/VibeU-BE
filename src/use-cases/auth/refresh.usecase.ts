@@ -27,7 +27,8 @@ export class RefreshUsecase {
 
   async execute(refreshToken: string): Promise<RefreshResult> {
     // 1. Find session by refresh token
-    const session = await this.sessionRepository.findByRefreshToken(refreshToken);
+    const session =
+      await this.sessionRepository.findByRefreshToken(refreshToken);
     if (!session) {
       throw new AppException(ErrorCode.AUTH_INVALID_TOKEN);
     }
@@ -55,10 +56,16 @@ export class RefreshUsecase {
     }
 
     // 4. Generate new token pair
-    const tokenPair = this.tokenService.createTokenPair(user.id, user.email, user.role);
+    const tokenPair = this.tokenService.createTokenPair(
+      user.id,
+      user.email,
+      user.role,
+    );
 
     // 5. Update session with new refresh token and extend expiration
-    const newExpiresAt = new Date(Date.now() + config.jwt.refreshTokenTtl * 1000);
+    const newExpiresAt = new Date(
+      Date.now() + config.jwt.refreshTokenTtl * 1000,
+    );
 
     const updatedSession = new SessionEntity(
       session.id,

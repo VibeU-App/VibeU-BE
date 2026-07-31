@@ -6,7 +6,9 @@ import {
 
 export interface IQuestionnaireRepository {
   findQuestions(): Promise<QuestionnaireQuestionEntity[]>;
-  findOptionsByQuestionIds(questionIds: number[]): Promise<QuestionnaireOptionEntity[]>;
+  findOptionsByQuestionIds(
+    questionIds: number[],
+  ): Promise<QuestionnaireOptionEntity[]>;
   saveAnswers(answers: UserQuestionnaireAnswerEntity[]): Promise<void>;
   findUserAnswers(profileId: number): Promise<UserQuestionnaireAnswerEntity[]>;
 }

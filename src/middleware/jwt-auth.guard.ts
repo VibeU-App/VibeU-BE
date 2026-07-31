@@ -1,4 +1,9 @@
-import { CanActivate, ExecutionContext, Injectable, Inject } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  Inject,
+} from '@nestjs/common';
 import { ITokenService } from '../infrastructure/services/token/token.service';
 import { AppException, ErrorCode } from '../core/errors';
 

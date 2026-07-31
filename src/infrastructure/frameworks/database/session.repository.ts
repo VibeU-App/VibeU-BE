@@ -45,7 +45,9 @@ export class PrismaSessionRepository implements ISessionRepository {
    * Finds a session by its refresh token.
    * Returns null if not found or soft-deleted.
    */
-  async findByRefreshToken(refreshToken: string): Promise<SessionEntity | null> {
+  async findByRefreshToken(
+    refreshToken: string,
+  ): Promise<SessionEntity | null> {
     const session = await this.prisma.session.findFirst({
       where: {
         refreshToken,

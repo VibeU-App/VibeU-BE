@@ -10,10 +10,10 @@ import { success } from './envelope.helper';
 
 /**
  * Interceptor that wraps all successful responses in the envelope format.
- * 
+ *
  * This runs after the controller returns a response. If the controller
  * returns a plain object/array, it wraps it in { statusCode, message, data, metadata }.
- * 
+ *
  * If the controller already returns an envelope (has statusCode and data fields),
  * it passes through unchanged.
  */
@@ -23,7 +23,12 @@ export class EnvelopeInterceptor implements NestInterceptor {
     return next.handle().pipe(
       map((response) => {
         // If response is already an envelope, return as-is
-        if (response && typeof response === 'object' && 'statusCode' in response && 'data' in response) {
+        if (
+          response &&
+          typeof response === 'object' &&
+          'statusCode' in response &&
+          'data' in response
+        ) {
           return response;
         }
 

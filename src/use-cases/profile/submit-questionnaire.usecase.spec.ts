@@ -4,6 +4,7 @@ import {
   MockQuestionnaireRepository,
   MockPersonalityArchetypeRepository,
   MockAIService,
+  MockHobbyRepository,
 } from './test-mocks';
 import { ProfileEntity } from '../../core/entities/profile.entity';
 import {
@@ -24,18 +25,32 @@ describe('SubmitQuestionnaireUseCase', () => {
     mockQuestionnaireRepo = new MockQuestionnaireRepository();
     mockArchetypeRepo = new MockPersonalityArchetypeRepository();
     mockAIService = new MockAIService();
+    const mockHobbyRepo = new MockHobbyRepository();
 
     useCase = new SubmitQuestionnaireUseCase(
       mockProfileRepo,
       mockQuestionnaireRepo,
       mockArchetypeRepo,
+      mockHobbyRepo,
       mockAIService,
     );
 
     // Seed questions
     mockQuestionnaireRepo.questions = [
-      new QuestionnaireQuestionEntity(1, 'Question 1', 1, new Date(), new Date()),
-      new QuestionnaireQuestionEntity(2, 'Question 2', 2, new Date(), new Date()),
+      new QuestionnaireQuestionEntity(
+        1,
+        'Question 1',
+        1,
+        new Date(),
+        new Date(),
+      ),
+      new QuestionnaireQuestionEntity(
+        2,
+        'Question 2',
+        2,
+        new Date(),
+        new Date(),
+      ),
     ];
 
     // Seed options
@@ -48,7 +63,14 @@ describe('SubmitQuestionnaireUseCase', () => {
 
     // Seed archetypes
     mockArchetypeRepo.archetypes = [
-      new PersonalityArchetypeEntity(1, 'Lotus', 'Lotus Desc', ['Empathetic'], new Date(), new Date()),
+      new PersonalityArchetypeEntity(
+        1,
+        'Lotus',
+        'Lotus Desc',
+        ['Empathetic'],
+        new Date(),
+        new Date(),
+      ),
     ];
   });
 
@@ -71,8 +93,10 @@ describe('SubmitQuestionnaireUseCase', () => {
       { questionId: 2, selectedOptionId: 21 },
     ];
 
-    // Note: Since usecases are placeholders returning NotImplemented, we expect it to throw here
-    await expect(useCase.execute('user-1', answers)).rejects.toThrow('Method not implemented.');
+    const result = await useCase.execute('user-1', answers);
+    expect(result.profile.personalityArchetypeId).toBe(1);
+    expect(result.profile.isCompleted).toBe(true);
+    expect(result.archetype.id).toBe(1);
   });
 
   it('should throw an error if profile is not found', async () => {
@@ -81,7 +105,7 @@ describe('SubmitQuestionnaireUseCase', () => {
       { questionId: 2, selectedOptionId: 21 },
     ];
     await expect(useCase.execute('non-existent', answers)).rejects.toThrow(
-      'Method not implemented.',
+      'Profile not found',
     );
   });
 });

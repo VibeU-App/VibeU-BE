@@ -16,16 +16,32 @@ export class PrismaQuestionnaireRepository implements IQuestionnaireRepository {
       orderBy: { order: 'asc' },
     });
     return list.map(
-      (q) => new QuestionnaireQuestionEntity(q.id, q.text, q.order, q.createdAt, q.updatedAt),
+      (q) =>
+        new QuestionnaireQuestionEntity(
+          q.id,
+          q.text,
+          q.order,
+          q.createdAt,
+          q.updatedAt,
+        ),
     );
   }
 
-  async findOptionsByQuestionIds(questionIds: number[]): Promise<QuestionnaireOptionEntity[]> {
+  async findOptionsByQuestionIds(
+    questionIds: number[],
+  ): Promise<QuestionnaireOptionEntity[]> {
     const list = await this.prisma.questionnaireOption.findMany({
       where: { questionId: { in: questionIds } },
     });
     return list.map(
-      (o) => new QuestionnaireOptionEntity(o.id, o.questionId, o.text, o.createdAt, o.updatedAt),
+      (o) =>
+        new QuestionnaireOptionEntity(
+          o.id,
+          o.questionId,
+          o.text,
+          o.createdAt,
+          o.updatedAt,
+        ),
     );
   }
 
@@ -52,12 +68,21 @@ export class PrismaQuestionnaireRepository implements IQuestionnaireRepository {
     });
   }
 
-  async findUserAnswers(profileId: number): Promise<UserQuestionnaireAnswerEntity[]> {
+  async findUserAnswers(
+    profileId: number,
+  ): Promise<UserQuestionnaireAnswerEntity[]> {
     const list = await this.prisma.userQuestionnaireAnswer.findMany({
       where: { profileId },
     });
     return list.map(
-      (a) => new UserQuestionnaireAnswerEntity(a.id, a.profileId, a.questionId, a.selectedOptionId, a.createdAt),
+      (a) =>
+        new UserQuestionnaireAnswerEntity(
+          a.id,
+          a.profileId,
+          a.questionId,
+          a.selectedOptionId,
+          a.createdAt,
+        ),
     );
   }
 }

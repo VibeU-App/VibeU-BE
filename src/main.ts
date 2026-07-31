@@ -52,7 +52,9 @@ async function bootstrap() {
   );
 
   console.log(`Server is running on port ${process.env.PORT ?? 3005}`);
-  console.log(`API Documentation: http://localhost:${process.env.PORT ?? 3005}/docs`);
+  console.log(
+    `API Documentation: http://localhost:${process.env.PORT ?? 3005}/docs`,
+  );
   await app.listen(process.env.PORT ?? 3005);
 }
 bootstrap();

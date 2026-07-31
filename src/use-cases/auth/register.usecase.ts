@@ -41,7 +41,9 @@ export class RegisterUsecase {
 
     // 1. Check if email already exists
     const existingUser = await this.userRepository.findByEmail(email);
-    const pendingStatusId = await this.userRepository.findStatusByName(AccountStatusName.PENDING);
+    const pendingStatusId = await this.userRepository.findStatusByName(
+      AccountStatusName.PENDING,
+    );
     if (!pendingStatusId) {
       throw new Error('Pending account status not found in system');
     }
@@ -50,11 +52,15 @@ export class RegisterUsecase {
 
     if (existingUser) {
       if (existingUser.accountStatusId !== pendingStatusId) {
-        this.logger.warn(`Registration rejected. Email already exists and is active: ${email}`);
+        this.logger.warn(
+          `Registration rejected. Email already exists and is active: ${email}`,
+        );
         throw new AppException(ErrorCode.AUTH_EMAIL_ALREADY_EXISTS);
       }
 
-      this.logger.log(`Email ${email} has pending registration. Sending new OTP.`);
+      this.logger.log(
+        `Email ${email} has pending registration. Sending new OTP.`,
+      );
       // Update existing user metadata, keeping empty/existing password until verified
       const updatedUser = new UserEntity(
         existingUser.id,
@@ -79,10 +85,14 @@ export class RegisterUsecase {
     }
 
     // 4. Generate and save OTP
-    const maxAttemptsVal = await this.policyRepository.findValueByKey('MAX_OTP_ATTEMPTS');
+    const maxAttemptsVal =
+      await this.policyRepository.findValueByKey('MAX_OTP_ATTEMPTS');
     const maxAttempts = maxAttemptsVal ? parseInt(maxAttemptsVal, 10) : 5;
-    const expiryMinutesVal = await this.policyRepository.findValueByKey('OTP_EXPIRY_MINUTES');
-    const expiryMinutes = expiryMinutesVal ? parseInt(expiryMinutesVal, 10) : 15;
+    const expiryMinutesVal =
+      await this.policyRepository.findValueByKey('OTP_EXPIRY_MINUTES');
+    const expiryMinutes = expiryMinutesVal
+      ? parseInt(expiryMinutesVal, 10)
+      : 15;
 
     const otp = OtpEntity.create({
       userId: savedUser.id,
@@ -97,9 +107,17 @@ export class RegisterUsecase {
       otp: otp.code,
       expiryMinutes,
     });
-    this.mailService.send(savedUser.email, 'Your Verification Code', emailHtml)
-      .catch(err => this.logger.error(`Failed to send verification email to ${savedUser.email}: ${err.message}`, err.stack));
+    this.mailService
+      .send(savedUser.email, 'Your Verification Code', emailHtml)
+      .catch((err) =>
+        this.logger.error(
+          `Failed to send verification email to ${savedUser.email}: ${err.message}`,
+          err.stack,
+        ),
+      );
 
-    this.logger.log(`User registration process completed successfully for: ${email}`);
+    this.logger.log(
+      `User registration process completed successfully for: ${email}`,
+    );
   }
 }

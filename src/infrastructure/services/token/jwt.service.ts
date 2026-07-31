@@ -11,10 +11,10 @@ export interface IJwtService {
 
 /**
  * JWT service implementation using jsonwebtoken library.
- * 
+ *
  * This service handles JWT token creation and verification. It uses the
  * secret key from configuration to sign and verify tokens.
- * 
+ *
  * The token payload typically contains:
  * - sub: The user ID (subject)
  * - email: The user's email

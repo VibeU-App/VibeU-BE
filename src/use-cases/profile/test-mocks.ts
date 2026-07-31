@@ -51,7 +51,9 @@ export class MockProfileRepository implements IProfileRepository {
     return profile;
   }
 
-  async getProfilePostAndMatchCounts(profileId: number): Promise<{ outpostCount: number; matchlistCount: number }> {
+  async getProfilePostAndMatchCounts(
+    profileId: number,
+  ): Promise<{ outpostCount: number; matchlistCount: number }> {
     return { outpostCount: 5, matchlistCount: 2 };
   }
 }
@@ -73,7 +75,10 @@ export class MockHobbyRepository implements IHobbyRepository {
     return this.hobbies.filter((h) => ids.includes(h.id));
   }
 
-  async updateProfileHobbies(profileId: number, hobbyIds: number[]): Promise<void> {
+  async updateProfileHobbies(
+    profileId: number,
+    hobbyIds: number[],
+  ): Promise<void> {
     this.profileHobbies.set(profileId, hobbyIds);
   }
 }
@@ -99,7 +104,9 @@ export class MockQuestionnaireRepository implements IQuestionnaireRepository {
     return this.questions;
   }
 
-  async findOptionsByQuestionIds(questionIds: number[]): Promise<QuestionnaireOptionEntity[]> {
+  async findOptionsByQuestionIds(
+    questionIds: number[],
+  ): Promise<QuestionnaireOptionEntity[]> {
     return this.options.filter((o) => questionIds.includes(o.questionId));
   }
 
@@ -107,7 +114,9 @@ export class MockQuestionnaireRepository implements IQuestionnaireRepository {
     this.answers.push(...answers);
   }
 
-  async findUserAnswers(profileId: number): Promise<UserQuestionnaireAnswerEntity[]> {
+  async findUserAnswers(
+    profileId: number,
+  ): Promise<UserQuestionnaireAnswerEntity[]> {
     return this.answers.filter((a) => a.profileId === profileId);
   }
 }

@@ -19,7 +19,11 @@ export class ChangePasswordUsecase {
     private readonly cryptoService: ICryptoService,
   ) {}
 
-  async execute(userId: string, oldPassword: string, newPassword: string): Promise<ChangePasswordResult> {
+  async execute(
+    userId: string,
+    oldPassword: string,
+    newPassword: string,
+  ): Promise<ChangePasswordResult> {
     this.logger.log(`Change password attempt for user ID: ${userId}`);
 
     const user = await this.userRepository.findById(userId);
@@ -29,13 +33,24 @@ export class ChangePasswordUsecase {
 
     // If password hash is empty, they must use Create Password endpoint first
     if (user.passwordHash === '') {
-      throw new AppException(ErrorCode.AUTH_INVALID_CREDENTIALS, HttpStatus.BAD_REQUEST, 'No password set. Use create password endpoint.');
+      throw new AppException(
+        ErrorCode.AUTH_INVALID_CREDENTIALS,
+        HttpStatus.BAD_REQUEST,
+        'No password set. Use create password endpoint.',
+      );
     }
 
     // Verify old password
-    const isOldPasswordMatch = await this.cryptoService.compare(oldPassword, user.passwordHash);
+    const isOldPasswordMatch = await this.cryptoService.compare(
+      oldPassword,
+      user.passwordHash,
+    );
     if (!isOldPasswordMatch) {
-      throw new AppException(ErrorCode.AUTH_INVALID_CREDENTIALS, HttpStatus.BAD_REQUEST, 'Old password is incorrect.');
+      throw new AppException(
+        ErrorCode.AUTH_INVALID_CREDENTIALS,
+        HttpStatus.BAD_REQUEST,
+        'Old password is incorrect.',
+      );
     }
 
     const passwordHash = await this.cryptoService.hash(newPassword);
