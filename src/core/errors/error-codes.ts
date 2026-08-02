@@ -27,17 +27,23 @@ export enum ErrorCode {
 
 export const ErrorMessage: Record<ErrorCode, string> = {
   [ErrorCode.AUTH_INVALID_CREDENTIALS]: 'Invalid email or password',
-  [ErrorCode.AUTH_EMAIL_ALREADY_EXISTS]: 'An account with this email already exists',
+  [ErrorCode.AUTH_EMAIL_ALREADY_EXISTS]:
+    'An account with this email already exists',
   [ErrorCode.AUTH_INVALID_TOKEN]: 'Invalid authentication token',
   [ErrorCode.AUTH_TOKEN_EXPIRED]: 'Authentication token has expired',
   [ErrorCode.AUTH_OTP_INVALID]: 'Invalid or incorrect OTP code',
-  [ErrorCode.AUTH_OTP_EXPIRED]: 'OTP code has expired, please request a new one',
+  [ErrorCode.AUTH_OTP_EXPIRED]:
+    'OTP code has expired, please request a new one',
   [ErrorCode.AUTH_USER_NOT_FOUND]: 'No account found with this email',
-  [ErrorCode.AUTH_WEAK_PASSWORD]: 'Password must be at least 8 characters with uppercase, lowercase, number, and special character',
+  [ErrorCode.AUTH_WEAK_PASSWORD]:
+    'Password must be at least 8 characters with uppercase, lowercase, number, and special character',
   [ErrorCode.AUTH_INVALID_EMAIL]: 'Please provide a valid email address',
-  [ErrorCode.AUTH_FORBIDDEN]: 'You do not have permission to access this resource',
-  [ErrorCode.AUTH_USER_NOT_VERIFIED]: 'Please verify your email before logging in',
-  [ErrorCode.AUTH_MATCHING_OLD_PASSWORD]: 'New password must be different from old password',
+  [ErrorCode.AUTH_FORBIDDEN]:
+    'You do not have permission to access this resource',
+  [ErrorCode.AUTH_USER_NOT_VERIFIED]:
+    'Please verify your email before logging in',
+  [ErrorCode.AUTH_MATCHING_OLD_PASSWORD]:
+    'New password must be different from old password',
   [ErrorCode.AUTH_SESSION_EXPIRED]: 'Session has expired, please log in again',
   [ErrorCode.PROFILE_USER_NOT_FOUND]: 'No profile was found with this user',
   [ErrorCode.PROFILE_USER_NOT_OLD_ENOUGH]: 'User must be 18 or older',

@@ -20,32 +20,35 @@ export class VerifyResetPasswordOtpUsecase {
     private readonly userRepository: IUserRepository,
   ) {}
 
-  async execute(email: string, otp: string): Promise<VerifyResetPasswordOtpResult> {
+  async execute(
+    email: string,
+    otp: string,
+  ): Promise<VerifyResetPasswordOtpResult> {
     const user = await this.userRepository.findByEmailOrRecoveryEmail(email);
-    
-    if (!!user) {
+
+    if (user) {
       const userOtp = await this.otpRepository.findByUserId(user.id);
       console.log('userOtp:', userOtp); // Debugging line to check the value of userOtp
-      if (!!userOtp) {
+      if (userOtp) {
         if (userOtp.code !== otp) {
           await this.otpRepository.incrementAttempts(user.id);
           throw new BadRequestException({
             code: ErrorCode.AUTH_OTP_INVALID,
-            message: "Invalid OTP",
+            message: 'Invalid OTP',
           });
         }
 
         if (userOtp.isMaxAttemptsReached()) {
           throw new BadRequestException({
             code: ErrorCode.AUTH_OTP_INVALID,
-            message: "Invalid OTP",
+            message: 'Invalid OTP',
           });
         }
 
         if (userOtp.isExpired()) {
           throw new BadRequestException({
             code: ErrorCode.AUTH_OTP_EXPIRED,
-            message: "Expired OTP",
+            message: 'Expired OTP',
           });
         }
 
@@ -54,20 +57,19 @@ export class VerifyResetPasswordOtpUsecase {
           sub: user.id,
           email: user.email,
           role: UserRole.USER,
-          purpose: "password_reset",
+          purpose: 'password_reset',
           hash: user.passwordHash,
-        }
+        };
 
         return {
           resetToken: this.jwtService.signPayload(payload),
-        }
+        };
       }
     }
-  
 
     throw new BadRequestException({
       code: ErrorCode.AUTH_USER_NOT_FOUND,
-      message: "User not found",
+      message: 'User not found',
     });
   }
 }

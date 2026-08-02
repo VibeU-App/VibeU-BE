@@ -1,6 +1,9 @@
 import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
 import { PrismaService } from './prisma.service';
-import { AccountStatusEntity, AccountStatusName } from '../../../core/entities/user.entity';
+import {
+  AccountStatusEntity,
+  AccountStatusName,
+} from '../../../core/entities/user.entity';
 
 /**
  * Service that loads account statuses into memory at startup.
@@ -68,7 +71,9 @@ export class AccountStatusLoaderService implements OnModuleInit {
   getStatusId(name: AccountStatusName): number {
     const status = this.statusByName.get(name);
     if (!status) {
-      throw new Error(`Account status '${name}' not found. Was the database seeded?`);
+      throw new Error(
+        `Account status '${name}' not found. Was the database seeded?`,
+      );
     }
     return status.id;
   }

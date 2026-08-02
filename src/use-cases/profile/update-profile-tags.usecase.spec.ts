@@ -58,7 +58,9 @@ describe('UpdateProfileTagsUseCase', () => {
     await mockProfileRepo.save(profile);
 
     await useCase.execute('user-1', [2, 3]);
-    const profileHobbies = (await mockHobbyRepo.findProfileHobbies(1)).map(h => h.id);
+    const profileHobbies = (await mockHobbyRepo.findProfileHobbies(1)).map(
+      (h) => h.id,
+    );
     const dto = plainToInstance(UpdateProfileTagsRequestDto, {
       userId: profile.userId,
       hobbyIds: profileHobbies,

@@ -14,9 +14,9 @@ export interface TokenPair {
  * Decoded access token payload.
  */
 export interface AccessTokenPayload {
-  sub: string;    // User ID
-  email: string;  // User email
-  role: string;   // User role
+  sub: string; // User ID
+  email: string; // User email
+  role: string; // User role
 }
 
 /**
@@ -73,7 +73,11 @@ export class TokenService implements ITokenService {
    * Creates a JWT access token.
    * Token TTL is loaded from config (default: 1 hour).
    */
-  private createAccessToken(userId: string, email: string, role: string): string {
+  private createAccessToken(
+    userId: string,
+    email: string,
+    role: string,
+  ): string {
     const payload: AccessTokenPayload = {
       sub: userId,
       email,

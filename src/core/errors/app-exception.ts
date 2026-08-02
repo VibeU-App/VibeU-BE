@@ -23,16 +23,23 @@ const ErrorCodeToHttpStatus: Record<ErrorCode, HttpStatus> = {
 
 /**
  * Custom application exception that includes an error code.
- * 
+ *
  * The envelope filter catches this and includes the error code
  * in the response metadata for the frontend to handle.
  */
 export class AppException extends HttpException {
   public readonly code: ErrorCode;
 
-  constructor(code: ErrorCode, statusCode?: HttpStatus, customMessage?: string) {
+  constructor(
+    code: ErrorCode,
+    statusCode?: HttpStatus,
+    customMessage?: string,
+  ) {
     const message = customMessage ?? ErrorMessage[code];
-    const status = statusCode ?? ErrorCodeToHttpStatus[code] ?? HttpStatus.INTERNAL_SERVER_ERROR;
+    const status =
+      statusCode ??
+      ErrorCodeToHttpStatus[code] ??
+      HttpStatus.INTERNAL_SERVER_ERROR;
 
     super(message, status);
     this.code = code;

@@ -5,7 +5,7 @@ import { config } from '../../../configuration';
 
 /**
  * SMTP email service implementation using nodemailer.
- * 
+ *
  * Exposes a generic send method adhering to OCP and ISP.
  */
 @Injectable()
@@ -46,13 +46,13 @@ export class SmtpMailService implements IMailService {
    */
   getTargetEmail(email: string): string | null {
     if (this.isValidEmail(email)) {
-      const emailParts = email.split("@");
+      const emailParts = email.split('@');
       const identifier = emailParts[0];
       const domains = emailParts[1];
       let targetEmail = email;
 
-      if (identifier.includes("+")) {
-        targetEmail = targetEmail.split("+")[0] + "@" + domains;
+      if (identifier.includes('+')) {
+        targetEmail = targetEmail.split('+')[0] + '@' + domains;
       }
 
       return targetEmail.toLowerCase();
@@ -65,9 +65,11 @@ export class SmtpMailService implements IMailService {
    * Sends an email with generic HTML content.
    */
   async send(to: string, subject: string, content: string): Promise<void> {
-    const targetEmail : string | null = this.getTargetEmail(to);
+    const targetEmail: string | null = this.getTargetEmail(to);
     if (targetEmail === null) {
-      throw new Error(`Cannot send email: recipient address '${to}' does not contain '.edu' in the domain.`);
+      throw new Error(
+        `Cannot send email: recipient address '${to}' does not contain '.edu' in the domain.`,
+      );
     }
 
     await this.transporter.sendMail({

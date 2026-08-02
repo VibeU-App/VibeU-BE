@@ -18,7 +18,13 @@ describe('SaveHobbiesUseCase', () => {
       new HobbyEntity(1, 'Soccer', 'SPORT', new Date(), new Date()),
       new HobbyEntity(2, 'Cats', 'PET', new Date(), new Date()),
       new HobbyEntity(3, 'Pizza', 'FOOD', new Date(), new Date()),
-      new HobbyEntity(4, 'Direct', 'COMMUNICATION_STYLE', new Date(), new Date()),
+      new HobbyEntity(
+        4,
+        'Direct',
+        'COMMUNICATION_STYLE',
+        new Date(),
+        new Date(),
+      ),
       new HobbyEntity(5, 'Introverted', 'PERSONALITY', new Date(), new Date()),
     ];
   });

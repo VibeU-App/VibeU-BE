@@ -15,7 +15,7 @@ export class UpdateProfileTagsUseCase {
   async execute(userId: string, hobbyIds: number[]): Promise<void> {
     const userProfile = await this.profileRepository.findByUserId(userId);
 
-    if (!!userProfile) {
+    if (userProfile) {
       await this.hobbyRepository.updateProfileHobbies(userProfile.id, hobbyIds);
     } else {
       throw new AppException(ErrorCode.PROFILE_USER_NOT_FOUND);

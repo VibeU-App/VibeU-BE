@@ -27,7 +27,8 @@ export class OtpEntity {
     expiryMinutes?: number;
     maxAttempts?: number;
   }): OtpEntity {
-    const code = props.code ?? Math.floor(100000 + Math.random() * 900000).toString();
+    const code =
+      props.code ?? Math.floor(100000 + Math.random() * 900000).toString();
     const now = new Date();
     const expiresAt = new Date(now);
     expiresAt.setMinutes(expiresAt.getMinutes() + (props.expiryMinutes ?? 15)); // Default 15 minutes

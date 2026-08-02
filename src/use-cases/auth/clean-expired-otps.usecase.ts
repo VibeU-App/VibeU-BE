@@ -14,7 +14,9 @@ export class CleanExpiredOtpsUsecase {
     this.logger.log('Executing expired OTP cleaner job...');
     const deletedCount = await this.otpRepository.deleteExpiredOtps();
     if (deletedCount > 0) {
-      this.logger.log(`Successfully cleaned up ${deletedCount} expired OTPs from the database.`);
+      this.logger.log(
+        `Successfully cleaned up ${deletedCount} expired OTPs from the database.`,
+      );
     }
     return deletedCount;
   }

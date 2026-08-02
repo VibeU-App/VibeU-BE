@@ -29,6 +29,8 @@ describe('GetProfileUseCase', () => {
     );
     await mockProfileRepo.save(profile);
 
-    await expect(useCase.execute('user-1')).rejects.toThrow('Method not implemented.');
+    await expect(useCase.execute('user-1')).rejects.toThrow(
+      'Method not implemented.',
+    );
   });
 });

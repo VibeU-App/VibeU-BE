@@ -21,37 +21,44 @@ export class ResetPasswordUsecase {
     private readonly jwtService: IJwtService,
   ) {}
 
-  async execute(newPassword: string, resetToken: string): Promise<ResetPasswordResult> {
-    const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/;
-    
+  async execute(
+    newPassword: string,
+    resetToken: string,
+  ): Promise<ResetPasswordResult> {
+    const strongPasswordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/;
+
     if (!strongPasswordRegex.test(newPassword)) {
       throw new BadRequestException({
         code: ErrorCode.AUTH_WEAK_PASSWORD,
-        message: "Password is too weak",
+        message: 'Password is too weak',
       });
     }
 
     const tokenData = this.jwtService.verifyToken(resetToken);
     const userId = tokenData?.sub;
     const tokenHash = tokenData?.hash;
-    
-    if (!!userId) {
+
+    if (userId) {
       const user = await this.userRepository.findById(userId);
 
-      if (!!user) {
+      if (user) {
         // Enforce single-use reset token
         if (user.passwordHash !== tokenHash) {
           throw new BadRequestException({
             code: ErrorCode.AUTH_INVALID_TOKEN,
-            message: "Reset token is invalid or has already been used",
+            message: 'Reset token is invalid or has already been used',
           });
         }
 
-        const isSamePassword = await this.cryptoService.compare(newPassword, user.passwordHash);
+        const isSamePassword = await this.cryptoService.compare(
+          newPassword,
+          user.passwordHash,
+        );
         if (isSamePassword) {
           throw new BadRequestException({
             code: ErrorCode.AUTH_MATCHING_OLD_PASSWORD,
-            message: "New password must be different from old password",
+            message: 'New password must be different from old password',
           });
         }
 
@@ -72,14 +79,14 @@ export class ResetPasswordUsecase {
         await this.userRepository.update(newUser);
 
         return {
-          message: "Password reset successfully"
-        }
+          message: 'Password reset successfully',
+        };
       }
-    } 
+    }
 
-    throw new BadRequestException({ 
-        code: ErrorCode.AUTH_USER_NOT_FOUND,
-        message: "Invalid or expired OTP",
+    throw new BadRequestException({
+      code: ErrorCode.AUTH_USER_NOT_FOUND,
+      message: 'Invalid or expired OTP',
     });
   }
 }

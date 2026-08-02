@@ -34,8 +34,20 @@ describe('SubmitQuestionnaireUseCase', () => {
 
     // Seed questions
     mockQuestionnaireRepo.questions = [
-      new QuestionnaireQuestionEntity(1, 'Question 1', 1, new Date(), new Date()),
-      new QuestionnaireQuestionEntity(2, 'Question 2', 2, new Date(), new Date()),
+      new QuestionnaireQuestionEntity(
+        1,
+        'Question 1',
+        1,
+        new Date(),
+        new Date(),
+      ),
+      new QuestionnaireQuestionEntity(
+        2,
+        'Question 2',
+        2,
+        new Date(),
+        new Date(),
+      ),
     ];
 
     // Seed options
@@ -48,7 +60,14 @@ describe('SubmitQuestionnaireUseCase', () => {
 
     // Seed archetypes
     mockArchetypeRepo.archetypes = [
-      new PersonalityArchetypeEntity(1, 'Lotus', 'Lotus Desc', ['Empathetic'], new Date(), new Date()),
+      new PersonalityArchetypeEntity(
+        1,
+        'Lotus',
+        'Lotus Desc',
+        ['Empathetic'],
+        new Date(),
+        new Date(),
+      ),
     ];
   });
 
@@ -72,7 +91,9 @@ describe('SubmitQuestionnaireUseCase', () => {
     ];
 
     // Note: Since usecases are placeholders returning NotImplemented, we expect it to throw here
-    await expect(useCase.execute('user-1', answers)).rejects.toThrow('Method not implemented.');
+    await expect(useCase.execute('user-1', answers)).rejects.toThrow(
+      'Method not implemented.',
+    );
   });
 
   it('should throw an error if profile is not found', async () => {

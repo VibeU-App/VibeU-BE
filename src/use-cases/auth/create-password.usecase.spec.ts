@@ -41,6 +41,8 @@ describe('CreatePasswordUsecase', () => {
     });
     mockUserRepository.addUser({ ...user, id: 'user-1' } as UserEntity);
 
-    await expect(usecase.execute('user-1', 'NewSecurePass123!')).rejects.toThrow();
+    await expect(
+      usecase.execute('user-1', 'NewSecurePass123!'),
+    ).rejects.toThrow();
   });
 });

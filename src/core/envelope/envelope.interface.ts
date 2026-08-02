@@ -1,6 +1,6 @@
 /**
  * Standard API response envelope.
- * 
+ *
  * All responses (success or failure) follow this structure.
  * The frontend expects this exact format to parse responses consistently.
  */

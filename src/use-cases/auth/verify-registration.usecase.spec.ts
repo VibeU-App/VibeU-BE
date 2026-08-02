@@ -1,5 +1,10 @@
 import { VerifyRegistrationUsecase } from './verify-registration.usecase';
-import { MockUserRepository, MockOtpRepository, MockSessionRepository, MockTokenService } from './test-mocks';
+import {
+  MockUserRepository,
+  MockOtpRepository,
+  MockSessionRepository,
+  MockTokenService,
+} from './test-mocks';
 import { ErrorCode } from '../../core/errors';
 import { UserEntity } from '../../core/entities/user.entity';
 import { OtpEntity } from '../../core/entities/otp.entity';

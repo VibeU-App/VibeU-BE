@@ -23,7 +23,7 @@ export class UpdateProfileMeUseCase {
     const userProfile: ProfileEntity | null =
       await this.profileRepository.findByUserId(userId);
 
-    if (!!userProfile) {
+    if (userProfile) {
       if (
         !!payload.birthday &&
         this.profileRepository.getAge(payload.birthday) < 18

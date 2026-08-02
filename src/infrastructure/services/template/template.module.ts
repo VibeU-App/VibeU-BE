@@ -3,7 +3,7 @@ import { TemplateLoaderService } from './template-loader.service';
 
 /**
  * Global template module.
- * 
+ *
  * Making this module global allows any service to inject TemplateLoaderService
  * without importing the module explicitly.
  */

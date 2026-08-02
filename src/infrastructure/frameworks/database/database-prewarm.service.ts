@@ -34,16 +34,18 @@ export class DatabasePrewarmService implements OnModuleInit {
 
     for (const table of this.TABLES_TO_PREWARM) {
       try {
-        const result = await this.prisma.$queryRawUnsafe<{ pg_prewarm: number }[]>(
-          `SELECT pg_prewarm(quote_ident('${table}')) as pg_prewarm`
-        );
+        const result = await this.prisma.$queryRawUnsafe<
+          { pg_prewarm: number }[]
+        >(`SELECT pg_prewarm(quote_ident('${table}')) as pg_prewarm`);
 
         const blocks = result[0]?.pg_prewarm ?? 0;
-        this.logger.log(`Prewarmed table '${table}': ${blocks} blocks loaded into shared_buffers`);
+        this.logger.log(
+          `Prewarmed table '${table}': ${blocks} blocks loaded into shared_buffers`,
+        );
       } catch (error) {
         this.logger.warn(
           `Failed to prewarm table '${table}': ${error.message}. ` +
-          `Make sure pg_prewarm extension is enabled: CREATE EXTENSION IF NOT EXISTS pg_prewarm;`
+            `Make sure pg_prewarm extension is enabled: CREATE EXTENSION IF NOT EXISTS pg_prewarm;`,
         );
       }
     }
@@ -56,15 +58,17 @@ export class DatabasePrewarmService implements OnModuleInit {
    */
   async prewarmTable(tableName: string): Promise<number> {
     try {
-      const result = await this.prisma.$queryRawUnsafe<{ pg_prewarm: number }[]>(
-        `SELECT pg_prewarm(quote_ident('${tableName}')) as pg_prewarm`
-      );
+      const result = await this.prisma.$queryRawUnsafe<
+        { pg_prewarm: number }[]
+      >(`SELECT pg_prewarm(quote_ident('${tableName}')) as pg_prewarm`);
 
       const blocks = result[0]?.pg_prewarm ?? 0;
       this.logger.log(`Prewarmed table '${tableName}': ${blocks} blocks`);
       return blocks;
     } catch (error) {
-      this.logger.error(`Failed to prewarm table '${tableName}': ${error.message}`);
+      this.logger.error(
+        `Failed to prewarm table '${tableName}': ${error.message}`,
+      );
       throw error;
     }
   }

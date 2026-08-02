@@ -28,7 +28,10 @@ export class PrismaHobbyRepository implements IHobbyRepository {
     return list.map((ph) => this.mapToEntity(ph.hobby));
   }
 
-  async updateProfileHobbies(profileId: number, hobbyIds: number[]): Promise<void> {
+  async updateProfileHobbies(
+    profileId: number,
+    hobbyIds: number[],
+  ): Promise<void> {
     // Delete existing profile hobbies and write new ones in a transaction
     await this.prisma.$transaction(async (tx) => {
       await tx.profileHobby.deleteMany({

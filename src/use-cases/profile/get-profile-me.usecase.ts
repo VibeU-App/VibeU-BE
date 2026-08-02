@@ -14,7 +14,7 @@ export class GetProfileMeUseCase {
     const userProfile: ProfileEntity | null =
       await this.profileRepository.findByUserId(userId);
 
-    if (!!userProfile) {
+    if (userProfile) {
       const birthday = userProfile.birthday;
       const age = this.profileRepository.getAge(birthday);
       const zodiac: string = this.profileRepository.getZodiacSign(birthday);

@@ -30,21 +30,33 @@ export class RequestLoginOtpUsecase {
     // 1. Find user by email
     const user = await this.userRepository.findByEmail(email);
     if (!user) {
-      this.logger.warn(`Login OTP request failed: User not found for email ${email}`);
-      throw new AppException(ErrorCode.AUTH_USER_NOT_FOUND, undefined, 'User not found');
+      this.logger.warn(
+        `Login OTP request failed: User not found for email ${email}`,
+      );
+      throw new AppException(
+        ErrorCode.AUTH_USER_NOT_FOUND,
+        undefined,
+        'User not found',
+      );
     }
 
     // 2. Check if verified
     if (!user.isVerified) {
-      this.logger.warn(`Login OTP request failed: User email ${email} is not verified`);
+      this.logger.warn(
+        `Login OTP request failed: User email ${email} is not verified`,
+      );
       throw new AppException(ErrorCode.AUTH_USER_NOT_VERIFIED);
     }
 
     // 3. Generate and save OTP
-    const maxAttemptsVal = await this.policyRepository.findValueByKey('MAX_OTP_ATTEMPTS');
+    const maxAttemptsVal =
+      await this.policyRepository.findValueByKey('MAX_OTP_ATTEMPTS');
     const maxAttempts = maxAttemptsVal ? parseInt(maxAttemptsVal, 10) : 5;
-    const expiryMinutesVal = await this.policyRepository.findValueByKey('OTP_EXPIRY_MINUTES');
-    const expiryMinutes = expiryMinutesVal ? parseInt(expiryMinutesVal, 10) : 15;
+    const expiryMinutesVal =
+      await this.policyRepository.findValueByKey('OTP_EXPIRY_MINUTES');
+    const expiryMinutes = expiryMinutesVal
+      ? parseInt(expiryMinutesVal, 10)
+      : 15;
 
     // Delete any existing OTP first to avoid duplicates/conflicts
     await this.otpRepository.deleteByUserId(user.id);
@@ -62,8 +74,14 @@ export class RequestLoginOtpUsecase {
       otp: otp.code,
       expiryMinutes,
     });
-    this.mailService.send(user.email, 'Your Login Verification Code', emailHtml)
-      .catch(err => this.logger.error(`Failed to send login verification email to ${user.email}: ${err.message}`, err.stack));
+    this.mailService
+      .send(user.email, 'Your Login Verification Code', emailHtml)
+      .catch((err) =>
+        this.logger.error(
+          `Failed to send login verification email to ${user.email}: ${err.message}`,
+          err.stack,
+        ),
+      );
 
     this.logger.log(`Login OTP successfully sent to: ${email}`);
 

@@ -1,5 +1,9 @@
 import { VerifyResetPasswordOtpUsecase } from './verify-reset-password-otp.usecase';
-import { MockOtpRepository, MockJwtService, MockUserRepository } from './test-mocks';
+import {
+  MockOtpRepository,
+  MockJwtService,
+  MockUserRepository,
+} from './test-mocks';
 import { ErrorCode } from '../../core/errors';
 import { OtpEntity } from '../../core/entities/otp.entity';
 import { UserEntity, UserRole } from '../../core/entities';
@@ -14,7 +18,11 @@ describe('VerifyResetPasswordOtpUsecase', () => {
     mockOtpRepository = new MockOtpRepository();
     mockJwtService = new MockJwtService();
     mockUserRepository = new MockUserRepository();
-    usecase = new VerifyResetPasswordOtpUsecase(mockOtpRepository, mockJwtService, mockUserRepository);
+    usecase = new VerifyResetPasswordOtpUsecase(
+      mockOtpRepository,
+      mockJwtService,
+      mockUserRepository,
+    );
   });
 
   afterEach(() => {
@@ -30,11 +38,17 @@ describe('VerifyResetPasswordOtpUsecase', () => {
     });
     mockOtpRepository.addOtp(validOtp);
 
-    const testUser : UserEntity = new UserEntity(
-      'user-123', 'user@example.edu', 'Examplepassword123!', 1,
+    const testUser: UserEntity = new UserEntity(
+      'user-123',
+      'user@example.edu',
+      'Examplepassword123!',
+      1,
       UserRole.USER,
-      false, new Date(Date.now()), new Date(Date.now()), null,
-    )
+      false,
+      new Date(Date.now()),
+      new Date(Date.now()),
+      null,
+    );
     mockUserRepository.addUser(testUser);
 
     const testResult = await usecase.execute('user@example.edu', '123456');
@@ -56,11 +70,17 @@ describe('VerifyResetPasswordOtpUsecase', () => {
     });
     mockOtpRepository.addOtp(validOtp);
 
-    const testUser : UserEntity = new UserEntity(
-      'user-123', 'user@example.edu', 'Examplepassword123!', 1,
+    const testUser: UserEntity = new UserEntity(
+      'user-123',
+      'user@example.edu',
+      'Examplepassword123!',
+      1,
       UserRole.USER,
-      false, new Date(Date.now()), new Date(Date.now()), null,
-    )
+      false,
+      new Date(Date.now()),
+      new Date(Date.now()),
+      null,
+    );
     mockUserRepository.addUser(testUser);
 
     try {
@@ -79,11 +99,17 @@ describe('VerifyResetPasswordOtpUsecase', () => {
     });
     mockOtpRepository.addOtp(expiredOtp);
 
-    const testUser : UserEntity = new UserEntity(
-      'user-123', 'user@example.edu', 'Examplepassword123!', 1,
+    const testUser: UserEntity = new UserEntity(
+      'user-123',
+      'user@example.edu',
+      'Examplepassword123!',
+      1,
       UserRole.USER,
-      false, new Date(Date.now()), new Date(Date.now()), null,
-    )
+      false,
+      new Date(Date.now()),
+      new Date(Date.now()),
+      null,
+    );
     mockUserRepository.addUser(testUser);
 
     try {

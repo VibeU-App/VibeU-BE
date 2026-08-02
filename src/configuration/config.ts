@@ -6,16 +6,28 @@ dotenv.config();
 
 // Define Joi schema to validate environment variables
 const envVarsSchema = Joi.object({
-  JWT_SECRET_KEY: Joi.string().required().description('Secret key to sign JWT tokens'),
-  ACCESS_TOKEN_TTL: Joi.number().default(3600).description('Access token lifetime in seconds'),
-  REFRESH_TOKEN_TTL: Joi.number().default(604800).description('Refresh token lifetime in seconds'),
+  JWT_SECRET_KEY: Joi.string()
+    .required()
+    .description('Secret key to sign JWT tokens'),
+  ACCESS_TOKEN_TTL: Joi.number()
+    .default(3600)
+    .description('Access token lifetime in seconds'),
+  REFRESH_TOKEN_TTL: Joi.number()
+    .default(604800)
+    .description('Refresh token lifetime in seconds'),
   SMTP_HOST: Joi.string().required().description('SMTP server host name'),
   SMTP_PORT: Joi.number().required().description('SMTP server port number'),
   SMTP_USER: Joi.string().required().description('SMTP server user email'),
   SMTP_PASS: Joi.string().required().description('SMTP server password'),
-  DATABASE_URL: Joi.string().required().description('Database connection string'),
-  DIRECT_URL: Joi.string().default(Joi.ref('DATABASE_URL')).description('Database direct connection string for migrations'),
-}).unknown().required();
+  DATABASE_URL: Joi.string()
+    .required()
+    .description('Database connection string'),
+  DIRECT_URL: Joi.string()
+    .default(Joi.ref('DATABASE_URL'))
+    .description('Database direct connection string for migrations'),
+})
+  .unknown()
+  .required();
 
 // Validate and cast environment variables
 const { error, value: envVars } = envVarsSchema.validate(process.env, {

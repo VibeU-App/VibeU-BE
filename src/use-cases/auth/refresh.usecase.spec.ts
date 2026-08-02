@@ -1,5 +1,9 @@
 import { RefreshUsecase } from './refresh.usecase';
-import { MockSessionRepository, MockUserRepository, MockTokenService } from './test-mocks';
+import {
+  MockSessionRepository,
+  MockUserRepository,
+  MockTokenService,
+} from './test-mocks';
 import { SessionEntity } from '../../core/entities/session.entity';
 import { UserEntity, UserRole } from '../../core/entities/user.entity';
 import { ErrorCode } from '../../core/errors/error-codes';
@@ -14,7 +18,11 @@ describe('RefreshUsecase', () => {
     mockSessionRepository = new MockSessionRepository();
     mockUserRepository = new MockUserRepository();
     mockTokenService = new MockTokenService();
-    usecase = new RefreshUsecase(mockSessionRepository, mockUserRepository, mockTokenService);
+    usecase = new RefreshUsecase(
+      mockSessionRepository,
+      mockUserRepository,
+      mockTokenService,
+    );
   });
 
   afterEach(() => {
@@ -60,11 +68,15 @@ describe('RefreshUsecase', () => {
     expect(result.user.id).toBe('user-123');
 
     // Check that the old refresh token is no longer in active sessions
-    const oldSession = await mockSessionRepository.findByRefreshToken('active-refresh-token');
+    const oldSession = await mockSessionRepository.findByRefreshToken(
+      'active-refresh-token',
+    );
     expect(oldSession).toBeNull();
 
     // Check that the new refresh token is active
-    const newSession = await mockSessionRepository.findByRefreshToken(result.refreshToken);
+    const newSession = await mockSessionRepository.findByRefreshToken(
+      result.refreshToken,
+    );
     expect(newSession).toBeDefined();
     expect(newSession?.expiresAt.getTime()).toBeGreaterThan(Date.now());
   });
@@ -111,7 +123,9 @@ describe('RefreshUsecase', () => {
     }
 
     // Verify session is soft-deleted
-    const oldSession = await mockSessionRepository.findByRefreshToken('expired-refresh-token');
+    const oldSession = await mockSessionRepository.findByRefreshToken(
+      'expired-refresh-token',
+    );
     expect(oldSession).toBeNull();
   });
 });
