@@ -4,7 +4,6 @@ import {
   Body,
   HttpCode,
   HttpStatus,
-  Param,
   Patch,
   Put,
   UseGuards,
@@ -30,7 +29,6 @@ import {
   UpdateProfileRequestDto,
   UpdateProfileResponseDto,
 } from 'src/core/dtos/profile/update-profile.dto';
-import { ProfileEntity } from 'src/core/entities';
 import { UpdateProfileTagsRequestDto } from 'src/core/dtos/profile/update-profile-tags.dto';
 import { JwtAuthGuard } from 'src/middleware/jwt-auth.guard';
 

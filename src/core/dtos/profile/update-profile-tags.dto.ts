@@ -1,9 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
   ArrayMaxSize,
   ArrayMinSize,
   ArrayUnique,
-  IsString,
+  IsNumber,
 } from 'class-validator';
 
 /**
@@ -15,5 +16,7 @@ export class UpdateProfileTagsRequestDto {
   @ArrayMinSize(3)
   @ArrayMaxSize(10)
   @ArrayUnique()
+  @Type(() => Number)
+  @IsNumber({}, { each: true })
   hobbyIds: number[];
 }

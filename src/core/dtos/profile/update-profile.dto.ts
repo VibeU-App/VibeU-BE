@@ -1,6 +1,5 @@
 import {
   IsOptional,
-  IsString,
   MaxDate,
   MaxLength,
   MinDate,
@@ -8,6 +7,7 @@ import {
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { ProfileEntity } from '../../../core/entities';
+import { Type } from 'class-transformer';
 
 /**
  * Request DTO for update profile me.
@@ -21,6 +21,7 @@ export class UpdateProfileRequestDto {
   nickname?: string;
 
   @ApiProperty({ example: new Date('2000-01-01') })
+  @Type(() => Date)
   @MaxDate(new Date())
   @MinDate(new Date('1906-01-01'))
   @IsOptional()
@@ -32,6 +33,7 @@ export class UpdateProfileRequestDto {
   bio?: string;
 
   @ApiProperty({ example: 'abc1234' })
+  @MaxLength(300)
   @IsOptional()
   avatarSeed?: string;
 

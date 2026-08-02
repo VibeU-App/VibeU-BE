@@ -10,11 +10,7 @@ import { IPolicyRepository } from '../../core/abstracts/policy-repository.interf
 import { IUserRepository } from '../../core/abstracts/user-repository.interface';
 import { IOtpRepository } from '../../core/abstracts/otp-repository.interface';
 import { ISessionRepository } from '../../core/abstracts/session-repository.interface';
-import {
-  UserEntity,
-  AccountStatusEntity,
-  AccountStatusName,
-} from '../../core/entities/user.entity';
+import { UserEntity, AccountStatusName } from '../../core/entities/user.entity';
 import { OtpEntity } from '../../core/entities/otp.entity';
 import { SessionEntity } from '../../core/entities/session.entity';
 
