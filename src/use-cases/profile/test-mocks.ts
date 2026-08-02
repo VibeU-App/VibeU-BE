@@ -52,8 +52,9 @@ export class MockProfileRepository implements IProfileRepository {
   }
 
   async getProfilePostAndMatchCounts(
-    _profileId: number,
+    profileId: number,
   ): Promise<{ outpostCount: number; matchlistCount: number }> {
+    void profileId;
     return { outpostCount: 5, matchlistCount: 2 };
   }
 
