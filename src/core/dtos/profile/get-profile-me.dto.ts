@@ -10,7 +10,10 @@ export class GetProfileMeResponseDto {
     @ApiProperty({ example: 'abc1234' })
     avatarSeed: string;
 
-    @ApiProperty({ example: 'Hello, I am Alice!' })
+    @ApiProperty({ 
+        nullable: true,
+        example: 'Hello, I am Alice!',
+    })
     bio: string | null;
 
     @ApiProperty({ example: 'Capricorn' })
@@ -19,12 +22,15 @@ export class GetProfileMeResponseDto {
     @ApiProperty({ example: 26 })
     age: number;
 
-    @ApiProperty({ example: 2 })
+    @ApiProperty({ 
+        nullable: true,
+        example: 2,
+    })
     personalityArchetypeId: number | null;
 
     @ApiProperty({ example: 100 })
-    nuumOfPosts: number;
+    numOfPosts: number;
 
     @ApiProperty({ example: 10 })
-    nuumOfMatches: number;
+    numOfMatches: number;
 }

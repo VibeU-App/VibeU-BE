@@ -51,7 +51,9 @@ export class MockProfileRepository implements IProfileRepository {
     return profile;
   }
 
-  async getProfilePostAndMatchCounts(profileId: number): Promise<{ outpostCount: number; matchlistCount: number }> {
+  async getProfilePostAndMatchCounts(
+    profileId: number,
+  ): Promise<{ outpostCount: number; matchlistCount: number }> {
     return { outpostCount: 5, matchlistCount: 2 };
   }
 
@@ -59,19 +61,34 @@ export class MockProfileRepository implements IProfileRepository {
     const currentDate = new Date();
     let age = currentDate.getUTCFullYear() - birthday.getUTCFullYear();
 
-    if (currentDate.getUTCMonth() - birthday.getUTCMonth() < 0 ||
-        (currentDate.getUTCMonth() - birthday.getUTCMonth() === 0 && currentDate.getUTCDate() - birthday.getUTCDate() < 0)) {
-          age--;
+    if (
+      currentDate.getUTCMonth() - birthday.getUTCMonth() < 0 ||
+      (currentDate.getUTCMonth() - birthday.getUTCMonth() === 0 &&
+        currentDate.getUTCDate() - birthday.getUTCDate() < 0)
+    ) {
+      age--;
     }
 
     return age;
   }
-  
+
   getZodiacSign(birthday: Date): string {
-    const zodiacSignsMap = ["Aquarius", "Pisces", "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
-                      "Libra", "Scorpio", "Sagittarius", "Capricorn"];
-    
-    const zodiacDayMap = [20, 19, 21, 20 ,21, 21, 23, 23, 23, 23, 22, 22];
+    const zodiacSignsMap = [
+      'Aquarius',
+      'Pisces',
+      'Aries',
+      'Taurus',
+      'Gemini',
+      'Cancer',
+      'Leo',
+      'Virgo',
+      'Libra',
+      'Scorpio',
+      'Sagittarius',
+      'Capricorn',
+    ];
+
+    const zodiacDayMap = [20, 19, 21, 20, 21, 21, 23, 23, 23, 23, 22, 22];
 
     const birthMonth = birthday.getUTCMonth();
     const birthDate = birthday.getUTCDate();
@@ -105,7 +122,10 @@ export class MockHobbyRepository implements IHobbyRepository {
     return this.hobbies.filter((h) => ids.includes(h.id));
   }
 
-  async updateProfileHobbies(profileId: number, hobbyIds: number[]): Promise<void> {
+  async updateProfileHobbies(
+    profileId: number,
+    hobbyIds: number[],
+  ): Promise<void> {
     this.profileHobbies.set(profileId, hobbyIds);
   }
 }
@@ -131,7 +151,9 @@ export class MockQuestionnaireRepository implements IQuestionnaireRepository {
     return this.questions;
   }
 
-  async findOptionsByQuestionIds(questionIds: number[]): Promise<QuestionnaireOptionEntity[]> {
+  async findOptionsByQuestionIds(
+    questionIds: number[],
+  ): Promise<QuestionnaireOptionEntity[]> {
     return this.options.filter((o) => questionIds.includes(o.questionId));
   }
 
@@ -139,7 +161,9 @@ export class MockQuestionnaireRepository implements IQuestionnaireRepository {
     this.answers.push(...answers);
   }
 
-  async findUserAnswers(profileId: number): Promise<UserQuestionnaireAnswerEntity[]> {
+  async findUserAnswers(
+    profileId: number,
+  ): Promise<UserQuestionnaireAnswerEntity[]> {
     return this.answers.filter((a) => a.profileId === profileId);
   }
 }

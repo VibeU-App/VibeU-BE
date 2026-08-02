@@ -1,7 +1,7 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { IProfileRepository } from '../../core/abstracts/profile-repository.interface';
 import { IHobbyRepository } from '../../core/abstracts/hobby-repository.interface';
-import { ErrorCode } from '../../core';
+import { AppException, ErrorCode } from '../../core';
 
 @Injectable()
 export class UpdateProfileTagsUseCase {
@@ -18,10 +18,7 @@ export class UpdateProfileTagsUseCase {
     if (!!userProfile) {
       await this.hobbyRepository.updateProfileHobbies(userProfile.id, hobbyIds);
     } else {
-      throw new BadRequestException({
-        code: ErrorCode.PROFILE_USER_NOT_FOUND,
-        message: "User not found",
-      });
+      throw new AppException(ErrorCode.PROFILE_USER_NOT_FOUND);
     }
   }
 }

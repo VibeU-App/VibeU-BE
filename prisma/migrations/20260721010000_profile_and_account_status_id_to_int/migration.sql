@@ -45,7 +45,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS "users_recovery_email_key" ON "users"("recover
 CREATE TABLE IF NOT EXISTS "profiles" (
     "id" SERIAL NOT NULL,
     "user_id" TEXT NOT NULL,
-    "nickname" TEXT NOT NULL,
+    "full_name" TEXT NOT NULL,
     "gender" TEXT NOT NULL,
     "university" TEXT,
     "bio" TEXT,

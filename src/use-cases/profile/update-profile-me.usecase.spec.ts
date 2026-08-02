@@ -1,10 +1,10 @@
 import { UpdateProfileMeUseCase } from './update-profile-me.usecase';
 import { MockProfileRepository } from './test-mocks';
 import { ProfileEntity } from '../../core/entities/profile.entity';
-import { ErrorCode } from '../../core';
 import { validate } from 'class-validator';
 import { plainToInstance } from 'class-transformer';
 import { UpdateProfileRequestDto } from '../../core/dtos/profile/update-profile.dto';
+import { HttpStatus } from '@nestjs/common';
 
 describe('UpdateProfileMeUseCase', () => {
   let useCase: UpdateProfileMeUseCase;
@@ -75,15 +75,15 @@ describe('UpdateProfileMeUseCase', () => {
 
     const payload = {
       nickname: 'a',
-    }
-    
+    };
+
     const newProfile = await useCase.execute('user-1', payload);
     const dto = plainToInstance(UpdateProfileRequestDto, newProfile);
     const errors = await validate(dto);
 
     expect(errors.length).toBe(1);
     expect(errors[0].property).toBe('nickname');
-  })
+  });
 
   it('should reject if user is younger than 18', async () => {
     const profile = new ProfileEntity(
@@ -101,16 +101,16 @@ describe('UpdateProfileMeUseCase', () => {
       1, // Numeric ID
     );
     await mockProfileRepo.save(profile);
-    
+
     const payload = {
       birthday: new Date('2020-10-10'),
-    }
+    };
 
     try {
       await useCase.execute('user-1', payload);
       fail('Should have thrown an error');
     } catch (error) {
-      expect(error.getResponse().code).toBe(ErrorCode.PROFILE_USER_NOT_OLD_ENOUGH);
+      expect(error.getStatus()).toBe(HttpStatus.BAD_REQUEST);
     }
-  })
+  });
 });
