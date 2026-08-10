@@ -14,10 +14,5 @@ import { Module } from '@nestjs/common';
     UpdateProfileMeUseCase,
     UpdateProfileTagsUseCase,
   ],
-  exports: [
-    GetProfileMeUseCase,
-    UpdateProfileMeUseCase,
-    UpdateProfileTagsUseCase,
-  ],
 })
 export class ProfileModule {}

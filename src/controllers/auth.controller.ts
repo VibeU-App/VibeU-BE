@@ -13,40 +13,39 @@ import {
   ApiResponse,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-import { RegisterRequestDto } from '../core/dtos/auth/register.dto';
 import {
+  RegisterRequestDto,
   VerifyRegistrationRequestDto,
   VerifyRegistrationResponseDto,
-} from '../core/dtos/auth/verify-registration.dto';
-import { LoginRequestDto, LoginResponseDto } from '../core/dtos/auth/login.dto';
-import { ForgotPasswordRequestDto } from '../core/dtos/auth/forgot-password.dto';
-import {
+  LoginRequestDto,
+  LoginResponseDto,
+  ForgotPasswordRequestDto,
   VerifyResetPasswordOtpRequestDto,
   VerifyResetPasswordOtpResponseDto,
-} from '../core/dtos/auth/verify-reset-password-otp.dto';
-import { ResetPasswordRequestDto } from '../core/dtos/auth/reset-password.dto';
-import {
+  ResetPasswordRequestDto,
   RefreshRequestDto,
   RefreshResponseDto,
-} from '../core/dtos/auth/refresh.dto';
-import { CreatePasswordDto } from '../core/dtos/auth/create-password.dto';
-import { ChangePasswordDto } from '../core/dtos/auth/change-password.dto';
+  CreatePasswordDto,
+  ChangePasswordDto,
+} from 'src/core/dtos';
 import { Envelope } from '../core/envelope/envelope.interface';
 import {
   ApiOkResponseEnvelope,
   ApiOkResponseEnvelopeNull,
   ApiCreatedResponseEnvelopeNull,
 } from '../core/envelope/envelope.decorator';
-import { RegisterUsecase } from '../use-cases/auth/register.usecase';
-import { VerifyRegistrationUsecase } from '../use-cases/auth/verify-registration.usecase';
-import { LoginUsecase } from '../use-cases/auth/login.usecase';
-import { RequestLoginOtpUsecase } from '../use-cases/auth/request-login-otp.usecase';
-import { ForgotPasswordUsecase } from '../use-cases/auth/forgot-password.usecase';
-import { VerifyResetPasswordOtpUsecase } from '../use-cases/auth/verify-reset-password-otp.usecase';
-import { ResetPasswordUsecase } from '../use-cases/auth/reset-password.usecase';
-import { RefreshUsecase } from '../use-cases/auth/refresh.usecase';
-import { CreatePasswordUsecase } from '../use-cases/auth/create-password.usecase';
-import { ChangePasswordUsecase } from '../use-cases/auth/change-password.usecase';
+import {
+  RegisterUsecase,
+  VerifyRegistrationUsecase,
+  LoginUsecase,
+  RequestLoginOtpUsecase,
+  ForgotPasswordUsecase,
+  VerifyResetPasswordOtpUsecase,
+  ResetPasswordUsecase,
+  RefreshUsecase,
+  CreatePasswordUsecase,
+  ChangePasswordUsecase,
+} from 'src/use-cases';
 import { JwtAuthGuard } from '../middleware/jwt-auth.guard';
 import { RolesGuard } from '../middleware/roles.guard';
 import { Roles } from '../middleware/roles.decorator';

@@ -21,15 +21,17 @@ import {
   ApiCreatedResponseEnvelopeNull,
   ApiOkResponseEnvelope,
 } from 'src/core';
-import { GetProfileMeResponseDto } from 'src/core/dtos/profile/get-profile-me.dto';
-import { GetProfileMeUseCase } from 'src/use-cases/profile/get-profile-me.usecase';
-import { UpdateProfileMeUseCase } from 'src/use-cases/profile/update-profile-me.usecase';
-import { UpdateProfileTagsUseCase } from 'src/use-cases/profile/update-profile-tags.usecase';
 import {
+  GetProfileMeUseCase,
+  UpdateProfileMeUseCase,
+  UpdateProfileTagsUseCase,
+} from 'src/use-cases';
+import {
+  GetProfileMeResponseDto,
   UpdateProfileRequestDto,
   UpdateProfileResponseDto,
-} from 'src/core/dtos/profile/update-profile.dto';
-import { UpdateProfileTagsRequestDto } from 'src/core/dtos/profile/update-profile-tags.dto';
+  UpdateProfileTagsRequestDto,
+} from 'src/core/dtos';
 import { JwtAuthGuard } from 'src/middleware/jwt-auth.guard';
 
 @ApiTags('Profile')
