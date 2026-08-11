@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+export class ProfileRequestDto {}
+
 export class HobbyResponseDto {
   @ApiProperty()
   id!: string;

@@ -12,11 +12,27 @@ class AnswerDto {
   selectedOptionId!: number;
 }
 
-export class SubmitAnswersDto {
+export class SubmitAnswersRequestDto {
   @ApiProperty({ type: [AnswerDto], description: 'Array of user answers' })
   @IsArray()
   @ArrayMinSize(1)
   @ValidateNested({ each: true })
   @Type(() => AnswerDto)
   answers!: AnswerDto[];
+}
+
+class PersonalityArchetypeDto {
+  @ApiProperty()
+  id!: string;
+
+  @ApiProperty()
+  name!: string;
+
+  @ApiProperty()
+  description!: string;
+}
+
+export class SubmitAnswersResponseDto {
+  @ApiProperty({ type: PersonalityArchetypeDto })
+  personalityArchetype!: PersonalityArchetypeDto;
 }

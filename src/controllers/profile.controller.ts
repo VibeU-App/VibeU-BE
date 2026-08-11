@@ -7,6 +7,8 @@ import {
   UseGuards,
   Req,
   Param,
+  Inject,
+  Get,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -18,15 +20,24 @@ import { SaveBasicProfileUseCase } from '../use-cases/profile/save-basic-profile
 import { SaveHobbiesUseCase } from '../use-cases/profile/save-hobbies.usecase';
 import { SubmitQuestionnaireUseCase } from '../use-cases/profile/submit-questionnaire.usecase';
 import { GetProfileUseCase } from '../use-cases/profile/get-profile.usecase';
-import { SaveBasicProfileDto } from '../core/dtos/profile/save-basic-profile.dto';
-import { SaveHobbiesDto } from '../core/dtos/profile/save-hobbies.dto';
-import { SubmitAnswersDto } from '../core/dtos/profile/submit-answers.dto';
+import { 
+  SaveBasicProfileRequestDto, 
+  SaveBasicProfileResponseDto 
+} from '../core/dtos/profile/save-basic-profile.dto';
+import { 
+  SaveHobbiesRequestDto, 
+  SaveHobbiesResponseDto 
+} from '../core/dtos/profile/save-hobbies.dto';
+import { 
+  SubmitAnswersRequestDto, 
+  SubmitAnswersResponseDto 
+} from '../core/dtos/profile/submit-answers.dto';
 import { ProfileResponseDto } from '../core/dtos/profile/profile-response.dto';
 import { JwtAuthGuard } from '../middleware/jwt-auth.guard';
 import { Envelope } from '../core/envelope/envelope.interface';
 import { IHobbyRepository } from '../core/abstracts/hobby-repository.interface';
 import { IQuestionnaireRepository } from '../core/abstracts/questionnaire-repository.interface';
-import { Inject, Get } from '@nestjs/common';
+import { getZodiacSign } from '../utils/calculating';
 
 @ApiTags('Profile')
 @Controller('profile')
@@ -53,8 +64,8 @@ export class ProfileController {
   })
   async saveBasicProfile(
     @Req() req: any,
-    @Body() dto: SaveBasicProfileDto,
-  ): Promise<Envelope<any>> {
+    @Body() dto: SaveBasicProfileRequestDto,
+  ): Promise<Envelope<SaveBasicProfileResponseDto>> {
     const userId = req.user.sub;
 
     const profile = await this.saveBasicProfileUseCase.execute(userId, {
@@ -65,8 +76,6 @@ export class ProfileController {
       university: dto.university,
     });
 
-    // Helper logic for age and zodiac will be implemented in get-profile or we can compute it here.
-    // The contract expects age and zodiac returned. For now we will return them as part of the profile object.
     const now = new Date();
     let age = now.getFullYear() - profile.birthday.getFullYear();
     const m = now.getMonth() - profile.birthday.getMonth();
@@ -74,19 +83,21 @@ export class ProfileController {
       age--;
     }
 
+    const zodiac = getZodiacSign(profile.birthday);
+
     return {
       statusCode: HttpStatus.CREATED,
       message: 'Success',
       data: {
         profile: {
-          id: profile.id,
+          id: profile.id.toString(),
           userId: profile.userId,
           nickname: profile.fullName,
           gender: profile.gender,
           avatarSeed: profile.avatarSeed,
           birthday: profile.birthday.toISOString(),
           age: age,
-          zodiac: 'Gemini', // placeholder
+          zodiac: zodiac,
           isCompleted: profile.isCompleted,
         },
       },
@@ -124,8 +135,8 @@ export class ProfileController {
   @ApiResponse({ status: 201, description: 'Saved hobbies successfully' })
   async saveHobbies(
     @Req() req: any,
-    @Body() dto: SaveHobbiesDto,
-  ): Promise<Envelope<any>> {
+    @Body() dto: SaveHobbiesRequestDto,
+  ): Promise<Envelope<SaveHobbiesResponseDto>> {
     const userId = req.user.sub;
     await this.saveHobbiesUseCase.execute(userId, dto.tagIds);
     return {
@@ -183,8 +194,8 @@ export class ProfileController {
   })
   async submitQuestionnaire(
     @Req() req: any,
-    @Body() dto: SubmitAnswersDto,
-  ): Promise<Envelope<any>> {
+    @Body() dto: SubmitAnswersRequestDto,
+  ): Promise<Envelope<SubmitAnswersResponseDto>> {
     const userId = req.user.sub;
 
     const result = await this.submitQuestionnaireUseCase.execute(

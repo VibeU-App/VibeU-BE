@@ -7,7 +7,7 @@ import {
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-export class SaveBasicProfileDto {
+export class SaveBasicProfileRequestDto {
   @ApiProperty({
     example: 'Alex',
     description: 'User nickname (2-30 characters)',
@@ -45,4 +45,38 @@ export class SaveBasicProfileDto {
   @IsString()
   @IsOptional()
   university?: string;
+}
+
+export class ProfileDto {
+  @ApiProperty()
+  id!: string;
+
+  @ApiProperty()
+  userId!: string;
+
+  @ApiProperty()
+  nickname!: string;
+
+  @ApiProperty()
+  gender!: string;
+
+  @ApiProperty()
+  avatarSeed!: string;
+
+  @ApiProperty()
+  birthday!: string;
+
+  @ApiProperty()
+  age!: number;
+
+  @ApiProperty()
+  zodiac!: string;
+
+  @ApiProperty()
+  isCompleted!: boolean;
+}
+
+export class SaveBasicProfileResponseDto {
+  @ApiProperty({ type: ProfileDto })
+  profile!: ProfileDto;
 }
