@@ -182,6 +182,7 @@ export class MockUserRepository implements IUserRepository {
       user.updatedAt,
       user.deletedAt,
       user.recoveryEmail,
+      user.userId || UserEntity.generateRandomUserId(),
     );
     this.users.set(savedUser.id, savedUser);
     return savedUser;

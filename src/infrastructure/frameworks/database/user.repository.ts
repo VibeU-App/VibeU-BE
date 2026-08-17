@@ -98,6 +98,7 @@ export class PrismaUserRepository implements IUserRepository {
   async save(user: UserEntity): Promise<UserEntity> {
     const created = await this.prisma.user.create({
       data: {
+        userId: user.userId,
         email: user.email,
         recoveryEmail: user.recoveryEmail,
         passwordHash: user.passwordHash,
@@ -117,6 +118,7 @@ export class PrismaUserRepository implements IUserRepository {
     const updated = await this.prisma.user.update({
       where: { id: user.id },
       data: {
+        userId: user.userId,
         email: user.email,
         recoveryEmail: user.recoveryEmail,
         passwordHash: user.passwordHash,
@@ -156,6 +158,7 @@ export class PrismaUserRepository implements IUserRepository {
       prismaUser.updatedAt,
       prismaUser.deletedAt,
       prismaUser.recoveryEmail,
+      prismaUser.userId,
     );
   }
 

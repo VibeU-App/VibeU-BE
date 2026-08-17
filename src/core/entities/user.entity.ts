@@ -44,7 +44,19 @@ export class UserEntity {
     public readonly updatedAt: Date,
     public readonly deletedAt: Date | null,
     public readonly recoveryEmail: string | null = null,
+    public readonly userId: string = '',
   ) {}
+
+  /**
+   * Generates a random 8-digit string of digits.
+   */
+  static generateRandomUserId(): string {
+    let result = '';
+    for (let i = 0; i < 8; i++) {
+      result += Math.floor(Math.random() * 10).toString();
+    }
+    return result;
+  }
 
   /**
    * Creates a new user entity with default values.
@@ -52,6 +64,7 @@ export class UserEntity {
   static create(props: {
     email: string;
     passwordHash: string;
+    userId?: string;
     accountStatusId?: number;
     role?: UserRole;
     isVerified?: boolean;
@@ -69,6 +82,7 @@ export class UserEntity {
       now,
       null, // Not deleted
       props.recoveryEmail ? props.recoveryEmail.toLowerCase() : null,
+      props.userId ?? this.generateRandomUserId(),
     );
   }
 
