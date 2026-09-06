@@ -51,6 +51,20 @@ describe('SubmitQuestionnaireUseCase', () => {
         new Date(),
         new Date(),
       ),
+      new QuestionnaireQuestionEntity(
+        1,
+        'Question 1',
+        1,
+        new Date(),
+        new Date(),
+      ),
+      new QuestionnaireQuestionEntity(
+        2,
+        'Question 2',
+        2,
+        new Date(),
+        new Date(),
+      ),
     ];
 
     // Seed options

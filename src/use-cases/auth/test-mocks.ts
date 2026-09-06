@@ -5,6 +5,11 @@ import {
   TokenPair,
   AccessTokenPayload,
 } from '../../infrastructure/services/token/token.service';
+import {
+  ITokenService,
+  TokenPair,
+  AccessTokenPayload,
+} from '../../infrastructure/services/token/token.service';
 import { IMailService } from '../../infrastructure/services/mail/mail.interface';
 import { IPolicyRepository } from '../../core/abstracts/policy-repository.interface';
 import { IUserRepository } from '../../core/abstracts/user-repository.interface';
@@ -92,6 +97,11 @@ export class MockMailService implements IMailService {
     subject: string;
     content: string;
   }> = [];
+  public sentEmails: Array<{
+    email: string;
+    subject: string;
+    content: string;
+  }> = [];
 
   isValidEmail(email: string): boolean {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -104,6 +114,7 @@ export class MockMailService implements IMailService {
 
   getTargetEmail(email: string): string | null {
     if (this.isValidEmail(email)) {
+      const emailParts = email.split('@');
       const emailParts = email.split('@');
       const identifier = emailParts[0];
       const domains = emailParts[1];

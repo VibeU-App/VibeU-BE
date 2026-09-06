@@ -99,7 +99,7 @@ Users and other authorized actors can view a user's completed profile, including
 - **Profile**:
   - `id`: Unique identifier (Int / PK).
   - `userId`: Unique reference to the core User account (One-to-One / FK).
-  - `fullName`: Display name / Full name of the user (String).
+  - `nickname`: Display name / Full name of the user (String).
   - `gender`: Biological sex or gender preference (String).
   - `university`: Educational institution name (String, nullable).
   - `bio`: Short user biography (String, nullable).

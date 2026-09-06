@@ -31,7 +31,7 @@ export class MockProfileRepository implements IProfileRepository {
     const saved = new ProfileEntity(
       this.idCounter++,
       profile.userId,
-      profile.fullName,
+      profile.nickname,
       profile.gender,
       profile.avatarSeed,
       profile.birthday,
@@ -54,7 +54,55 @@ export class MockProfileRepository implements IProfileRepository {
   async getProfilePostAndMatchCounts(
     profileId: number,
   ): Promise<{ outpostCount: number; matchlistCount: number }> {
+    void profileId;
     return { outpostCount: 5, matchlistCount: 2 };
+  }
+
+  getAge(birthday: Date): number {
+    const currentDate = new Date();
+    let age = currentDate.getUTCFullYear() - birthday.getUTCFullYear();
+
+    if (
+      currentDate.getUTCMonth() - birthday.getUTCMonth() < 0 ||
+      (currentDate.getUTCMonth() - birthday.getUTCMonth() === 0 &&
+        currentDate.getUTCDate() - birthday.getUTCDate() < 0)
+    ) {
+      age--;
+    }
+
+    return age;
+  }
+
+  getZodiacSign(birthday: Date): string {
+    const zodiacSignsMap = [
+      'Aquarius',
+      'Pisces',
+      'Aries',
+      'Taurus',
+      'Gemini',
+      'Cancer',
+      'Leo',
+      'Virgo',
+      'Libra',
+      'Scorpio',
+      'Sagittarius',
+      'Capricorn',
+    ];
+
+    const zodiacDayMap = [20, 19, 21, 20, 21, 21, 23, 23, 23, 23, 22, 22];
+
+    const birthMonth = birthday.getUTCMonth();
+    const birthDate = birthday.getUTCDate();
+
+    if (birthDate < zodiacDayMap[birthMonth]) {
+      if (birthMonth === 0) {
+        return zodiacSignsMap[11];
+      } else {
+        return zodiacSignsMap[birthMonth - 1];
+      }
+    } else {
+      return zodiacSignsMap[birthMonth];
+    }
   }
 }
 

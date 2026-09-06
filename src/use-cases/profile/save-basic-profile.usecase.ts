@@ -12,7 +12,7 @@ export class SaveBasicProfileUseCase {
   async execute(
     userId: string,
     payload: {
-      fullName: string;
+      nickname: string;
       gender: string;
       avatarSeed: string;
       birthday: Date;

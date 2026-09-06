@@ -31,16 +31,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'pnpm'
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
 
       - name: Install dependencies
         run: pnpm install
@@ -55,7 +55,7 @@ jobs:
         run: |
           # Create a temporary migration to check if schema changes are valid
           pnpm prisma migrate dev --name temp_validation --create-only
-          
+
           # Check if any migration files were created
           if [ -d "prisma/migrations/*temp_validation*" ]; then
             echo "✅ Migration files generated successfully"
@@ -65,7 +65,7 @@ jobs:
             echo "⚠️ No new migration needed (schema unchanged)"
           fi
         env:
-          DATABASE_URL: "postgresql://postgres:password@localhost:5432/vibeu"
+          DATABASE_URL: 'postgresql://postgres:password@localhost:5432/vibeu'
 
       - name: Build project
         run: pnpm build

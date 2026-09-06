@@ -1,24 +1,17 @@
 import { GetProfileMeUseCase } from './get-profile-me.usecase';
-import { MockProfileRepository, MockHobbyRepository } from './test-mocks';
+import { MockProfileRepository } from './test-mocks';
 import { ProfileEntity } from '../../core/entities/profile.entity';
-import { HobbyEntity } from '../../core/entities/hobby.entity';
 
 describe('GetProfileMeUseCase', () => {
   let useCase: GetProfileMeUseCase;
   let mockProfileRepo: MockProfileRepository;
-  let mockHobbyRepo: MockHobbyRepository;
 
   beforeEach(() => {
     mockProfileRepo = new MockProfileRepository();
-    mockHobbyRepo = new MockHobbyRepository();
-    useCase = new GetProfileMeUseCase(mockProfileRepo, mockHobbyRepo);
-
-    mockHobbyRepo.hobbies = [
-      new HobbyEntity(1, 'Soccer', 'SPORT', new Date(), new Date()),
-    ];
+    useCase = new GetProfileMeUseCase(mockProfileRepo);
   });
 
-  it('should throw NotImplemented placeholder error', async () => {
+  it('should return profile with correct information', async () => {
     const profile = new ProfileEntity(
       1,
       'user-1',
@@ -35,6 +28,15 @@ describe('GetProfileMeUseCase', () => {
     );
     await mockProfileRepo.save(profile);
 
-    await expect(useCase.execute('user-1')).rejects.toThrow('Method not implemented.');
+    expect(await useCase.execute('user-1')).toEqual({
+      nickname: 'Alice',
+      avatarSeed: 'seed',
+      bio: 'Hello!',
+      zodiacSign: 'Sagittarius',
+      age: expect.any(Number),
+      personalityArchetypeId: 1,
+      numOfPosts: 5,
+      numOfMatches: 2,
+    });
   });
 });

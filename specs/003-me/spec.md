@@ -65,8 +65,8 @@ Users must be able to update their selected interest/hobby tags (between 3 and 1
 
 ### Functional Requirements
 
-- **FR-001**: The system MUST allow users to retrieve their profile dashboard details (fullName, avatar seed, biography text, zodiac sign, age, AI archetype, and aggregate counts of posts/matches).
-- **FR-002**: The system MUST support updating a user's fullName, biography (about me), avatar seed, date of birth, and university.
+- **FR-001**: The system MUST allow users to retrieve their profile dashboard details (nickname, avatar seed, biography text, zodiac sign, age, AI archetype, and aggregate counts of posts/matches).
+- **FR-002**: The system MUST support updating a user's nickname, biography (about me), avatar seed, date of birth, and university.
 - **FR-003**: The system MUST prevent any manual updates to the user's Sex (gender) and matched AI personality archetype (Vibe testing) fields after initial profiling completion.
 - **FR-004**: The system MUST support updating the user's selected interest/hobby tags (hobbies), enforcing the constraint of minimum 3 and maximum 10 tags.
 - **FR-005**: The system MUST dynamically query and aggregate the post count (outposts) and match count (matchlist) from their respective domains when rendering the dashboard.
@@ -74,7 +74,7 @@ Users must be able to update their selected interest/hobby tags (between 3 and 1
 ### Key Entities *(include if feature involves data)*
 
 - **Profile** (Updated):
-  - `fullName`: Display name / Full name of the user (String).
+  - `nickname`: Display name / Full name of the user (String).
   - `bio`: Short user description (String, max 150 characters, nullable).
   - `university`: Name of university (String, nullable).
   - `avatarSeed`: Value used to generate the user's avatar image (String).

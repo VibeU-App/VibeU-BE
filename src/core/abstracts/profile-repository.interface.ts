@@ -8,4 +8,6 @@ export interface IProfileRepository {
   getProfilePostAndMatchCounts(
     profileId: number,
   ): Promise<{ outpostCount: number; matchlistCount: number }>;
+  getAge(birthday: Date): number;
+  getZodiacSign(birthday: Date): string;
 }
