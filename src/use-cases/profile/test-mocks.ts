@@ -179,4 +179,23 @@ export class MockAIService implements IAIService {
   ): Promise<number> {
     return this.mockArchetypeId;
   }
+
+  async generatePersonalityResult(
+    dominantArchetype: string,
+    scoreSummary: Record<string, number>,
+    percentageSummary: Record<string, number>,
+    answers: { questionText: string; answerText: string }[],
+  ): Promise<{
+    personality_code: string;
+    personality_name: string;
+    vibe_description: string;
+    matching_criteria: string;
+  }> {
+    return {
+      personality_code: dominantArchetype,
+      personality_name: 'Mock Name',
+      vibe_description: 'Mock Vibe',
+      matching_criteria: 'Mock Criteria',
+    };
+  }
 }

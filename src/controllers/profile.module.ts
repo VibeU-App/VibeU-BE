@@ -1,18 +1,25 @@
-import { DatabaseModule } from 'src/infrastructure/frameworks/database/database.module';
-import { ProfileController } from './profile.controller';
-import { GetProfileMeUseCase } from 'src/use-cases/profile/get-profile-me.usecase';
-import { UpdateProfileMeUseCase } from 'src/use-cases/profile/update-profile-me.usecase';
-import { UpdateProfileTagsUseCase } from 'src/use-cases/profile/update-profile-tags.usecase';
 import { Module } from '@nestjs/common';
+import { ProfileController } from './profile.controller';
+import {
+  SaveBasicProfileUseCase,
+  SaveHobbiesUseCase,
+  SubmitQuestionnaireUseCase,
+  GetProfileUseCase,
+} from '../use-cases';
+import { JwtAuthGuard } from '../middleware/jwt-auth.guard';
+import { DatabaseModule } from '../infrastructure/frameworks/database/database.module';
+
+const USE_CASES = [
+  SaveBasicProfileUseCase,
+  SaveHobbiesUseCase,
+  SubmitQuestionnaireUseCase,
+  GetProfileUseCase,
+];
 
 @Module({
   imports: [DatabaseModule],
   controllers: [ProfileController],
-  providers: [
-    // Use cases
-    GetProfileMeUseCase,
-    UpdateProfileMeUseCase,
-    UpdateProfileTagsUseCase,
-  ],
+  providers: [...USE_CASES, JwtAuthGuard],
+  exports: [...USE_CASES, JwtAuthGuard],
 })
 export class ProfileModule {}

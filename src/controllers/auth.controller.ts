@@ -27,7 +27,7 @@ import {
   RefreshResponseDto,
   CreatePasswordDto,
   ChangePasswordDto,
-} from 'src/core/dtos';
+} from '../core/dtos';
 import { Envelope } from '../core/envelope/envelope.interface';
 import {
   ApiOkResponseEnvelope,
@@ -45,11 +45,12 @@ import {
   RefreshUsecase,
   CreatePasswordUsecase,
   ChangePasswordUsecase,
-} from 'src/use-cases';
+} from '../use-cases';
 import { JwtAuthGuard } from '../middleware/jwt-auth.guard';
 import { RolesGuard } from '../middleware/roles.guard';
 import { Roles } from '../middleware/roles.decorator';
 import { UserRole } from '../core/entities/user.entity';
+
 
 @ApiTags('Authentication')
 @Controller('auth')

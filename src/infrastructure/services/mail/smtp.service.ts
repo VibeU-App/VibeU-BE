@@ -55,6 +55,11 @@ export class SmtpMailService implements IMailService {
         targetEmail = targetEmail.split('+')[0] + '@' + domains;
       }
 
+      if (identifier.includes('.') && domains.split('.')[0] == 'gmail') {
+        targetEmail =
+          targetEmail.split('@')[0].replaceAll('.', '') + '@' + domains;
+      }
+
       return targetEmail.toLowerCase();
     } else {
       return null;

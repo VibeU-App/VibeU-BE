@@ -12,6 +12,20 @@ export class SaveHobbiesUseCase {
   ) {}
 
   async execute(userId: string, hobbyIds: number[]): Promise<void> {
-    throw new Error('Method not implemented.');
+    if (hobbyIds.length < 3 || hobbyIds.length > 10) {
+      throw new Error('Must select between 3 and 10 hobbies');
+    }
+
+    const profile = await this.profileRepository.findByUserId(userId);
+    if (!profile) {
+      throw new Error('Profile not found');
+    }
+
+    const existingHobbies = await this.hobbyRepository.findByIds(hobbyIds);
+    if (existingHobbies.length !== hobbyIds.length) {
+      throw new Error('One or more invalid hobby IDs');
+    }
+
+    await this.hobbyRepository.updateProfileHobbies(profile.id, hobbyIds);
   }
 }

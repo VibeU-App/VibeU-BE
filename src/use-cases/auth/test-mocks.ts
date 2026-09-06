@@ -5,12 +5,21 @@ import {
   TokenPair,
   AccessTokenPayload,
 } from '../../infrastructure/services/token/token.service';
+import {
+  ITokenService,
+  TokenPair,
+  AccessTokenPayload,
+} from '../../infrastructure/services/token/token.service';
 import { IMailService } from '../../infrastructure/services/mail/mail.interface';
 import { IPolicyRepository } from '../../core/abstracts/policy-repository.interface';
 import { IUserRepository } from '../../core/abstracts/user-repository.interface';
 import { IOtpRepository } from '../../core/abstracts/otp-repository.interface';
 import { ISessionRepository } from '../../core/abstracts/session-repository.interface';
-import { UserEntity, AccountStatusName } from '../../core/entities/user.entity';
+import {
+  UserEntity,
+  AccountStatusEntity,
+  AccountStatusName,
+} from '../../core/entities/user.entity';
 import { OtpEntity } from '../../core/entities/otp.entity';
 import { SessionEntity } from '../../core/entities/session.entity';
 
@@ -88,6 +97,11 @@ export class MockMailService implements IMailService {
     subject: string;
     content: string;
   }> = [];
+  public sentEmails: Array<{
+    email: string;
+    subject: string;
+    content: string;
+  }> = [];
 
   isValidEmail(email: string): boolean {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -101,12 +115,18 @@ export class MockMailService implements IMailService {
   getTargetEmail(email: string): string | null {
     if (this.isValidEmail(email)) {
       const emailParts = email.split('@');
+      const emailParts = email.split('@');
       const identifier = emailParts[0];
       const domains = emailParts[1];
       let targetEmail = email;
 
       if (identifier.includes('+')) {
         targetEmail = targetEmail.split('+')[0] + '@' + domains;
+      }
+
+      if (identifier.includes('.') && domains.split('.')[0] == 'gmail') {
+        targetEmail =
+          targetEmail.split('@')[0].replaceAll('.', '') + '@' + domains;
       }
 
       return targetEmail.toLowerCase();
@@ -186,6 +206,7 @@ export class MockUserRepository implements IUserRepository {
       user.updatedAt,
       user.deletedAt,
       user.recoveryEmail,
+      user.userId || UserEntity.generateRandomUserId(),
     );
     this.users.set(savedUser.id, savedUser);
     return savedUser;

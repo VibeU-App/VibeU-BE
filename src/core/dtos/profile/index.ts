@@ -1,3 +1,4 @@
-export * from './get-profile-me.dto';
-export * from './update-profile.dto';
-export * from './update-profile-tags.dto';
+export * from './save-basic-profile.dto';
+export * from './save-hobbies.dto';
+export * from './submit-answers.dto';
+export * from './profile-response.dto';

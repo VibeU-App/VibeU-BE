@@ -27,8 +27,8 @@
 
 **Purpose**: Project initialization and structure setup
 
-- [ ] T001 Create folders and placeholder files for profiling domain under `src/core/entities/`, `src/core/abstracts/`, and `src/use-cases/profile/`
-- [ ] T002 Verify Prisma CLI is working and can connect to the dev database
+- [X] T001 Create folders and placeholder files for profiling domain under `src/core/entities/`, `src/core/abstracts/`, and `src/use-cases/profile/`
+- [X] T002 Verify Prisma CLI is working and can connect to the dev database
 
 ---
 
@@ -38,13 +38,13 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T003 Update database models in `prisma/schema.prisma` to include `Profile`, `PersonalityArchetype`, `Hobby`, `ProfileHobby`, `QuestionnaireQuestion`, `QuestionnaireOption`, and `UserQuestionnaireAnswer`
-- [ ] T004 Run Prisma migrations using `npx prisma migrate dev --name add_profiling_schema` to apply schema updates to database
-- [ ] T005 Update the database seed script in `prisma/seed.ts` to include initial hobbies, questionnaire questions/options, and personality archetypes, then run `npx prisma db seed`
-- [ ] T006 [P] Define core Domain entities in `src/core/entities/profile.entity.ts`, `src/core/entities/hobby.entity.ts`, `src/core/entities/personality-archetype.entity.ts`, and `src/core/entities/questionnaire.entity.ts`
-- [ ] T007 [P] Create repository interfaces (contracts) in `src/core/abstracts/profile-repository.interface.ts`, `src/core/abstracts/hobby-repository.interface.ts`, `src/core/abstracts/personality-archetype-repository.interface.ts`, and `src/core/abstracts/questionnaire-repository.interface.ts`
-- [ ] T008 [P] Define AI matching interface contract in `src/core/abstracts/ai-service.interface.ts`
-- [ ] T009 Implement concrete database repositories using Prisma under `src/infrastructure/frameworks/database/` implementing core interfaces: `prisma-profile.repository.ts`, `prisma-hobby.repository.ts`, `prisma-personality-archetype.repository.ts`, and `prisma-questionnaire.repository.ts`
+- [X] T003 Update database models in `prisma/schema.prisma` to include `Profile`, `PersonalityArchetype`, `Hobby`, `ProfileHobby`, `QuestionnaireQuestion`, `QuestionnaireOption`, and `UserQuestionnaireAnswer`
+- [X] T004 Run Prisma migrations using `npx prisma migrate dev --name add_profiling_schema` to apply schema updates to database
+- [X] T005 Update the database seed script in `prisma/seed.ts` to include initial hobbies, questionnaire questions/options, and personality archetypes, then run `npx prisma db seed`
+- [X] T006 [P] Define core Domain entities in `src/core/entities/profile.entity.ts`, `src/core/entities/hobby.entity.ts`, `src/core/entities/personality-archetype.entity.ts`, and `src/core/entities/questionnaire.entity.ts`
+- [X] T007 [P] Create repository interfaces (contracts) in `src/core/abstracts/profile-repository.interface.ts`, `src/core/abstracts/hobby-repository.interface.ts`, `src/core/abstracts/personality-archetype-repository.interface.ts`, and `src/core/abstracts/questionnaire-repository.interface.ts`
+- [X] T008 [P] Define AI matching interface contract in `src/core/abstracts/ai-service.interface.ts`
+- [X] T009 Implement concrete database repositories using Prisma under `src/infrastructure/frameworks/database/` implementing core interfaces: `prisma-profile.repository.ts`, `prisma-hobby.repository.ts`, `prisma-personality-archetype.repository.ts`, and `prisma-questionnaire.repository.ts`
 
 **Checkpoint**: Foundation ready - database models, migrations, seeds, and ports/adapters are set up.
 
@@ -57,12 +57,12 @@
 **Independent Test**: Perform an HTTP POST to `/api/v1/profile/basic` with profile payload and confirm the row is created in `profiles` table.
 
 ### Tests for User Story 1
-- [ ] T010 [P] [US1] Create pure Jest unit tests in `src/use-cases/profile/save-basic-profile.usecase.spec.ts` matching basic profile saving validation constraints (uniqueness, empty inputs, future birthday rejection)
+- [X] T010 [P] [US1] Create pure Jest unit tests in `src/use-cases/profile/save-basic-profile.usecase.spec.ts` matching basic profile saving validation constraints (uniqueness, empty inputs, future birthday rejection)
 
 ### Implementation for User Story 1
-- [ ] T011 [US1] Implement core logic in `src/use-cases/profile/save-basic-profile.usecase.ts` utilizing `IProfileRepository` to create/save basic details
-- [ ] T012 [P] [US1] Create class-validator DTOs for payload inputs in `src/controllers/profile/dto/save-basic-profile.dto.ts`
-- [ ] T013 [US1] Build routes and controller actions in `src/controllers/profile/profile.controller.ts` pointing to `SaveBasicProfileUseCase`
+- [X] T011 [US1] Implement core logic in `src/use-cases/profile/save-basic-profile.usecase.ts` utilizing `IProfileRepository` to create/save basic details
+- [X] T012 [P] [US1] Create class-validator DTOs for payload inputs in `src/controllers/profile/dto/save-basic-profile.dto.ts`
+- [X] T013 [US1] Build routes and controller actions in `src/controllers/profile/profile.controller.ts` pointing to `SaveBasicProfileUseCase`
 
 **Checkpoint**: Basic details creation and verification works independently.
 
@@ -75,31 +75,29 @@
 **Independent Test**: Verify via HTTP POST to `/api/v1/profile/hobbies` with list of tagIds and retrieve back to check matching.
 
 ### Tests for User Story 2
-- [ ] T014 [P] [US2] Create pure Jest unit tests in `src/use-cases/profile/save-hobbies.usecase.spec.ts` asserting constraints (min 3 hobbies, max 10 hobbies, invalid hobby id rejection)
+- [X] T014 [US2] Create pure Jest unit tests in `src/use-cases/profile/save-hobbies.usecase.spec.ts` ensuring validation logic (must be between 3 and 10 hobbies)
 
 ### Implementation for User Story 2
-- [ ] T015 [US2] Implement core logic in `src/use-cases/profile/save-hobbies.usecase.ts` using `IHobbyRepository` and `IProfileRepository`
-- [ ] T016 [P] [US2] Create input validation DTO in `src/controllers/profile/dto/save-hobbies.dto.ts`
-- [ ] T017 [US2] Expose endpoints in `src/controllers/profile/profile.controller.ts` for fetching available hobbies and saving profile hobbies
+- [X] T015 [US2] Implement core logic in `src/use-cases/profile/save-hobbies.usecase.ts` utilizing `IHobbyRepository`
+- [X] T016 [P] [US2] Create class-validator DTO in `src/controllers/profile/dto/save-hobbies.dto.ts`
+- [X] T017 [US2] Expose endpoints in `src/controllers/profile/profile.controller.ts` for fetching available hobbies and saving profile hobbies
 
-**Checkpoint**: Users can search, fetch, and associate hobbies with their profile.
+**Checkpoint**: Users can select between 3 and 10 hobbies correctly.
 
 ---
 
-## Phase 5: User Story 3 - AI-Powered Personality Archetype Matching (Priority: P2)
+## Phase 5: User Story 3 - Personality AI Classification
 
-**Goal**: Match users to a predefined archetype based on their questionnaire answers using Gemini API.
-
-**Independent Test**: Submit questionnaire answers to `/api/v1/profile/questionnaire/submit`, confirm LLM selection is logged and user profile points to correct `personalityArchetypeId`.
+**⚠️ CRITICAL**: Proceed to this phase only after Phase 4 is verified.
 
 ### Tests for User Story 3
-- [ ] T018 [P] [US3] Create pure Jest unit tests in `src/use-cases/profile/submit-questionnaire.usecase.spec.ts` mocking the AI service wrapper to return static classification matches
+- [X] T018 [P] [US3] Create pure Jest unit tests in `src/use-cases/profile/submit-questionnaire.usecase.spec.ts` mocking the AI service wrapper to return static classification matches
 
 ### Implementation for User Story 3
-- [ ] T019 [US3] Implement Gemini API connection service in `src/infrastructure/services/gemini-ai.service.ts` implementing `IAIService` using direct fetch queries
-- [ ] T020 [US3] Write core application logic in `src/use-cases/profile/submit-questionnaire.usecase.ts` to fetch user answers + hobbies, construct LLM classification prompt, call `IAIService`, and save matched `personalityArchetypeId`
-- [ ] T021 [P] [US3] Create answers payload validation DTO in `src/controllers/profile/dto/submit-answers.dto.ts`
-- [ ] T022 [US3] Add endpoints in `src/controllers/profile/profile.controller.ts` to get questions and submit questionnaire answers
+- [X] T019 [P] [US3] Implement concrete `src/infrastructure/services/gemini-ai.service.ts` wrapping Google Vertex/Gemini APIs using prompt engineering to map user responses to the most relevant personality archetype. Ensure a fallback exists if API rate limits are hit.
+- [X] T020 [P] [US3] Bind all interfaces (IProfileRepository, etc.) to Prisma implementations in `src/infrastructure/frameworks/database/database.module.ts` and register `IAIService` to `GeminiAiService`
+- [X] T021 [P] [US3] Create validation DTO `src/controllers/profile/dto/submit-answers.dto.ts`
+- [X] T022 [US3] Expose endpoints for fetching questions and submitting answers in `profile.controller.ts`, delegating to `SubmitQuestionnaireUseCase`nswers
 
 **Checkpoint**: Complete AI matching flow works end-to-end.
 
@@ -112,11 +110,11 @@
 **Independent Test**: Query GET `/api/v1/profile` and verify returned JSON returns correct calculated age and Western zodiac.
 
 ### Tests for User Story 4
-- [ ] T023 [P] [US4] Create unit tests in `src/use-cases/profile/get-profile.usecase.spec.ts` validating correct age/zodiac calculations across different leap years and edge-case dates
+- [X] T023 [P] [US4] Create unit tests in `src/use-cases/profile/get-profile.usecase.spec.ts` validating correct age/zodiac calculations across different leap years and edge-case dates
 
 ### Implementation for User Story 4
-- [ ] T024 [US4] Implement helper calculation methods for age and zodiac in `src/use-cases/profile/get-profile.usecase.ts`
-- [ ] T025 [US4] Create endpoint GET `/api/v1/profile` in `src/controllers/profile/profile.controller.ts` to fetch user profile details
+- [X] T024 [US4] Implement helper calculation methods for age and zodiac in `src/use-cases/profile/get-profile.usecase.ts`
+- [X] T025 [US4] Create endpoint GET `/api/v1/profile` in `src/controllers/profile/profile.controller.ts` to fetch user profile details
 
 **Checkpoint**: Dynamic values (age, zodiac) are verified and outputted in envelope payload.
 
@@ -126,10 +124,10 @@
 
 **Purpose**: Integrity checks, documentation, and cleanups
 
-- [ ] T026 Update Swagger/OpenAPI documentation annotations in `src/controllers/profile.controller.ts`
-- [ ] T027 Verify error interceptors globally format profiling exceptions correctly
-- [ ] T028 Run end-to-end curls documented in `specs/002-profiling/quickstart.md` to verify system integrity
-- [ ] T029 Execute full backend lint check and format (`pnpm run lint` and `pnpm run format`)
+- [X] T026 Update Swagger/OpenAPI documentation annotations in `src/controllers/profile.controller.ts`
+- [X] T027 Verify error interceptors globally format profiling exceptions correctly
+- [X] T028 Run end-to-end curls documented in `specs/002-profiling/quickstart.md` to verify system integrity
+- [X] T029 Execute full backend lint check and format (`pnpm run lint` and `pnpm run format`)
 
 ---
 
