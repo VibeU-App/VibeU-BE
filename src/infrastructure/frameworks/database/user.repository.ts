@@ -38,10 +38,7 @@ export class PrismaUserRepository implements IUserRepository {
     const normalizedEmail = email.toLowerCase();
     const user = await this.prisma.user.findFirst({
       where: {
-        OR: [
-          { email: normalizedEmail },
-          { recoveryEmail: normalizedEmail },
-        ],
+        OR: [{ email: normalizedEmail }, { recoveryEmail: normalizedEmail }],
         deletedAt: null,
       },
     });

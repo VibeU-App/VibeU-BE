@@ -13,10 +13,10 @@ import { ErrorCode, ErrorMessage } from '../errors/error-codes';
 /**
  * Global exception filter that catches all exceptions and returns
  * them in the envelope format.
- * 
+ *
  * This ensures that even errors follow the standard structure:
  * { statusCode, message, data: null, metadata: null }
- * 
+ *
  * The frontend can always parse responses using the same logic,
  * regardless of whether the request succeeded or failed.
  */
@@ -39,10 +39,13 @@ export class EnvelopeExceptionFilter implements ExceptionFilter {
       // Handle NestJS HTTP exceptions (BadRequest, NotFound, etc.)
       statusCode = exception.getStatus();
       const exceptionResponse = exception.getResponse();
-      
+
       if (typeof exceptionResponse === 'string') {
         message = exceptionResponse;
-      } else if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
+      } else if (
+        typeof exceptionResponse === 'object' &&
+        exceptionResponse !== null
+      ) {
         message = (exceptionResponse as any).message || exception.message;
         errorCode = (exceptionResponse as any).code || errorCode;
       }

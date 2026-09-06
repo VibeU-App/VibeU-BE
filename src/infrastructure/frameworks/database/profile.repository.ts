@@ -58,7 +58,9 @@ export class PrismaProfileRepository implements IProfileRepository {
     return this.mapToEntity(updated);
   }
 
-  async getProfilePostAndMatchCounts(profileId: number): Promise<{ outpostCount: number; matchlistCount: number }> {
+  async getProfilePostAndMatchCounts(
+    profileId: number,
+  ): Promise<{ outpostCount: number; matchlistCount: number }> {
     return {
       outpostCount: 0,
       matchlistCount: 0,

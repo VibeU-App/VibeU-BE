@@ -10,6 +10,7 @@ import { PrismaPersonalityArchetypeRepository } from './personality-archetype.re
 import { PrismaQuestionnaireRepository } from './questionnaire.repository';
 import { AccountStatusLoaderService } from './account-status-loader.service';
 import { DatabasePrewarmService } from './database-prewarm.service';
+import { GeminiAiService } from '../../services/gemini-ai.service';
 
 /**
  * Database module for VibeU.
@@ -62,6 +63,11 @@ import { DatabasePrewarmService } from './database-prewarm.service';
     },
     AccountStatusLoaderService,
     DatabasePrewarmService,
+    GeminiAiService,
+    {
+      provide: 'IAIService',
+      useClass: GeminiAiService,
+    },
   ],
   exports: [
     'IUserRepository',
@@ -74,6 +80,7 @@ import { DatabasePrewarmService } from './database-prewarm.service';
     'IQuestionnaireRepository',
     AccountStatusLoaderService,
     DatabasePrewarmService,
+    'IAIService',
   ],
 })
 export class DatabaseModule {}

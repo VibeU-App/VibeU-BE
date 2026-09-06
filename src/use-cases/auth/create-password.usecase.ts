@@ -19,7 +19,10 @@ export class CreatePasswordUsecase {
     private readonly cryptoService: ICryptoService,
   ) {}
 
-  async execute(userId: string, password: string): Promise<CreatePasswordResult> {
+  async execute(
+    userId: string,
+    password: string,
+  ): Promise<CreatePasswordResult> {
     this.logger.log(`Create password attempt for user ID: ${userId}`);
 
     const user = await this.userRepository.findById(userId);
@@ -29,7 +32,11 @@ export class CreatePasswordUsecase {
 
     // If password hash is already set (non-empty), they must use Change Password endpoint
     if (user.passwordHash !== '') {
-      throw new AppException(ErrorCode.AUTH_INVALID_CREDENTIALS, HttpStatus.BAD_REQUEST, 'Password already set. Use change password endpoint.');
+      throw new AppException(
+        ErrorCode.AUTH_INVALID_CREDENTIALS,
+        HttpStatus.BAD_REQUEST,
+        'Password already set. Use change password endpoint.',
+      );
     }
 
     const passwordHash = await this.cryptoService.hash(password);

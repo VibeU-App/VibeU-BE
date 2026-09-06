@@ -28,7 +28,10 @@ export class VerifyRegistrationUsecase {
     private readonly tokenService: ITokenService,
   ) {}
 
-  async execute(email: string, otpCode: string): Promise<VerifyRegistrationResult> {
+  async execute(
+    email: string,
+    otpCode: string,
+  ): Promise<VerifyRegistrationResult> {
     // 1. Find user
     const user = await this.userRepository.findByEmail(email);
     if (!user) {
@@ -64,7 +67,9 @@ export class VerifyRegistrationUsecase {
     }
 
     // 4. Update user status to ACTIVE
-    const activeStatusId = await this.userRepository.findStatusByName(AccountStatusName.ACTIVE);
+    const activeStatusId = await this.userRepository.findStatusByName(
+      AccountStatusName.ACTIVE,
+    );
     if (!activeStatusId) {
       throw new Error('Active account status not found in system');
     }
@@ -87,7 +92,11 @@ export class VerifyRegistrationUsecase {
     await this.otpRepository.deleteByUserId(user.id);
 
     // 6. Generate access and refresh tokens using TokenService
-    const tokenPair = this.tokenService.createTokenPair(updatedUser.id, updatedUser.email, updatedUser.role);
+    const tokenPair = this.tokenService.createTokenPair(
+      updatedUser.id,
+      updatedUser.email,
+      updatedUser.role,
+    );
 
     const expiresAt = new Date(Date.now() + config.jwt.refreshTokenTtl * 1000);
     const session = SessionEntity.create({

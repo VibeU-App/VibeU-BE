@@ -1,50 +1,39 @@
 import { Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
-import { RegisterUsecase } from '../use-cases/auth/register.usecase';
-import { LoginUsecase } from '../use-cases/auth/login.usecase';
-import { VerifyRegistrationUsecase } from '../use-cases/auth/verify-registration.usecase';
-import { ForgotPasswordUsecase } from '../use-cases/auth/forgot-password.usecase';
-import { VerifyResetPasswordOtpUsecase } from '../use-cases/auth/verify-reset-password-otp.usecase';
-import { ResetPasswordUsecase } from '../use-cases/auth/reset-password.usecase';
-import { RefreshUsecase } from '../use-cases/auth/refresh.usecase';
-import { CreatePasswordUsecase } from '../use-cases/auth/create-password.usecase';
-import { ChangePasswordUsecase } from '../use-cases/auth/change-password.usecase';
-import { RequestLoginOtpUsecase } from '../use-cases/auth/request-login-otp.usecase';
-import { CleanExpiredOtpsUsecase } from '../use-cases/auth/clean-expired-otps.usecase';
+import {
+  RegisterUsecase,
+  LoginUsecase,
+  VerifyRegistrationUsecase,
+  ForgotPasswordUsecase,
+  VerifyResetPasswordOtpUsecase,
+  ResetPasswordUsecase,
+  RefreshUsecase,
+  CreatePasswordUsecase,
+  ChangePasswordUsecase,
+  RequestLoginOtpUsecase,
+  CleanExpiredOtpsUsecase,
+} from '../use-cases';
 import { JwtAuthGuard } from '../middleware/jwt-auth.guard';
 import { DatabaseModule } from '../infrastructure/frameworks/database/database.module';
+
+const USE_CASES = [
+  RegisterUsecase,
+  LoginUsecase,
+  VerifyRegistrationUsecase,
+  ForgotPasswordUsecase,
+  VerifyResetPasswordOtpUsecase,
+  ResetPasswordUsecase,
+  RefreshUsecase,
+  CreatePasswordUsecase,
+  ChangePasswordUsecase,
+  RequestLoginOtpUsecase,
+  CleanExpiredOtpsUsecase,
+];
 
 @Module({
   imports: [DatabaseModule],
   controllers: [AuthController],
-  providers: [
-    // Use cases
-    RegisterUsecase,
-    LoginUsecase,
-    VerifyRegistrationUsecase,
-    ForgotPasswordUsecase,
-    VerifyResetPasswordOtpUsecase,
-    ResetPasswordUsecase,
-    RefreshUsecase,
-    CreatePasswordUsecase,
-    ChangePasswordUsecase,
-    RequestLoginOtpUsecase,
-    CleanExpiredOtpsUsecase,
-    JwtAuthGuard,
-  ],
-  exports: [
-    RegisterUsecase,
-    LoginUsecase,
-    VerifyRegistrationUsecase,
-    ForgotPasswordUsecase,
-    VerifyResetPasswordOtpUsecase,
-    ResetPasswordUsecase,
-    RefreshUsecase,
-    CreatePasswordUsecase,
-    ChangePasswordUsecase,
-    RequestLoginOtpUsecase,
-    CleanExpiredOtpsUsecase,
-    JwtAuthGuard,
-  ],
+  providers: [...USE_CASES, JwtAuthGuard],
+  exports: [...USE_CASES, JwtAuthGuard],
 })
 export class AuthModule {}

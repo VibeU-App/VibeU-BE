@@ -1,5 +1,10 @@
 import { ForgotPasswordUsecase } from './forgot-password.usecase';
-import { MockUserRepository, MockMailService, MockOtpRepository, MockPolicyRepository } from './test-mocks';
+import {
+  MockUserRepository,
+  MockMailService,
+  MockOtpRepository,
+  MockPolicyRepository,
+} from './test-mocks';
 import { ErrorCode } from '../../core/errors';
 import { UserEntity } from '../../core/entities';
 
@@ -17,7 +22,9 @@ describe('ForgotPasswordUsecase', () => {
     mockOtpRepository = new MockOtpRepository();
     mockPolicyRepository = new MockPolicyRepository();
     mockTemplateLoader = {
-      render: jest.fn().mockImplementation((name, vars) => JSON.stringify(vars)),
+      render: jest
+        .fn()
+        .mockImplementation((name, vars) => JSON.stringify(vars)),
     };
     usecase = new ForgotPasswordUsecase(
       mockUserRepository,
@@ -39,19 +46,21 @@ describe('ForgotPasswordUsecase', () => {
     // Security: Never reveal if email exists
     const testResult = await usecase.execute('nonexistent@example.edu');
 
-    expect(testResult.message).toBe("If that email is registered, an OTP has been sent.");
+    expect(testResult.message).toBe(
+      'If that email is registered, an OTP has been sent.',
+    );
   });
 
   it('should send OTP if user exists', async () => {
-    const user : UserEntity = UserEntity.create({
-      email: "user@example.edu.vn",
-      passwordHash: "i3hr92hr9ebfusboc",
+    const user: UserEntity = UserEntity.create({
+      email: 'user@example.edu.vn',
+      passwordHash: 'i3hr92hr9ebfusboc',
     });
 
     mockUserRepository.addUser(user);
 
     await usecase.execute('user@example.edu.vn');
-    
+
     // Verify that an email is sent
     expect(mockMailService.sentEmails.length).toBe(1);
 
@@ -64,63 +73,65 @@ describe('ForgotPasswordUsecase', () => {
   });
 
   it('should send OTP if recovery email matches and isRecovery is true', async () => {
-    const user : UserEntity = UserEntity.create({
-      email: "user@example.edu.vn",
-      passwordHash: "i3hr92hr9ebfusboc",
-      recoveryEmail: "recovery@example.edu.vn",
+    const user: UserEntity = UserEntity.create({
+      email: 'user@example.edu.vn',
+      passwordHash: 'i3hr92hr9ebfusboc',
+      recoveryEmail: 'recovery@example.edu.vn',
     });
 
     mockUserRepository.addUser(user);
 
     await usecase.execute('recovery@example.edu.vn', true);
-    
+
     // Verify that an email is sent to the recovery email address directly
     expect(mockMailService.sentEmails.length).toBe(1);
-    expect(mockMailService.sentEmails[0].email).toEqual("recovery@example.edu.vn");
+    expect(mockMailService.sentEmails[0].email).toEqual(
+      'recovery@example.edu.vn',
+    );
   });
 
   it('should NOT send OTP if recovery email matches but isRecovery is false', async () => {
-    const user : UserEntity = UserEntity.create({
-      email: "user@example.edu.vn",
-      passwordHash: "i3hr92hr9ebfusboc",
-      recoveryEmail: "recovery@example.edu.vn",
+    const user: UserEntity = UserEntity.create({
+      email: 'user@example.edu.vn',
+      passwordHash: 'i3hr92hr9ebfusboc',
+      recoveryEmail: 'recovery@example.edu.vn',
     });
 
     mockUserRepository.addUser(user);
 
     await usecase.execute('recovery@example.edu.vn', false);
-    
+
     // Verify that no email is sent because recovery email was not matched in primary scope
     expect(mockMailService.sentEmails.length).toBe(0);
   });
 
   it('should reject if not a .edu email', async () => {
-    const user : UserEntity = UserEntity.create({
-      email: "user@notedu.com",
-      passwordHash: "i3hr92hr9ebfusboc",
+    const user: UserEntity = UserEntity.create({
+      email: 'user@notedu.com',
+      passwordHash: 'i3hr92hr9ebfusboc',
     });
 
     mockUserRepository.addUser(user);
 
-    await usecase.execute("user@notedu.com");
+    await usecase.execute('user@notedu.com');
 
     // Wait a tick for the background email promise to reject and get caught
-    await new Promise(resolve => setImmediate(resolve));
+    await new Promise((resolve) => setImmediate(resolve));
 
     // Verify that no email was successfully sent
     expect(mockMailService.sentEmails.length).toEqual(0);
   });
 
   it('should normalize emails', async () => {
-    const user : UserEntity = UserEntity.create({
-      email: "user1+tag1@example.edu",
-      passwordHash: "i3hr92hr9ebfusboc",
+    const user: UserEntity = UserEntity.create({
+      email: 'user1+tag1@example.edu',
+      passwordHash: 'i3hr92hr9ebfusboc',
     });
 
     mockUserRepository.addUser(user);
 
-    await usecase.execute("user1+tag1@example.edu");
+    await usecase.execute('user1+tag1@example.edu');
 
-    expect(mockMailService.sentEmails[0]["email"]).toBe("user1@example.edu");
+    expect(mockMailService.sentEmails[0]['email']).toBe('user1@example.edu');
   });
 });

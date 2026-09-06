@@ -25,7 +25,11 @@ describe('ChangePasswordUsecase', () => {
     });
     mockUserRepository.addUser({ ...user, id: 'user-1' } as UserEntity);
 
-    const result = await usecase.execute('user-1', 'OldSecurePass123!', 'NewSecurePass123!');
+    const result = await usecase.execute(
+      'user-1',
+      'OldSecurePass123!',
+      'NewSecurePass123!',
+    );
     expect(result.message).toBe('Password changed successfully.');
 
     const updatedUser = await mockUserRepository.findById('user-1');
@@ -41,7 +45,9 @@ describe('ChangePasswordUsecase', () => {
     });
     mockUserRepository.addUser({ ...user, id: 'user-1' } as UserEntity);
 
-    await expect(usecase.execute('user-1', 'IncorrectPass123!', 'NewSecurePass123!')).rejects.toThrow();
+    await expect(
+      usecase.execute('user-1', 'IncorrectPass123!', 'NewSecurePass123!'),
+    ).rejects.toThrow();
   });
 
   it('should throw an error if user does not have a password set yet', async () => {
@@ -51,6 +57,8 @@ describe('ChangePasswordUsecase', () => {
     });
     mockUserRepository.addUser({ ...user, id: 'user-1' } as UserEntity);
 
-    await expect(usecase.execute('user-1', 'SomeOldPass!', 'NewSecurePass123!')).rejects.toThrow();
+    await expect(
+      usecase.execute('user-1', 'SomeOldPass!', 'NewSecurePass123!'),
+    ).rejects.toThrow();
   });
 });

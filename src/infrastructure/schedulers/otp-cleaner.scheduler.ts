@@ -16,7 +16,10 @@ export class OtpCleanerScheduler {
     try {
       await this.cleanExpiredOtpsUsecase.execute();
     } catch (error) {
-      this.logger.error('Failed to run scheduled expired OTP cleaner job:', error);
+      this.logger.error(
+        'Failed to run scheduled expired OTP cleaner job:',
+        error,
+      );
     }
   }
 }

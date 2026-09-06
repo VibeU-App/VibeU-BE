@@ -1,5 +1,10 @@
 import { RequestLoginOtpUsecase } from './request-login-otp.usecase';
-import { MockUserRepository, MockOtpRepository, MockPolicyRepository, MockMailService } from './test-mocks';
+import {
+  MockUserRepository,
+  MockOtpRepository,
+  MockPolicyRepository,
+  MockMailService,
+} from './test-mocks';
 import { ErrorCode } from '../../core/errors';
 import { UserEntity } from '../../core/entities/user.entity';
 
@@ -17,7 +22,9 @@ describe('RequestLoginOtpUsecase', () => {
     mockPolicyRepository = new MockPolicyRepository();
     mockMailService = new MockMailService();
     mockTemplateLoader = {
-      render: jest.fn().mockImplementation((name, vars) => JSON.stringify(vars)),
+      render: jest
+        .fn()
+        .mockImplementation((name, vars) => JSON.stringify(vars)),
     };
 
     usecase = new RequestLoginOtpUsecase(

@@ -26,16 +26,23 @@ export class ForgotPasswordUsecase {
     private readonly templateLoader: TemplateLoaderService,
   ) {}
 
-  async execute(email: string, isRecovery: boolean = false): Promise<ForgotPasswordResult> {
+  async execute(
+    email: string,
+    isRecovery: boolean = false,
+  ): Promise<ForgotPasswordResult> {
     const user = isRecovery
       ? await this.userRepository.findByRecoveryEmail(email)
       : await this.userRepository.findByEmail(email);
 
-    if (!!user) {
-      const maxAttemptsVal = await this.policyRepository.findValueByKey('MAX_OTP_ATTEMPTS');
+    if (user) {
+      const maxAttemptsVal =
+        await this.policyRepository.findValueByKey('MAX_OTP_ATTEMPTS');
       const maxAttempts = maxAttemptsVal ? parseInt(maxAttemptsVal, 10) : 5;
-      const expiryMinutesVal = await this.policyRepository.findValueByKey('OTP_EXPIRY_MINUTES');
-      const expiryMinutes = expiryMinutesVal ? parseInt(expiryMinutesVal, 10) : 15;
+      const expiryMinutesVal =
+        await this.policyRepository.findValueByKey('OTP_EXPIRY_MINUTES');
+      const expiryMinutes = expiryMinutesVal
+        ? parseInt(expiryMinutesVal, 10)
+        : 15;
 
       const otpObject = OtpEntity.create({
         userId: user.id,
@@ -51,13 +58,18 @@ export class ForgotPasswordUsecase {
         otp: otpObject.code,
         expiryMinutes,
       });
-      this.mailService.send(email, 'Password Reset Code', emailHtml)
-        .catch(err => this.logger.error(`Failed to send password reset email to ${email}: ${err.message}`, err.stack));
-    } 
+      this.mailService
+        .send(email, 'Password Reset Code', emailHtml)
+        .catch((err) =>
+          this.logger.error(
+            `Failed to send password reset email to ${email}: ${err.message}`,
+            err.stack,
+          ),
+        );
+    }
 
     return {
-      message: "If that email is registered, an OTP has been sent."
+      message: 'If that email is registered, an OTP has been sent.',
     };
-
   }
 }
