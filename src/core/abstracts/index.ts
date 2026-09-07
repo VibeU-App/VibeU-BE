@@ -7,3 +7,8 @@ export * from './hobby-repository.interface';
 export * from './personality-archetype-repository.interface';
 export * from './questionnaire-repository.interface';
 export * from './ai-service.interface';
+export * from './crypto-service.interface';
+export * from './mail-service.interface';
+export * from './token-service.interface';
+export * from './jwt-service.interface';
+export * from './template-loader-service.interface';

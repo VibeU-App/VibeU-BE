@@ -1,12 +1,6 @@
 /**
- * OTP (One-Time Password) entity for in-memory cache.
- * Used for email verification and password reset.
- *
- * OTPs are stored in memory (not database) because:
- * - They are short-lived (expire in minutes)
- * - They don't need to survive server restarts
- * - In-memory lookups are faster
- * - No need to clean up expired OTPs from DB
+ * OTP (One-Time Password) domain entity.
+ * Used for email verification, passwordless login, and password reset.
  */
 export class OtpEntity {
   constructor(
