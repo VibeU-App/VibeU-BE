@@ -5,6 +5,9 @@ import {
   SaveHobbiesUseCase,
   SubmitQuestionnaireUseCase,
   GetProfileUseCase,
+  GetProfileMeUseCase,
+  UpdateProfileMeUseCase,
+  UpdateProfileTagsUseCase,
 } from '../use-cases';
 import { JwtAuthGuard } from '../middleware/jwt-auth.guard';
 import { DatabaseModule } from '../infrastructure/frameworks/database/database.module';
@@ -14,6 +17,9 @@ const USE_CASES = [
   SaveHobbiesUseCase,
   SubmitQuestionnaireUseCase,
   GetProfileUseCase,
+  GetProfileMeUseCase,
+  UpdateProfileMeUseCase,
+  UpdateProfileTagsUseCase,
 ];
 
 @Module({

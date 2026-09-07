@@ -7,7 +7,6 @@ import {
   Patch,
   Put,
   UseGuards,
-  Req,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -20,19 +19,21 @@ import {
   ApiCreatedResponseEnvelope,
   ApiCreatedResponseEnvelopeNull,
   ApiOkResponseEnvelope,
-} from 'src/core';
+} from '../core/envelope/envelope.decorator';
 import {
   GetProfileMeUseCase,
   UpdateProfileMeUseCase,
   UpdateProfileTagsUseCase,
-} from 'src/use-cases';
+} from '../use-cases';
 import {
   GetProfileMeResponseDto,
   UpdateProfileRequestDto,
   UpdateProfileResponseDto,
   UpdateProfileTagsRequestDto,
-} from 'src/core/dtos';
-import { JwtAuthGuard } from 'src/middleware/jwt-auth.guard';
+} from '../core/dtos';
+import { JwtAuthGuard } from '../middleware/jwt-auth.guard';
+import { CurrentUser } from '../middleware/current-user.decorator';
+import { TokenPayload } from '../middleware/token-payload.interface';
 
 @ApiTags('Profile')
 @Controller('profile')
@@ -53,9 +54,9 @@ export class ProfileController {
   })
   @ApiResponse({ status: 404, description: 'Profile not found' })
   async getProfileMe(
-    @Req() req: any,
+    @CurrentUser() user: TokenPayload,
   ): Promise<Envelope<GetProfileMeResponseDto>> {
-    const result = await this.getProfileMeUsecase.execute(req.user.sub);
+    const result = await this.getProfileMeUsecase.execute(user.sub);
 
     return {
       statusCode: HttpStatus.OK,
@@ -82,10 +83,10 @@ export class ProfileController {
     description: "Profile can't be found",
   })
   async updateProfile(
-    @Req() req: any,
+    @CurrentUser() user: TokenPayload,
     @Body() dto: UpdateProfileRequestDto,
   ): Promise<Envelope<UpdateProfileResponseDto>> {
-    const result = await this.updateProfileMeUsecase.execute(req.user.sub, dto);
+    const result = await this.updateProfileMeUsecase.execute(user.sub, dto);
 
     return {
       statusCode: HttpStatus.CREATED,
@@ -112,10 +113,10 @@ export class ProfileController {
     description: "Profile can't be found",
   })
   async updateProfileTags(
-    @Req() req: any,
+    @CurrentUser() user: TokenPayload,
     @Body() dto: UpdateProfileTagsRequestDto,
   ): Promise<Envelope<null>> {
-    await this.updateProfileTagsUsecase.execute(req.user.sub, dto.hobbyIds);
+    await this.updateProfileTagsUsecase.execute(user.sub, dto.hobbyIds);
 
     return {
       statusCode: HttpStatus.CREATED,

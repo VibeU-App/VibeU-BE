@@ -5,7 +5,6 @@ import {
   HttpCode,
   HttpStatus,
   UseGuards,
-  Req,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -49,8 +48,9 @@ import {
 import { JwtAuthGuard } from '../middleware/jwt-auth.guard';
 import { RolesGuard } from '../middleware/roles.guard';
 import { Roles } from '../middleware/roles.decorator';
+import { CurrentUser } from '../middleware/current-user.decorator';
+import { TokenPayload } from '../middleware/token-payload.interface';
 import { UserRole } from '../core/entities/user.entity';
-
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -155,12 +155,10 @@ export class AuthController {
     );
 
     return {
-      statusCode: 200,
+      statusCode: HttpStatus.OK,
       message: result.message,
       data: null,
-      metadata: {
-        timestamp: new Date().toISOString(),
-      },
+      metadata: null,
     };
   }
 
@@ -180,14 +178,12 @@ export class AuthController {
     );
 
     return {
-      statusCode: 200,
+      statusCode: HttpStatus.OK,
       message: 'OK',
       data: {
         resetToken: result.resetToken,
       },
-      metadata: {
-        timestamp: new Date().toISOString(),
-      },
+      metadata: null,
     };
   }
 
@@ -205,12 +201,10 @@ export class AuthController {
     );
 
     return {
-      statusCode: 200,
+      statusCode: HttpStatus.OK,
       message: result.message,
       data: null,
-      metadata: {
-        timestamp: new Date().toISOString(),
-      },
+      metadata: null,
     };
   }
 
@@ -246,11 +240,11 @@ export class AuthController {
     description: 'Password already set or invalid input',
   })
   async createPassword(
-    @Req() req: any,
+    @CurrentUser() user: TokenPayload,
     @Body() dto: CreatePasswordDto,
   ): Promise<Envelope<null>> {
     const result = await this.createPasswordUsecase.execute(
-      req.user.sub,
+      user.sub,
       dto.password,
     );
     return {
@@ -273,11 +267,11 @@ export class AuthController {
     description: 'Incorrect old password or invalid input',
   })
   async changePassword(
-    @Req() req: any,
+    @CurrentUser() user: TokenPayload,
     @Body() dto: ChangePasswordDto,
   ): Promise<Envelope<null>> {
     const result = await this.changePasswordUsecase.execute(
-      req.user.sub,
+      user.sub,
       dto.oldPassword,
       dto.newPassword,
     );

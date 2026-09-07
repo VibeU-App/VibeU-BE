@@ -4,7 +4,6 @@ import { GlobalServicesModule } from './infrastructure/services/global-services.
 import { AuthModule } from './controllers/auth.module';
 import { SchedulingModule } from './infrastructure/schedulers/scheduling.module';
 import { ProfileModule } from './controllers/profile.module';
-import { ProfileModule } from './controllers/profile.module';
 
 @Module({
   imports: [
