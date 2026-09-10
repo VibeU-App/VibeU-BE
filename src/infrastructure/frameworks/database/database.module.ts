@@ -10,13 +10,10 @@ import { PrismaPersonalityArchetypeRepository } from './personality-archetype.re
 import { PrismaQuestionnaireRepository } from './questionnaire.repository';
 import { AccountStatusLoaderService } from './account-status-loader.service';
 import { DatabasePrewarmService } from './database-prewarm.service';
-import { GeminiAiService } from '../../services/gemini-ai.service';
 
 /**
  * Database module for VibeU.
- *
  * Consolidates repositories and database services under a single module.
- * Exports repository interfaces (tokens) to adhere to Dependency Inversion Principle.
  */
 @Module({
   providers: [
@@ -63,11 +60,6 @@ import { GeminiAiService } from '../../services/gemini-ai.service';
     },
     AccountStatusLoaderService,
     DatabasePrewarmService,
-    GeminiAiService,
-    {
-      provide: 'IAIService',
-      useClass: GeminiAiService,
-    },
   ],
   exports: [
     'IUserRepository',
@@ -80,7 +72,6 @@ import { GeminiAiService } from '../../services/gemini-ai.service';
     'IQuestionnaireRepository',
     AccountStatusLoaderService,
     DatabasePrewarmService,
-    'IAIService',
   ],
 })
 export class DatabaseModule {}

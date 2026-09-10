@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { IOtpRepository } from '../../../core/abstracts/otp-repository.interface';
 import { OtpEntity } from '../../../core/entities/otp.entity';
 import { PrismaService } from './prisma.service';
+import { Otp as PrismaOtp } from '@prisma/client';
 
 /**
  * Prisma implementation of the OTP repository storing OTPs in database.
@@ -98,7 +99,7 @@ export class PrismaOtpRepository implements IOtpRepository {
   /**
    * Maps database record to OtpEntity.
    */
-  private mapToEntity(record: any): OtpEntity {
+  private mapToEntity(record: PrismaOtp): OtpEntity {
     return new OtpEntity(
       record.userId,
       record.code,
