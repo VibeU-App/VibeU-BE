@@ -1,6 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { IProfileRepository } from '../../core/abstracts/profile-repository.interface';
+import { IProfileRepository } from '../../core/abstracts';
 import { ProfileEntity } from '../../core/entities/profile.entity';
+import { AppException, ErrorCode } from '../../core/errors';
+import { getAge } from '../../utils/calculating';
 
 @Injectable()
 export class SaveBasicProfileUseCase {
@@ -20,14 +22,9 @@ export class SaveBasicProfileUseCase {
     },
   ): Promise<ProfileEntity> {
     // Check age
-    const now = new Date();
-    let age = now.getFullYear() - payload.birthday.getFullYear();
-    const m = now.getMonth() - payload.birthday.getMonth();
-    if (m < 0 || (m === 0 && now.getDate() < payload.birthday.getDate())) {
-      age--;
-    }
+    const age = getAge(payload.birthday);
     if (age < 18) {
-      throw new Error('User must be at least 18 years old');
+      throw new AppException(ErrorCode.PROFILE_USER_NOT_OLD_ENOUGH);
     }
 
     const existingProfile = await this.profileRepository.findByUserId(userId);
@@ -36,7 +33,7 @@ export class SaveBasicProfileUseCase {
       const updatedProfile = new ProfileEntity(
         existingProfile.id,
         existingProfile.userId,
-        payload.fullName,
+        payload.nickname,
         payload.gender,
         payload.avatarSeed,
         payload.birthday,
@@ -53,7 +50,7 @@ export class SaveBasicProfileUseCase {
     } else {
       const newProfile = ProfileEntity.create({
         userId,
-        fullName: payload.fullName,
+        nickname: payload.nickname,
         gender: payload.gender,
         avatarSeed: payload.avatarSeed,
         birthday: payload.birthday,

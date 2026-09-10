@@ -1,18 +1,18 @@
 import { Injectable, Inject, Logger } from '@nestjs/common';
-import { IUserRepository } from '../../core/abstracts/user-repository.interface';
-import { ISessionRepository } from '../../core/abstracts/session-repository.interface';
-import { ICryptoService } from '../../infrastructure/services/crypto/crypto.interface';
-import { IMailService } from '../../infrastructure/services/mail/mail.interface';
-import { IOtpRepository } from '../../core/abstracts/otp-repository.interface';
-import { ITokenService } from '../../infrastructure/services/token/token.service';
-import { IPolicyRepository } from '../../core/abstracts/policy-repository.interface';
-import { TemplateLoaderService } from '../../infrastructure/services/template/template-loader.service';
-import { UserEntity, AccountStatusName } from '../../core/entities/user.entity';
-import { SessionEntity } from '../../core/entities/session.entity';
+import {
+  IUserRepository,
+  IMailService,
+  IOtpRepository,
+  IPolicyRepository,
+  ITemplateLoaderService,
+} from '../../core/abstracts';
+import {
+  UserEntity,
+  AccountStatusName,
+} from '../../core/entities/user.entity';
 import { OtpEntity } from '../../core/entities/otp.entity';
 import { AppException } from '../../core/errors/app-exception';
 import { ErrorCode } from '../../core/errors/error-codes';
-import { config } from '../../configuration';
 
 @Injectable()
 export class RegisterUsecase {
@@ -21,19 +21,14 @@ export class RegisterUsecase {
   constructor(
     @Inject('IUserRepository')
     private readonly userRepository: IUserRepository,
-    @Inject('ISessionRepository')
-    private readonly sessionRepository: ISessionRepository,
-    @Inject('ICryptoService')
-    private readonly cryptoService: ICryptoService,
     @Inject('IMailService')
     private readonly mailService: IMailService,
     @Inject('IOtpRepository')
     private readonly otpRepository: IOtpRepository,
-    @Inject('ITokenService')
-    private readonly tokenService: ITokenService,
     @Inject('IPolicyRepository')
     private readonly policyRepository: IPolicyRepository,
-    private readonly templateLoader: TemplateLoaderService,
+    @Inject('ITemplateLoaderService')
+    private readonly templateLoader: ITemplateLoaderService,
   ) {}
 
   async execute(email: string): Promise<void> {
@@ -72,6 +67,7 @@ export class RegisterUsecase {
         existingUser.createdAt,
         new Date(),
         existingUser.deletedAt,
+        existingUser.recoveryEmail,
       );
       savedUser = await this.userRepository.update(updatedUser);
     } else {
@@ -84,7 +80,7 @@ export class RegisterUsecase {
       savedUser = await this.userRepository.save(user);
     }
 
-    // 4. Generate and save OTP
+    // 3. Generate and save OTP
     const maxAttemptsVal =
       await this.policyRepository.findValueByKey('MAX_OTP_ATTEMPTS');
     const maxAttempts = maxAttemptsVal ? parseInt(maxAttemptsVal, 10) : 5;
@@ -101,7 +97,7 @@ export class RegisterUsecase {
     });
     await this.otpRepository.save(otp);
 
-    // 5. Render template and send verification email
+    // 4. Render template and send verification email
     const emailHtml = this.templateLoader.render('otp-verification', {
       appName: 'VibeU',
       otp: otp.code,

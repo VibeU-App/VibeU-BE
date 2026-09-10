@@ -1,10 +1,11 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { IUserRepository } from '../../core/abstracts/user-repository.interface';
-import { ICryptoService } from '../../infrastructure/services/crypto/crypto.interface';
-import { IJwtService } from '../../infrastructure/services/token';
+import {
+  IUserRepository,
+  ICryptoService,
+  IJwtService,
+} from '../../core/abstracts';
 import { UserEntity } from '../../core/entities';
-import { BadRequestException } from '@nestjs/common';
-import { ErrorCode } from '../../core/errors';
+import { AppException, ErrorCode } from '../../core/errors';
 
 export interface ResetPasswordResult {
   message: string;
@@ -29,10 +30,7 @@ export class ResetPasswordUsecase {
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/;
 
     if (!strongPasswordRegex.test(newPassword)) {
-      throw new BadRequestException({
-        code: ErrorCode.AUTH_WEAK_PASSWORD,
-        message: 'Password is too weak',
-      });
+      throw new AppException(ErrorCode.AUTH_WEAK_PASSWORD);
     }
 
     const tokenData = this.jwtService.verifyToken(resetToken);
@@ -45,10 +43,7 @@ export class ResetPasswordUsecase {
       if (user) {
         // Enforce single-use reset token
         if (user.passwordHash !== tokenHash) {
-          throw new BadRequestException({
-            code: ErrorCode.AUTH_INVALID_TOKEN,
-            message: 'Reset token is invalid or has already been used',
-          });
+          throw new AppException(ErrorCode.AUTH_INVALID_TOKEN);
         }
 
         const isSamePassword = await this.cryptoService.compare(
@@ -56,10 +51,7 @@ export class ResetPasswordUsecase {
           user.passwordHash,
         );
         if (isSamePassword) {
-          throw new BadRequestException({
-            code: ErrorCode.AUTH_MATCHING_OLD_PASSWORD,
-            message: 'New password must be different from old password',
-          });
+          throw new AppException(ErrorCode.AUTH_MATCHING_OLD_PASSWORD);
         }
 
         const passwordHash = await this.cryptoService.hash(newPassword);
@@ -74,6 +66,7 @@ export class ResetPasswordUsecase {
           user.createdAt,
           new Date(),
           user.deletedAt,
+          user.recoveryEmail,
         );
 
         await this.userRepository.update(newUser);
@@ -84,9 +77,6 @@ export class ResetPasswordUsecase {
       }
     }
 
-    throw new BadRequestException({
-      code: ErrorCode.AUTH_USER_NOT_FOUND,
-      message: 'Invalid or expired OTP',
-    });
+    throw new AppException(ErrorCode.AUTH_USER_NOT_FOUND);
   }
 }

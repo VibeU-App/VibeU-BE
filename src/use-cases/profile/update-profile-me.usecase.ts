@@ -1,7 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { IProfileRepository } from '../../core/abstracts/profile-repository.interface';
+import { IProfileRepository } from '../../core/abstracts';
 import { ProfileEntity } from '../../core/entities/profile.entity';
-import { AppException, ErrorCode } from '../../core';
+import { AppException, ErrorCode } from '../../core/errors';
+import { getAge } from '../../utils/calculating';
 
 @Injectable()
 export class UpdateProfileMeUseCase {
@@ -26,7 +27,7 @@ export class UpdateProfileMeUseCase {
     if (userProfile) {
       if (
         !!payload.birthday &&
-        this.profileRepository.getAge(payload.birthday) < 18
+        getAge(payload.birthday) < 18
       ) {
         throw new AppException(ErrorCode.PROFILE_USER_NOT_OLD_ENOUGH);
       }

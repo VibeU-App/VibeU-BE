@@ -1,7 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { IProfileRepository } from '../../core/abstracts/profile-repository.interface';
-import { IHobbyRepository } from '../../core/abstracts/hobby-repository.interface';
-import { AppException, ErrorCode } from '../../core';
+import { IProfileRepository, IHobbyRepository } from '../../core/abstracts';
+import { AppException, ErrorCode } from '../../core/errors';
 
 @Injectable()
 export class UpdateProfileTagsUseCase {

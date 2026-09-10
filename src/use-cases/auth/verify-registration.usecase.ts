@@ -1,8 +1,10 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { IUserRepository } from '../../core/abstracts/user-repository.interface';
-import { IOtpRepository } from '../../core/abstracts/otp-repository.interface';
-import { ISessionRepository } from '../../core/abstracts/session-repository.interface';
-import { ITokenService } from '../../infrastructure/services/token/token.service';
+import {
+  IUserRepository,
+  IOtpRepository,
+  ISessionRepository,
+  ITokenService,
+} from '../../core/abstracts';
 import { AppException } from '../../core/errors/app-exception';
 import { ErrorCode } from '../../core/errors/error-codes';
 import { AccountStatusName, UserEntity } from '../../core/entities/user.entity';
@@ -49,12 +51,7 @@ export class VerifyRegistrationUsecase {
       throw new AppException(ErrorCode.AUTH_OTP_INVALID);
     }
 
-    if (otp.code !== otpCode) {
-      await this.otpRepository.incrementAttempts(user.id);
-      throw new AppException(ErrorCode.AUTH_OTP_INVALID);
-    }
-
-    // Check if expired
+    // Check if expired first
     if (otp.isExpired()) {
       await this.otpRepository.deleteByUserId(user.id);
       throw new AppException(ErrorCode.AUTH_OTP_EXPIRED);
@@ -63,6 +60,12 @@ export class VerifyRegistrationUsecase {
     // Check max attempts
     if (otp.isMaxAttemptsReached()) {
       await this.otpRepository.deleteByUserId(user.id);
+      throw new AppException(ErrorCode.AUTH_OTP_INVALID);
+    }
+
+    // Validate code
+    if (otp.code !== otpCode) {
+      await this.otpRepository.incrementAttempts(user.id);
       throw new AppException(ErrorCode.AUTH_OTP_INVALID);
     }
 
@@ -84,6 +87,7 @@ export class VerifyRegistrationUsecase {
       user.createdAt,
       new Date(), // Updated at
       user.deletedAt,
+      user.recoveryEmail,
     );
 
     await this.userRepository.update(updatedUser);

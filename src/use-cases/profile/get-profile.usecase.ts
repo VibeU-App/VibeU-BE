@@ -1,7 +1,25 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { IProfileRepository } from '../../core/abstracts/profile-repository.interface';
-import { IHobbyRepository } from '../../core/abstracts/hobby-repository.interface';
-import { IPersonalityArchetypeRepository } from '../../core/abstracts/personality-archetype-repository.interface';
+import {
+  IProfileRepository,
+  IHobbyRepository,
+  IPersonalityArchetypeRepository,
+} from '../../core/abstracts';
+import {
+  ProfileEntity,
+  HobbyEntity,
+  PersonalityArchetypeEntity,
+} from '../../core/entities';
+import { AppException, ErrorCode } from '../../core/errors';
+import { getAge, getZodiacSign } from '../../utils/calculating';
+
+export interface GetProfileResult {
+  profile: ProfileEntity;
+  hobbies: HobbyEntity[];
+  archetype: PersonalityArchetypeEntity | null;
+  stats: { outpostCount: number; matchlistCount: number };
+  age: number;
+  zodiac: string;
+}
 
 @Injectable()
 export class GetProfileUseCase {
@@ -14,14 +32,14 @@ export class GetProfileUseCase {
     private readonly archetypeRepository: IPersonalityArchetypeRepository,
   ) {}
 
-  async execute(userId: string): Promise<any> {
+  async execute(userId: string): Promise<GetProfileResult> {
     const profile = await this.profileRepository.findByUserId(userId);
     if (!profile) {
-      throw new Error('Profile not found');
+      throw new AppException(ErrorCode.PROFILE_USER_NOT_FOUND);
     }
 
     const hobbies = await this.hobbyRepository.findProfileHobbies(profile.id);
-    let archetype: unknown = null;
+    let archetype: PersonalityArchetypeEntity | null = null;
     if (profile.personalityArchetypeId) {
       archetype = await this.archetypeRepository.findById(
         profile.personalityArchetypeId,
@@ -32,14 +50,8 @@ export class GetProfileUseCase {
       profile.id,
     );
 
-    const now = new Date();
-    let age = now.getFullYear() - profile.birthday.getFullYear();
-    const m = now.getMonth() - profile.birthday.getMonth();
-    if (m < 0 || (m === 0 && now.getDate() < profile.birthday.getDate())) {
-      age--;
-    }
-
-    const zodiac = this.getZodiac(profile.birthday);
+    const age = getAge(profile.birthday);
+    const zodiac = getZodiacSign(profile.birthday);
 
     return {
       profile,
@@ -49,33 +61,5 @@ export class GetProfileUseCase {
       age,
       zodiac,
     };
-  }
-
-  private getZodiac(date: Date): string {
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-
-    if ((month === 3 && day >= 21) || (month === 4 && day <= 19))
-      return 'Aries';
-    if ((month === 4 && day >= 20) || (month === 5 && day <= 20))
-      return 'Taurus';
-    if ((month === 5 && day >= 21) || (month === 6 && day <= 20))
-      return 'Gemini';
-    if ((month === 6 && day >= 21) || (month === 7 && day <= 22))
-      return 'Cancer';
-    if ((month === 7 && day >= 23) || (month === 8 && day <= 22)) return 'Leo';
-    if ((month === 8 && day >= 23) || (month === 9 && day <= 22))
-      return 'Virgo';
-    if ((month === 9 && day >= 23) || (month === 10 && day <= 22))
-      return 'Libra';
-    if ((month === 10 && day >= 23) || (month === 11 && day <= 21))
-      return 'Scorpio';
-    if ((month === 11 && day >= 22) || (month === 12 && day <= 21))
-      return 'Sagittarius';
-    if ((month === 12 && day >= 22) || (month === 1 && day <= 19))
-      return 'Capricorn';
-    if ((month === 1 && day >= 20) || (month === 2 && day <= 18))
-      return 'Aquarius';
-    return 'Pisces';
   }
 }
