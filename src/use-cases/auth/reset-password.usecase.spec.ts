@@ -67,7 +67,7 @@ describe('ResetPasswordUsecase', () => {
       await usecase.execute('NewSecurePass456!', 'random');
       fail('Should have thrown an error');
     } catch (error) {
-      expect(error.getResponse().code).toBe(ErrorCode.AUTH_USER_NOT_FOUND);
+      expect(error.code).toBe(ErrorCode.AUTH_USER_NOT_FOUND);
     }
   });
 
@@ -119,7 +119,7 @@ describe('ResetPasswordUsecase', () => {
       await usecase.execute('weakpassword', testToken);
       fail('Should have thrown an error');
     } catch (error) {
-      expect(error.getResponse().code).toBe(ErrorCode.AUTH_WEAK_PASSWORD);
+      expect(error.code).toBe(ErrorCode.AUTH_WEAK_PASSWORD);
     }
   });
 
@@ -147,9 +147,7 @@ describe('ResetPasswordUsecase', () => {
       await usecase.execute('Examplepassword123!', testToken);
       fail('Should have thrown an error');
     } catch (error) {
-      expect(error.getResponse().code).toBe(
-        ErrorCode.AUTH_MATCHING_OLD_PASSWORD,
-      );
+      expect(error.code).toBe(ErrorCode.AUTH_MATCHING_OLD_PASSWORD);
     }
   });
 
@@ -181,7 +179,7 @@ describe('ResetPasswordUsecase', () => {
       await usecase.execute('AnotherPass123!', testToken);
       fail('Should have thrown an error');
     } catch (error) {
-      expect(error.getResponse().code).toBe(ErrorCode.AUTH_INVALID_TOKEN);
+      expect(error.code).toBe(ErrorCode.AUTH_INVALID_TOKEN);
     }
   });
 });

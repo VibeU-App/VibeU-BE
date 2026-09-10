@@ -1,11 +1,8 @@
 import { RegisterUsecase } from './register.usecase';
 import {
   MockUserRepository,
-  MockCryptoService,
   MockMailService,
   MockOtpRepository,
-  MockSessionRepository,
-  MockTokenService,
   MockPolicyRepository,
 } from './test-mocks';
 import { ErrorCode } from '../../core/errors';
@@ -14,21 +11,15 @@ import { UserEntity } from '../../core/entities/user.entity';
 describe('RegisterUsecase', () => {
   let usecase: RegisterUsecase;
   let mockUserRepository: MockUserRepository;
-  let mockSessionRepository: MockSessionRepository;
-  let mockCryptoService: MockCryptoService;
   let mockMailService: MockMailService;
   let mockOtpRepository: MockOtpRepository;
-  let mockTokenService: MockTokenService;
   let mockPolicyRepository: MockPolicyRepository;
   let mockTemplateLoader: any;
 
   beforeEach(() => {
     mockUserRepository = new MockUserRepository();
-    mockSessionRepository = new MockSessionRepository();
-    mockCryptoService = new MockCryptoService();
     mockMailService = new MockMailService();
     mockOtpRepository = new MockOtpRepository();
-    mockTokenService = new MockTokenService();
     mockPolicyRepository = new MockPolicyRepository();
     mockTemplateLoader = {
       render: jest
@@ -37,11 +28,8 @@ describe('RegisterUsecase', () => {
     };
     usecase = new RegisterUsecase(
       mockUserRepository,
-      mockSessionRepository,
-      mockCryptoService,
       mockMailService,
       mockOtpRepository,
-      mockTokenService,
       mockPolicyRepository,
       mockTemplateLoader,
     );
@@ -49,7 +37,6 @@ describe('RegisterUsecase', () => {
 
   afterEach(() => {
     mockUserRepository.clear();
-    mockSessionRepository.clear();
     mockMailService.clear();
     mockOtpRepository.clear();
     mockPolicyRepository.clear();
@@ -104,11 +91,11 @@ describe('RegisterUsecase', () => {
   });
 
   it('should send OTP after successful registration', async () => {
-    const email = 'test@example.edu'; // Use a valid email for this test
+    const email = 'test@example.edu';
 
-    mockMailService = new MockMailService();
     await usecase.execute(email);
 
-    expect(mockMailService.sentEmails.length).toBe(0);
+    expect(mockMailService.sentEmails.length).toBe(1);
+    expect(mockMailService.sentEmails[0].email).toBe(email);
   });
 });

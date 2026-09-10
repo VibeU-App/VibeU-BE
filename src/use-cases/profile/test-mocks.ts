@@ -57,53 +57,6 @@ export class MockProfileRepository implements IProfileRepository {
     void profileId;
     return { outpostCount: 5, matchlistCount: 2 };
   }
-
-  getAge(birthday: Date): number {
-    const currentDate = new Date();
-    let age = currentDate.getUTCFullYear() - birthday.getUTCFullYear();
-
-    if (
-      currentDate.getUTCMonth() - birthday.getUTCMonth() < 0 ||
-      (currentDate.getUTCMonth() - birthday.getUTCMonth() === 0 &&
-        currentDate.getUTCDate() - birthday.getUTCDate() < 0)
-    ) {
-      age--;
-    }
-
-    return age;
-  }
-
-  getZodiacSign(birthday: Date): string {
-    const zodiacSignsMap = [
-      'Aquarius',
-      'Pisces',
-      'Aries',
-      'Taurus',
-      'Gemini',
-      'Cancer',
-      'Leo',
-      'Virgo',
-      'Libra',
-      'Scorpio',
-      'Sagittarius',
-      'Capricorn',
-    ];
-
-    const zodiacDayMap = [20, 19, 21, 20, 21, 21, 23, 23, 23, 23, 22, 22];
-
-    const birthMonth = birthday.getUTCMonth();
-    const birthDate = birthday.getUTCDate();
-
-    if (birthDate < zodiacDayMap[birthMonth]) {
-      if (birthMonth === 0) {
-        return zodiacSignsMap[11];
-      } else {
-        return zodiacSignsMap[birthMonth - 1];
-      }
-    } else {
-      return zodiacSignsMap[birthMonth];
-    }
-  }
 }
 
 export class MockHobbyRepository implements IHobbyRepository {
@@ -131,7 +84,9 @@ export class MockHobbyRepository implements IHobbyRepository {
   }
 }
 
-export class MockPersonalityArchetypeRepository implements IPersonalityArchetypeRepository {
+export class MockPersonalityArchetypeRepository
+  implements IPersonalityArchetypeRepository
+{
   public archetypes: PersonalityArchetypeEntity[] = [];
 
   async findAll(): Promise<PersonalityArchetypeEntity[]> {
@@ -177,6 +132,9 @@ export class MockAIService implements IAIService {
     hobbies: string[],
     archetypes: { id: number; name: string; description: string }[],
   ): Promise<number> {
+    void answers;
+    void hobbies;
+    void archetypes;
     return this.mockArchetypeId;
   }
 
@@ -191,6 +149,9 @@ export class MockAIService implements IAIService {
     vibe_description: string;
     matching_criteria: string;
   }> {
+    void scoreSummary;
+    void percentageSummary;
+    void answers;
     return {
       personality_code: dominantArchetype,
       personality_name: 'Mock Name',

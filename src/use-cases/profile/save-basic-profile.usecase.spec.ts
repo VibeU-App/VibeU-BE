@@ -1,5 +1,6 @@
 import { SaveBasicProfileUseCase } from './save-basic-profile.usecase';
 import { MockProfileRepository } from './test-mocks';
+import { ErrorCode } from '../../core/errors';
 
 describe('SaveBasicProfileUseCase', () => {
   let useCase: SaveBasicProfileUseCase;
@@ -37,9 +38,12 @@ describe('SaveBasicProfileUseCase', () => {
       birthday: new Date(new Date().getFullYear() - 15, 1, 1), // 15 years old
     };
 
-    await expect(useCase.execute('user-2', payload)).rejects.toThrow(
-      'User must be at least 18 years old',
-    );
+    try {
+      await useCase.execute('user-2', payload);
+      fail('Should have thrown an error');
+    } catch (error) {
+      expect(error.code).toBe(ErrorCode.PROFILE_USER_NOT_OLD_ENOUGH);
+    }
   });
 
   it('should successfully update an existing profile instead of creating a new one', async () => {

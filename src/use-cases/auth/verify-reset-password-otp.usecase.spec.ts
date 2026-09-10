@@ -87,7 +87,7 @@ describe('VerifyResetPasswordOtpUsecase', () => {
       await usecase.execute('user@example.edu', '000000');
       fail('Should have thrown an error');
     } catch (error) {
-      expect(error.getResponse().code).toBe(ErrorCode.AUTH_OTP_INVALID);
+      expect(error.code).toBe(ErrorCode.AUTH_OTP_INVALID);
     }
   });
 
@@ -116,7 +116,7 @@ describe('VerifyResetPasswordOtpUsecase', () => {
       await usecase.execute('user@example.edu', '999999');
       fail('Should have thrown an error');
     } catch (error) {
-      expect(error.getResponse().code).toBe(ErrorCode.AUTH_OTP_EXPIRED);
+      expect(error.code).toBe(ErrorCode.AUTH_OTP_EXPIRED);
     }
   });
 });
