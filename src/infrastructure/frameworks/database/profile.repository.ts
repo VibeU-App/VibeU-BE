@@ -28,7 +28,7 @@ export class PrismaProfileRepository implements IProfileRepository {
     const created = await this.prisma.profile.create({
       data: {
         userId: profile.userId,
-        fullName: profile.fullName,
+        nickname: profile.nickname,
         gender: profile.gender,
         university: profile.university,
         bio: profile.bio,
@@ -45,7 +45,7 @@ export class PrismaProfileRepository implements IProfileRepository {
     const updated = await this.prisma.profile.update({
       where: { id: profile.id },
       data: {
-        fullName: profile.fullName,
+        nickname: profile.nickname,
         gender: profile.gender,
         university: profile.university,
         bio: profile.bio,
@@ -61,6 +61,7 @@ export class PrismaProfileRepository implements IProfileRepository {
   async getProfilePostAndMatchCounts(
     profileId: number,
   ): Promise<{ outpostCount: number; matchlistCount: number }> {
+    void profileId;
     return {
       outpostCount: 0,
       matchlistCount: 0,
@@ -71,7 +72,7 @@ export class PrismaProfileRepository implements IProfileRepository {
     return new ProfileEntity(
       prismaProfile.id,
       prismaProfile.userId,
-      prismaProfile.fullName,
+      prismaProfile.nickname,
       prismaProfile.gender,
       prismaProfile.avatarSeed,
       prismaProfile.birthday,

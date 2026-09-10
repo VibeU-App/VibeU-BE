@@ -1,9 +1,10 @@
-import { Injectable, Inject, BadRequestException } from '@nestjs/common';
-import { IUserRepository } from '../../core/abstracts/user-repository.interface';
-import { IOtpRepository } from '../../core/abstracts/otp-repository.interface';
-import { IJwtService } from '../../infrastructure/services/token/jwt.service';
-import { UserRole } from '../../core/entities';
-import { ErrorCode } from '../../core/errors';
+import { Injectable, Inject } from '@nestjs/common';
+import {
+  IUserRepository,
+  IOtpRepository,
+  IJwtService,
+} from '../../core/abstracts';
+import { AppException, ErrorCode } from '../../core/errors';
 
 export interface VerifyResetPasswordOtpResult {
   resetToken: string;
@@ -28,35 +29,27 @@ export class VerifyResetPasswordOtpUsecase {
 
     if (user) {
       const userOtp = await this.otpRepository.findByUserId(user.id);
-      console.log('userOtp:', userOtp); // Debugging line to check the value of userOtp
       if (userOtp) {
-        if (userOtp.code !== otp) {
-          await this.otpRepository.incrementAttempts(user.id);
-          throw new BadRequestException({
-            code: ErrorCode.AUTH_OTP_INVALID,
-            message: 'Invalid OTP',
-          });
+        if (userOtp.isExpired()) {
+          await this.otpRepository.deleteByUserId(user.id);
+          throw new AppException(ErrorCode.AUTH_OTP_EXPIRED);
         }
 
         if (userOtp.isMaxAttemptsReached()) {
-          throw new BadRequestException({
-            code: ErrorCode.AUTH_OTP_INVALID,
-            message: 'Invalid OTP',
-          });
+          await this.otpRepository.deleteByUserId(user.id);
+          throw new AppException(ErrorCode.AUTH_OTP_INVALID);
         }
 
-        if (userOtp.isExpired()) {
-          throw new BadRequestException({
-            code: ErrorCode.AUTH_OTP_EXPIRED,
-            message: 'Expired OTP',
-          });
+        if (userOtp.code !== otp) {
+          await this.otpRepository.incrementAttempts(user.id);
+          throw new AppException(ErrorCode.AUTH_OTP_INVALID);
         }
 
         await this.otpRepository.deleteByUserId(user.id);
         const payload = {
           sub: user.id,
           email: user.email,
-          role: UserRole.USER,
+          role: user.role,
           purpose: 'password_reset',
           hash: user.passwordHash,
         };
@@ -67,9 +60,6 @@ export class VerifyResetPasswordOtpUsecase {
       }
     }
 
-    throw new BadRequestException({
-      code: ErrorCode.AUTH_USER_NOT_FOUND,
-      message: 'User not found',
-    });
+    throw new AppException(ErrorCode.AUTH_USER_NOT_FOUND);
   }
 }

@@ -1,15 +1,15 @@
-import { ICryptoService } from '../../infrastructure/services/crypto/crypto.interface';
-import { IJwtService } from '../../infrastructure/services/token/jwt.service';
 import {
+  ICryptoService,
+  IJwtService,
   ITokenService,
   TokenPair,
   AccessTokenPayload,
-} from '../../infrastructure/services/token/token.service';
-import { IMailService } from '../../infrastructure/services/mail/mail.interface';
-import { IPolicyRepository } from '../../core/abstracts/policy-repository.interface';
-import { IUserRepository } from '../../core/abstracts/user-repository.interface';
-import { IOtpRepository } from '../../core/abstracts/otp-repository.interface';
-import { ISessionRepository } from '../../core/abstracts/session-repository.interface';
+  IMailService,
+  IPolicyRepository,
+  IUserRepository,
+  IOtpRepository,
+  ISessionRepository,
+} from '../../core/abstracts';
 import {
   UserEntity,
   AccountStatusEntity,
@@ -18,12 +18,13 @@ import {
 import { OtpEntity } from '../../core/entities/otp.entity';
 import { SessionEntity } from '../../core/entities/session.entity';
 
+export { AccountStatusEntity, AccountStatusName };
+
 /**
  * Test mock implementations for use-case unit tests.
  *
  * These mocks provide simple in-memory implementations that allow
  * tests to run without external dependencies (database, email server, etc.).
- * Each mock has helper methods (addXxx, clear) to set up test scenarios.
  */
 
 // Mock crypto service that simulates password hashing without actual argon2
@@ -113,7 +114,7 @@ export class MockMailService implements IMailService {
         targetEmail = targetEmail.split('+')[0] + '@' + domains;
       }
 
-      if (identifier.includes('.') && domains.split('.')[0] == 'gmail') {
+      if (identifier.includes('.') && domains.split('.')[0] === 'gmail') {
         targetEmail =
           targetEmail.split('@')[0].replaceAll('.', '') + '@' + domains;
       }
@@ -195,7 +196,6 @@ export class MockUserRepository implements IUserRepository {
       user.updatedAt,
       user.deletedAt,
       user.recoveryEmail,
-      user.userId || UserEntity.generateRandomUserId(),
     );
     this.users.set(savedUser.id, savedUser);
     return savedUser;
@@ -226,12 +226,12 @@ export class MockOtpRepository implements IOtpRepository {
   private otps: Map<string, OtpEntity> = new Map();
 
   async save(otp: OtpEntity): Promise<OtpEntity> {
-    this.otps.set(`${otp.userId}:optCode`, otp);
+    this.otps.set(`${otp.userId}:otpCode`, otp);
     return otp;
   }
 
   async findByUserId(userId: string): Promise<OtpEntity | null> {
-    const otp = this.otps.get(`${userId}:optCode`);
+    const otp = this.otps.get(`${userId}:otpCode`);
     if (!otp) {
       return null;
     }
@@ -247,7 +247,7 @@ export class MockOtpRepository implements IOtpRepository {
   }
 
   async incrementAttempts(userId: string): Promise<boolean> {
-    const otp = this.otps.get(`${userId}:optCode`);
+    const otp = this.otps.get(`${userId}:otpCode`);
     if (!otp) {
       return false;
     }
@@ -266,7 +266,7 @@ export class MockOtpRepository implements IOtpRepository {
   }
 
   addOtp(otp: OtpEntity): void {
-    this.otps.set(`${otp.userId}:optCode`, otp);
+    this.otps.set(`${otp.userId}:otpCode`, otp);
   }
 
   clear(): void {

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ISessionRepository } from '../../../core/abstracts/session-repository.interface';
 import { SessionEntity } from '../../../core/entities/session.entity';
 import { PrismaService } from './prisma.service';
+import { Session as PrismaSession } from '@prisma/client';
 
 /**
  * Prisma implementation of the session repository.
@@ -94,7 +95,7 @@ export class PrismaSessionRepository implements ISessionRepository {
   /**
    * Maps a Prisma session record to a SessionEntity.
    */
-  private mapToEntity(session: any): SessionEntity {
+  private mapToEntity(session: PrismaSession): SessionEntity {
     return new SessionEntity(
       session.id,
       session.userId,

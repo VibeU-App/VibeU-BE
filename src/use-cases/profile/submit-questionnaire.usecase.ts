@@ -1,11 +1,20 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { IProfileRepository } from '../../core/abstracts/profile-repository.interface';
-import { IQuestionnaireRepository } from '../../core/abstracts/questionnaire-repository.interface';
-import { IPersonalityArchetypeRepository } from '../../core/abstracts/personality-archetype-repository.interface';
-import { IAIService } from '../../core/abstracts/ai-service.interface';
-import { IHobbyRepository } from '../../core/abstracts/hobby-repository.interface';
+import {
+  IProfileRepository,
+  IQuestionnaireRepository,
+  IPersonalityArchetypeRepository,
+  IAIService,
+  IHobbyRepository,
+} from '../../core/abstracts';
 import { ProfileEntity } from '../../core/entities/profile.entity';
+import { PersonalityArchetypeEntity } from '../../core/entities/personality-archetype.entity';
 import { UserQuestionnaireAnswerEntity } from '../../core/entities/questionnaire.entity';
+import { AppException, ErrorCode } from '../../core/errors';
+
+export interface SubmitQuestionnaireResult {
+  profile: ProfileEntity;
+  archetype: PersonalityArchetypeEntity | null;
+}
 
 @Injectable()
 export class SubmitQuestionnaireUseCase {
@@ -25,9 +34,11 @@ export class SubmitQuestionnaireUseCase {
   async execute(
     userId: string,
     answers: { questionId: number; selectedOptionId: number }[],
-  ): Promise<{ profile: ProfileEntity; archetype: any }> {
+  ): Promise<SubmitQuestionnaireResult> {
     const profile = await this.profileRepository.findByUserId(userId);
-    if (!profile) throw new Error('Profile not found');
+    if (!profile) {
+      throw new AppException(ErrorCode.PROFILE_USER_NOT_FOUND);
+    }
 
     const questions = await this.questionnaireRepository.findQuestions();
     const options = await this.questionnaireRepository.findOptionsByQuestionIds(
@@ -38,17 +49,26 @@ export class SubmitQuestionnaireUseCase {
 
     // validate answers
     for (const answer of answers) {
-      const q = questions.find((q) => q.id === answer.questionId);
-      if (!q) throw new Error(`Invalid question ID: ${answer.questionId}`);
+      const q = questions.find((item) => item.id === answer.questionId);
+      if (!q) {
+        throw new AppException(
+          ErrorCode.VALIDATION_FAILED,
+          400,
+          `Invalid question ID: ${answer.questionId}`,
+        );
+      }
       const o = options.find(
-        (o) =>
-          o.id === answer.selectedOptionId &&
-          o.questionId === answer.questionId,
+        (item) =>
+          item.id === answer.selectedOptionId &&
+          item.questionId === answer.questionId,
       );
-      if (!o)
-        throw new Error(
+      if (!o) {
+        throw new AppException(
+          ErrorCode.VALIDATION_FAILED,
+          400,
           `Invalid option ID: ${answer.selectedOptionId} for question: ${answer.questionId}`,
         );
+      }
 
       formattedAnswers.push({
         questionText: q.text,
@@ -59,7 +79,7 @@ export class SubmitQuestionnaireUseCase {
     const answerEntities = answers.map(
       (a) =>
         new UserQuestionnaireAnswerEntity(
-          '0',
+          '',
           profile.id,
           a.questionId,
           a.selectedOptionId,
@@ -80,15 +100,26 @@ export class SubmitQuestionnaireUseCase {
       archetypes,
     );
 
-    const updatedProfile = await this.profileRepository.update({
-      ...profile,
-      personalityArchetypeId: matchedArchetypeId,
-      isCompleted: true,
-    });
+    const newProfile = new ProfileEntity(
+      profile.id,
+      profile.userId,
+      profile.nickname,
+      profile.gender,
+      profile.avatarSeed,
+      profile.birthday,
+      true, // isCompleted
+      profile.createdAt,
+      new Date(),
+      profile.university,
+      profile.bio,
+      matchedArchetypeId,
+    );
+
+    const updatedProfile = await this.profileRepository.update(newProfile);
 
     return {
       profile: updatedProfile,
-      archetype: archetypes.find((a) => a.id === matchedArchetypeId)!,
+      archetype: archetypes.find((a) => a.id === matchedArchetypeId) ?? null,
     };
   }
 }

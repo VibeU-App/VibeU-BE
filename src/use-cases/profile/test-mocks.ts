@@ -31,7 +31,7 @@ export class MockProfileRepository implements IProfileRepository {
     const saved = new ProfileEntity(
       this.idCounter++,
       profile.userId,
-      profile.fullName,
+      profile.nickname,
       profile.gender,
       profile.avatarSeed,
       profile.birthday,
@@ -54,6 +54,7 @@ export class MockProfileRepository implements IProfileRepository {
   async getProfilePostAndMatchCounts(
     profileId: number,
   ): Promise<{ outpostCount: number; matchlistCount: number }> {
+    void profileId;
     return { outpostCount: 5, matchlistCount: 2 };
   }
 }
@@ -83,7 +84,9 @@ export class MockHobbyRepository implements IHobbyRepository {
   }
 }
 
-export class MockPersonalityArchetypeRepository implements IPersonalityArchetypeRepository {
+export class MockPersonalityArchetypeRepository
+  implements IPersonalityArchetypeRepository
+{
   public archetypes: PersonalityArchetypeEntity[] = [];
 
   async findAll(): Promise<PersonalityArchetypeEntity[]> {
@@ -129,6 +132,9 @@ export class MockAIService implements IAIService {
     hobbies: string[],
     archetypes: { id: number; name: string; description: string }[],
   ): Promise<number> {
+    void answers;
+    void hobbies;
+    void archetypes;
     return this.mockArchetypeId;
   }
 
@@ -143,6 +149,9 @@ export class MockAIService implements IAIService {
     vibe_description: string;
     matching_criteria: string;
   }> {
+    void scoreSummary;
+    void percentageSummary;
+    void answers;
     return {
       personality_code: dominantArchetype,
       personality_name: 'Mock Name',

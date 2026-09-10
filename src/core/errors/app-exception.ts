@@ -1,45 +1,47 @@
-import { HttpException, HttpStatus } from '@nestjs/common';
 import { ErrorCode, ErrorMessage } from './error-codes';
 
-const ErrorCodeToHttpStatus: Record<ErrorCode, HttpStatus> = {
-  [ErrorCode.AUTH_INVALID_CREDENTIALS]: HttpStatus.UNAUTHORIZED,
-  [ErrorCode.AUTH_EMAIL_ALREADY_EXISTS]: HttpStatus.CONFLICT,
-  [ErrorCode.AUTH_INVALID_TOKEN]: HttpStatus.UNAUTHORIZED,
-  [ErrorCode.AUTH_TOKEN_EXPIRED]: HttpStatus.UNAUTHORIZED,
-  [ErrorCode.AUTH_OTP_INVALID]: HttpStatus.BAD_REQUEST,
-  [ErrorCode.AUTH_OTP_EXPIRED]: HttpStatus.BAD_REQUEST,
-  [ErrorCode.AUTH_USER_NOT_FOUND]: HttpStatus.NOT_FOUND,
-  [ErrorCode.AUTH_WEAK_PASSWORD]: HttpStatus.BAD_REQUEST,
-  [ErrorCode.AUTH_INVALID_EMAIL]: HttpStatus.BAD_REQUEST,
-  [ErrorCode.AUTH_FORBIDDEN]: HttpStatus.FORBIDDEN,
-  [ErrorCode.AUTH_USER_NOT_VERIFIED]: HttpStatus.UNAUTHORIZED,
-  [ErrorCode.AUTH_MATCHING_OLD_PASSWORD]: HttpStatus.BAD_REQUEST,
-  [ErrorCode.AUTH_SESSION_EXPIRED]: HttpStatus.UNAUTHORIZED,
-  [ErrorCode.VALIDATION_FAILED]: HttpStatus.BAD_REQUEST,
-  [ErrorCode.INTERNAL_SERVER_ERROR]: HttpStatus.INTERNAL_SERVER_ERROR,
+export const ErrorCodeToHttpStatus: Record<ErrorCode, number> = {
+  [ErrorCode.AUTH_INVALID_CREDENTIALS]: 401,
+  [ErrorCode.AUTH_EMAIL_ALREADY_EXISTS]: 409,
+  [ErrorCode.AUTH_INVALID_TOKEN]: 401,
+  [ErrorCode.AUTH_TOKEN_EXPIRED]: 401,
+  [ErrorCode.AUTH_OTP_INVALID]: 400,
+  [ErrorCode.AUTH_OTP_EXPIRED]: 400,
+  [ErrorCode.AUTH_USER_NOT_FOUND]: 404,
+  [ErrorCode.AUTH_WEAK_PASSWORD]: 400,
+  [ErrorCode.AUTH_INVALID_EMAIL]: 400,
+  [ErrorCode.AUTH_FORBIDDEN]: 403,
+  [ErrorCode.AUTH_USER_NOT_VERIFIED]: 401,
+  [ErrorCode.AUTH_MATCHING_OLD_PASSWORD]: 400,
+  [ErrorCode.AUTH_SESSION_EXPIRED]: 401,
+  [ErrorCode.PROFILE_USER_NOT_FOUND]: 404,
+  [ErrorCode.PROFILE_USER_NOT_OLD_ENOUGH]: 400,
+  [ErrorCode.VALIDATION_FAILED]: 400,
+  [ErrorCode.INTERNAL_SERVER_ERROR]: 500,
 };
 
 /**
- * Custom application exception that includes an error code.
- *
- * The envelope filter catches this and includes the error code
- * in the response metadata for the frontend to handle.
+ * Domain application exception that includes a strongly-typed error code.
+ * Pure TypeScript error independent of delivery frameworks.
  */
-export class AppException extends HttpException {
+export class AppException extends Error {
   public readonly code: ErrorCode;
+  public readonly statusCode: number;
 
   constructor(
     code: ErrorCode,
-    statusCode?: HttpStatus,
+    statusCode?: number,
     customMessage?: string,
   ) {
-    const message = customMessage ?? ErrorMessage[code];
-    const status =
-      statusCode ??
-      ErrorCodeToHttpStatus[code] ??
-      HttpStatus.INTERNAL_SERVER_ERROR;
-
-    super(message, status);
+    const message = customMessage ?? ErrorMessage[code] ?? 'An error occurred';
+    super(message);
+    this.name = 'AppException';
     this.code = code;
+    this.statusCode = statusCode ?? ErrorCodeToHttpStatus[code] ?? 500;
+    Object.setPrototypeOf(this, new.target.prototype);
+  }
+
+  getStatus(): number {
+    return this.statusCode;
   }
 }

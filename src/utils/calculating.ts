@@ -1,5 +1,26 @@
+/**
+ * Calculates age in years based on birthday date.
+ */
+export function getAge(birthday: Date): number {
+  const currentDate = new Date();
+  let age = currentDate.getFullYear() - birthday.getFullYear();
+  const monthDiff = currentDate.getMonth() - birthday.getMonth();
+
+  if (
+    monthDiff < 0 ||
+    (monthDiff === 0 && currentDate.getDate() < birthday.getDate())
+  ) {
+    age--;
+  }
+
+  return age;
+}
+
+/**
+ * Calculates Western Zodiac sign based on birth date.
+ */
 export function getZodiacSign(date: Date): string {
-  const month = date.getMonth() + 1; // getMonth is 0-indexed
+  const month = date.getMonth() + 1; // 1-indexed
   const day = date.getDate();
 
   if ((month === 1 && day >= 20) || (month === 2 && day <= 18)) {

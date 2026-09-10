@@ -42,7 +42,6 @@ export class SmtpMailService implements IMailService {
   /**
    * Gets the target email:
    * - If the identifier contains "+", the rest of the identifier will be ignored.
-   * - If the identifier of a ".gmail" email contains ".", it will be ignored.
    * - If the email is invalid, null is returned
    */
   getTargetEmail(email: string): string | null {

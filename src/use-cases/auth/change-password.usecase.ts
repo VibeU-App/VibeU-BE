@@ -1,6 +1,5 @@
-import { Injectable, Inject, Logger, HttpStatus } from '@nestjs/common';
-import { IUserRepository } from '../../core/abstracts/user-repository.interface';
-import { ICryptoService } from '../../infrastructure/services/crypto/crypto.interface';
+import { Injectable, Inject, Logger } from '@nestjs/common';
+import { IUserRepository, ICryptoService } from '../../core/abstracts';
 import { AppException, ErrorCode } from '../../core/errors';
 import { UserEntity } from '../../core/entities';
 
@@ -35,7 +34,7 @@ export class ChangePasswordUsecase {
     if (user.passwordHash === '') {
       throw new AppException(
         ErrorCode.AUTH_INVALID_CREDENTIALS,
-        HttpStatus.BAD_REQUEST,
+        400,
         'No password set. Use create password endpoint.',
       );
     }
@@ -48,7 +47,7 @@ export class ChangePasswordUsecase {
     if (!isOldPasswordMatch) {
       throw new AppException(
         ErrorCode.AUTH_INVALID_CREDENTIALS,
-        HttpStatus.BAD_REQUEST,
+        400,
         'Old password is incorrect.',
       );
     }
@@ -64,6 +63,7 @@ export class ChangePasswordUsecase {
       user.createdAt,
       new Date(),
       user.deletedAt,
+      user.recoveryEmail,
     );
 
     await this.userRepository.update(updatedUser);

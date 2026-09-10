@@ -2,6 +2,7 @@ import { SaveHobbiesUseCase } from './save-hobbies.usecase';
 import { MockProfileRepository, MockHobbyRepository } from './test-mocks';
 import { ProfileEntity } from '../../core/entities/profile.entity';
 import { HobbyEntity } from '../../core/entities/hobby.entity';
+import { ErrorCode } from '../../core/errors';
 
 describe('SaveHobbiesUseCase', () => {
   let useCase: SaveHobbiesUseCase;
@@ -53,9 +54,12 @@ describe('SaveHobbiesUseCase', () => {
   });
 
   it('should throw an error if profile is not found', async () => {
-    await expect(useCase.execute('non-existent', [1, 2, 3])).rejects.toThrow(
-      'Profile not found',
-    );
+    try {
+      await useCase.execute('non-existent', [1, 2, 3]);
+      fail('Should have thrown an error');
+    } catch (error) {
+      expect(error.code).toBe(ErrorCode.PROFILE_USER_NOT_FOUND);
+    }
   });
 
   it('should throw an error if selecting less than 3 hobbies', async () => {

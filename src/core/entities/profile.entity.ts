@@ -2,7 +2,7 @@ export class ProfileEntity {
   constructor(
     public readonly id: number,
     public readonly userId: string,
-    public readonly fullName: string,
+    public readonly nickname: string,
     public readonly gender: string,
     public readonly avatarSeed: string,
     public readonly birthday: Date,
@@ -16,7 +16,7 @@ export class ProfileEntity {
 
   static create(props: {
     userId: string;
-    fullName: string;
+    nickname: string;
     gender: string;
     avatarSeed: string;
     birthday: Date;
@@ -28,7 +28,7 @@ export class ProfileEntity {
     return new ProfileEntity(
       0, // ID will be assigned by DB auto-increment
       props.userId,
-      props.fullName,
+      props.nickname,
       props.gender,
       props.avatarSeed,
       props.birthday,

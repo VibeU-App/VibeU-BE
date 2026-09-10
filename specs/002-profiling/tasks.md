@@ -52,7 +52,7 @@
 
 ## Phase 3: User Story 1 - Basic Profile Setup (Priority: P1) 🎯 MVP
 
-**Goal**: Allow users to initialize/update basic profile details (sex, fullName, birthday, avatarSeed).
+**Goal**: Allow users to initialize/update basic profile details (sex, nickname, birthday, avatarSeed).
 
 **Independent Test**: Perform an HTTP POST to `/api/v1/profile/basic` with profile payload and confirm the row is created in `profiles` table.
 

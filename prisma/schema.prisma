@@ -108,10 +108,10 @@ model Policy {
 model Profile {
   id                     Int       @id @default(autoincrement())
   userId                 String    @unique @map("user_id")
-  fullName               String    @map("full_name")
+  nickname               String    
   gender                 String
   university             String?
-  bio                    String?
+  bio                    String?   @db.VarChar(150)
   avatarSeed             String    @map("avatar_seed")
   birthday               DateTime
   personalityArchetypeId Int?      @map("personality_archetype_id")

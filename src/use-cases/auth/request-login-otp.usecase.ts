@@ -1,9 +1,11 @@
 import { Injectable, Inject, Logger } from '@nestjs/common';
-import { IUserRepository } from '../../core/abstracts/user-repository.interface';
-import { IOtpRepository } from '../../core/abstracts/otp-repository.interface';
-import { IPolicyRepository } from '../../core/abstracts/policy-repository.interface';
-import { IMailService } from '../../infrastructure/services/mail/mail.interface';
-import { TemplateLoaderService } from '../../infrastructure/services/template/template-loader.service';
+import {
+  IUserRepository,
+  IOtpRepository,
+  IPolicyRepository,
+  IMailService,
+  ITemplateLoaderService,
+} from '../../core/abstracts';
 import { OtpEntity } from '../../core/entities/otp.entity';
 import { AppException } from '../../core/errors/app-exception';
 import { ErrorCode } from '../../core/errors/error-codes';
@@ -21,7 +23,8 @@ export class RequestLoginOtpUsecase {
     private readonly policyRepository: IPolicyRepository,
     @Inject('IMailService')
     private readonly mailService: IMailService,
-    private readonly templateLoader: TemplateLoaderService,
+    @Inject('ITemplateLoaderService')
+    private readonly templateLoader: ITemplateLoaderService,
   ) {}
 
   async execute(email: string): Promise<{ message: string }> {

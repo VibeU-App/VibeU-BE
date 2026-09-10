@@ -1,24 +1,14 @@
 import * as jwt from 'jsonwebtoken';
 import { config } from '../../../configuration';
+import { IJwtService } from '../../../core/abstracts/jwt-service.interface';
 
-/**
- * Interface for JWT token service.
- */
-export interface IJwtService {
-  signPayload(payload: Record<string, any>): string;
-  verifyToken(token: string): Record<string, any>;
-}
+export type { IJwtService };
 
 /**
  * JWT service implementation using jsonwebtoken library.
  *
  * This service handles JWT token creation and verification. It uses the
  * secret key from configuration to sign and verify tokens.
- *
- * The token payload typically contains:
- * - sub: The user ID (subject)
- * - email: The user's email
- * - role: The user's role (e.g., 'user', 'admin')
  */
 export class JwtService implements IJwtService {
   /**

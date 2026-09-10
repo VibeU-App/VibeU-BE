@@ -6,7 +6,13 @@ import { SchedulingModule } from './infrastructure/schedulers/scheduling.module'
 import { ProfileModule } from './controllers/profile.module';
 
 @Module({
-  imports: [DatabaseModule, GlobalServicesModule, AuthModule, SchedulingModule, ProfileModule],
+  imports: [
+    DatabaseModule,
+    GlobalServicesModule,
+    AuthModule,
+    SchedulingModule,
+    ProfileModule,
+  ],
   controllers: [],
   providers: [],
 })

@@ -5,12 +5,14 @@ import { PrismaService } from './prisma.service';
 import { PersonalityArchetype as PrismaArchetype } from '@prisma/client';
 
 @Injectable()
-export class PrismaPersonalityArchetypeRepository implements IPersonalityArchetypeRepository {
+export class PrismaPersonalityArchetypeRepository
+  implements IPersonalityArchetypeRepository
+{
   constructor(private readonly prisma: PrismaService) {}
 
   async findAll(): Promise<PersonalityArchetypeEntity[]> {
     const list = await this.prisma.personalityArchetype.findMany();
-    return list.map(this.mapToEntity);
+    return list.map((item) => this.mapToEntity(item));
   }
 
   async findById(id: number): Promise<PersonalityArchetypeEntity | null> {

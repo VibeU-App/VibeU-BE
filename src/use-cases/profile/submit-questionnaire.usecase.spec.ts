@@ -12,6 +12,7 @@ import {
   QuestionnaireOptionEntity,
 } from '../../core/entities/questionnaire.entity';
 import { PersonalityArchetypeEntity } from '../../core/entities/personality-archetype.entity';
+import { ErrorCode } from '../../core/errors';
 
 describe('SubmitQuestionnaireUseCase', () => {
   let useCase: SubmitQuestionnaireUseCase;
@@ -104,8 +105,12 @@ describe('SubmitQuestionnaireUseCase', () => {
       { questionId: 1, selectedOptionId: 10 },
       { questionId: 2, selectedOptionId: 21 },
     ];
-    await expect(useCase.execute('non-existent', answers)).rejects.toThrow(
-      'Profile not found',
-    );
+
+    try {
+      await useCase.execute('non-existent', answers);
+      fail('Should have thrown an error');
+    } catch (error) {
+      expect(error.code).toBe(ErrorCode.PROFILE_USER_NOT_FOUND);
+    }
   });
 });

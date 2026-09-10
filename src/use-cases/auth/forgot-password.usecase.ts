@@ -1,9 +1,11 @@
 import { Injectable, Inject, Logger } from '@nestjs/common';
-import { IUserRepository } from '../../core/abstracts/user-repository.interface';
-import { IMailService } from '../../infrastructure/services/mail/mail.interface';
-import { IOtpRepository } from '../../core/abstracts/otp-repository.interface';
-import { IPolicyRepository } from '../../core/abstracts/policy-repository.interface';
-import { TemplateLoaderService } from '../../infrastructure/services/template/template-loader.service';
+import {
+  IUserRepository,
+  IMailService,
+  IOtpRepository,
+  IPolicyRepository,
+  ITemplateLoaderService,
+} from '../../core/abstracts';
 import { OtpEntity } from '../../core/entities';
 
 export interface ForgotPasswordResult {
@@ -23,7 +25,8 @@ export class ForgotPasswordUsecase {
     private readonly otpRepository: IOtpRepository,
     @Inject('IPolicyRepository')
     private readonly policyRepository: IPolicyRepository,
-    private readonly templateLoader: TemplateLoaderService,
+    @Inject('ITemplateLoaderService')
+    private readonly templateLoader: ITemplateLoaderService,
   ) {}
 
   async execute(
