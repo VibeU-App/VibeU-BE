@@ -2,6 +2,7 @@ title = "VibeU Gitleaks Configuration"
 
 [extend]
 # Extends the default Gitleaks detection rules
+useDefault = true
 
 [allowlist]
 description = "Global allowlist for tests, lockfiles, and non-sensitive fixtures"
@@ -10,5 +11,6 @@ paths = [
   '''(?i).*\.test\.ts$''',
   '''(?i)\.env\.example$''',
   '''(?i)test/.*''',
+  '''(?i)specs/.*''',
   '''(?i)pnpm-lock\.yaml$'''
 ]
