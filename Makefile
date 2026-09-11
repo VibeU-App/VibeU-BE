@@ -39,6 +39,10 @@ lint: ## Run linter
 format: ## Format code
 	pnpm format
 
+.PHONY: semgrep
+semgrep: ## Run Semgrep SAST scan locally via Docker
+	docker run --rm -v "%cd%:/src" semgrep/semgrep semgrep scan --config auto
+
 # ======================
 # Prisma / Database
 # ======================
@@ -139,6 +143,7 @@ help: ## Show this help message
 	@echo   test             Run tests
 	@echo   lint             Run linter
 	@echo   format           Format code
+	@echo   semgrep          Run Semgrep SAST scan locally (Docker)
 	@echo.
 	@echo   generate         Generate Prisma Client
 	@echo   migrate          Run migrations (DIRECT_URL)
