@@ -31,6 +31,10 @@ start: ## Start production server
 test: ## Run tests
 	pnpm test
 
+.PHONY: test-integration
+test-integration: ## Run integration tests with Testcontainers
+	pnpm test:integration
+
 .PHONY: lint
 lint: ## Run linter
 	pnpm lint
@@ -141,6 +145,7 @@ help: ## Show this help message
 	@echo   dev              Start development server
 	@echo   start            Start production server
 	@echo   test             Run tests
+	@echo   test-integration Run integration tests (Testcontainers)
 	@echo   lint             Run linter
 	@echo   format           Format code
 	@echo   semgrep          Run Semgrep SAST scan locally (Docker)

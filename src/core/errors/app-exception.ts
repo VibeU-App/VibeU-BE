@@ -28,11 +28,7 @@ export class AppException extends Error {
   public readonly code: ErrorCode;
   public readonly statusCode: number;
 
-  constructor(
-    code: ErrorCode,
-    statusCode?: number,
-    customMessage?: string,
-  ) {
+  constructor(code: ErrorCode, statusCode?: number, customMessage?: string) {
     const message = customMessage ?? ErrorMessage[code] ?? 'An error occurred';
     super(message);
     this.name = 'AppException';

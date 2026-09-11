@@ -128,9 +128,15 @@ export class GeminiAiService implements IAIService {
 
       // Clean up potential markdown formatting wrapping the JSON
       if (text.startsWith('\`\`\`json')) {
-        text = text.replace(/^\`\`\`json/, '').replace(/\`\`\`$/, '').trim();
+        text = text
+          .replace(/^\`\`\`json/, '')
+          .replace(/\`\`\`$/, '')
+          .trim();
       } else if (text.startsWith('\`\`\`')) {
-        text = text.replace(/^\`\`\`/, '').replace(/\`\`\`$/, '').trim();
+        text = text
+          .replace(/^\`\`\`/, '')
+          .replace(/\`\`\`$/, '')
+          .trim();
       }
 
       return JSON.parse(text);

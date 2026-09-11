@@ -25,10 +25,7 @@ export class UpdateProfileMeUseCase {
       await this.profileRepository.findByUserId(userId);
 
     if (userProfile) {
-      if (
-        !!payload.birthday &&
-        getAge(payload.birthday) < 18
-      ) {
+      if (!!payload.birthday && getAge(payload.birthday) < 18) {
         throw new AppException(ErrorCode.PROFILE_USER_NOT_OLD_ENOUGH);
       }
 

@@ -55,11 +55,15 @@ async function bootstrap() {
   await app.listen(port);
 
   const logger = new Logger('Bootstrap');
-  logger.log(`================================================================`);
+  logger.log(
+    `================================================================`,
+  );
   logger.log(`🚀 VibeU Backend Server running and listening on port: ${port}`);
   logger.log(`🌐 Local URL:         http://localhost:${port}`);
   logger.log(`📚 API Documentation: http://localhost:${port}/docs`);
   logger.log(`🔧 Environment:       ${process.env.NODE_ENV ?? 'development'}`);
-  logger.log(`================================================================`);
+  logger.log(
+    `================================================================`,
+  );
 }
 bootstrap();

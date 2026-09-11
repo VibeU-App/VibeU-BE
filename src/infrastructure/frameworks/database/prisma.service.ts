@@ -16,8 +16,13 @@ export class PrismaService
   private readonly logger = new Logger(PrismaService.name);
 
   constructor() {
+    const connectionString =
+      process.env.TEST_DATABASE_URL ||
+      process.env.DATABASE_URL ||
+      config.database.connectionString;
+
     const adapter = new PrismaPg({
-      connectionString: config.database.connectionString,
+      connectionString,
     });
     super({
       adapter,
@@ -37,7 +42,11 @@ export class PrismaService
     user: string;
   } {
     try {
-      const url = new URL(config.database.connectionString);
+      const connStr =
+        process.env.TEST_DATABASE_URL ||
+        process.env.DATABASE_URL ||
+        config.database.connectionString;
+      const url = new URL(connStr);
       const isSupabase = url.hostname.includes('supabase');
       const isPooler =
         url.searchParams.get('pgbouncer') === 'true' || url.port === '6543';

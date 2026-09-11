@@ -42,9 +42,7 @@ export class GetProfileMeUseCase {
     const age = getAge(birthday);
     const zodiac = getZodiacSign(birthday);
     const postAndMatches =
-      await this.profileRepository.getProfilePostAndMatchCounts(
-        userProfile.id,
-      );
+      await this.profileRepository.getProfilePostAndMatchCounts(userProfile.id);
 
     return {
       nickname: userProfile.nickname,
