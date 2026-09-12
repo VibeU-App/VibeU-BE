@@ -1,12 +1,13 @@
-name: CD - Build, Push & Deploy
+name: CD
 
 on:
-  push:
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
     branches:
       - main
       - staging
-    tags:
-      - 'v*.*.*'
   workflow_dispatch:
     inputs:
       environment:
@@ -19,13 +20,14 @@ on:
           - production
 
 concurrency:
-  group: cd-${{ github.ref_name }}
+  group: cd-${{ github.event.workflow_run.head_branch || github.ref_name }}
   cancel-in-progress: false
 
 jobs:
   build-and-push:
-    name: Build & Push Docker Image
-    runs-on: ubuntu-latest
+    name: Build & Push Docker Image (ARM64)
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-24.04-arm
     permissions:
       contents: read
       packages: write
@@ -37,9 +39,8 @@ jobs:
     steps:
       - name: Checkout VibeU-BE code
         uses: actions/checkout@v4
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -56,10 +57,13 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             ENV="${{ inputs.environment }}"
-          elif [ "${{ github.ref }}" = "refs/heads/main" ] || [[ "${{ github.ref }}" == refs/tags/v* ]]; then
-            ENV="production"
           else
-            ENV="staging"
+            BRANCH="${{ github.event.workflow_run.head_branch }}"
+            if [ "$BRANCH" = "main" ]; then
+              ENV="production"
+            else
+              ENV="staging"
+            fi
           fi
 
           if [ "$ENV" = "production" ]; then
@@ -95,6 +99,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
+          platforms: linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -122,7 +127,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.GITOPS_PAT_VIBEU || secrets.GITOPS_PAT || secrets.GITHUB_TOKEN }}
 
       - name: Deploy Staging
         if: needs.build-and-push.outputs.target_env == 'staging'
