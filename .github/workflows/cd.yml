@@ -105,6 +105,9 @@ jobs:
     name: Deploy via GitOps (${{ needs.build-and-push.outputs.target_env }})
     needs: build-and-push
     runs-on: self-hosted
+    permissions:
+      contents: read
+      packages: read
 
     steps:
       - name: Checkout GitOps repository
@@ -115,8 +118,11 @@ jobs:
           path: gitops
 
       - name: Log in to GitHub Container Registry on Self-Hosted Runner
-        run: |
-          echo "${{ secrets.GITOPS_PAT_VIBEU || secrets.GITOPS_PAT || secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Deploy Staging
         if: needs.build-and-push.outputs.target_env == 'staging'
