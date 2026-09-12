@@ -1,12 +1,24 @@
 name: CI
 
 on:
+  push:
+    branches:
+      - main
+      - staging
   pull_request:
-    branches: [main, develop]
+    branches:
+      - main
+      - staging
+      - develop
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  build-test:
-    name: Build & Test
+  test:
+    name: Run Tests (Unit & Integration)
     runs-on: ubuntu-latest
 
     steps:
@@ -14,9 +26,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
         with:
-          version: 8
+          version: 10
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -25,7 +37,7 @@ jobs:
           cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma Client
         run: pnpm prisma generate
@@ -36,6 +48,12 @@ jobs:
       - name: Build project
         run: pnpm build
 
-      - name: Run tests
+      - name: Run unit tests
         run: pnpm test
-        continue-on-error: true # Tests may fail if use-cases are not implemented
+
+      - name: Run integration tests (Testcontainers)
+        run: pnpm test:integration
+        env:
+          JWT_SECRET_KEY: test-secret-key-for-ci
+          ACCESS_TOKEN_TTL: '3600'
+          REFRESH_TOKEN_TTL: '604800'
