@@ -1,0 +1,136 @@
+name: CD - Build, Push & Deploy
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target deployment environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+concurrency:
+  group: cd-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  build-and-push:
+    name: Build & Push Docker Image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    outputs:
+      target_env: ${{ steps.determine-env.outputs.target_env }}
+      image_tag: ${{ steps.determine-env.outputs.image_tag }}
+
+    steps:
+      - name: Checkout VibeU-BE code
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Determine Environment & Primary Tag
+        id: determine-env
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            ENV="${{ inputs.environment }}"
+          elif [ "${{ github.ref }}" = "refs/heads/main" ] || [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            ENV="production"
+          else
+            ENV="staging"
+          fi
+
+          if [ "$ENV" = "production" ]; then
+            TAG="latest"
+          else
+            TAG="staging"
+          fi
+
+          echo "target_env=$ENV" >> $GITHUB_OUTPUT
+          echo "image_tag=$TAG" >> $GITHUB_OUTPUT
+          echo "Target Environment: $ENV"
+          echo "Primary Image Tag: $TAG"
+
+      - name: Lowercase repository name for GHCR
+        id: repo-name
+        run: |
+          echo "image=ghcr.io/${GITHUB_REPOSITORY,,}" >> $GITHUB_OUTPUT
+
+      - name: Extract Docker metadata (tags, labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ steps.repo-name.outputs.image }}
+          tags: |
+            type=raw,value=latest,enable=${{ steps.determine-env.outputs.target_env == 'production' }}
+            type=raw,value=staging,enable=${{ steps.determine-env.outputs.target_env == 'staging' }}
+            type=sha,format=short,prefix=sha-
+            type=ref,event=branch
+            type=ref,event=tag
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    name: Deploy via GitOps (${{ needs.build-and-push.outputs.target_env }})
+    needs: build-and-push
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout GitOps repository
+        uses: actions/checkout@v4
+        with:
+          repository: VibeU-App/Gitops
+          token: ${{ secrets.GITOPS_PAT_VIBEU || secrets.GITOPS_PAT }}
+          path: gitops
+
+      - name: Log in to GitHub Container Registry on Self-Hosted Runner
+        run: |
+          echo "${{ secrets.GITOPS_PAT_VIBEU || secrets.GITOPS_PAT || secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Deploy Staging
+        if: needs.build-and-push.outputs.target_env == 'staging'
+        run: |
+          echo "🚀 Deploying Staging environment via Gitops Makefile..."
+          make -C gitops deploy-staging
+
+      - name: Deploy Production
+        if: needs.build-and-push.outputs.target_env == 'production'
+        run: |
+          echo "🚀 Deploying Production environment via Gitops Makefile..."
+          make -C gitops deploy-prod
+
+      - name: Prune Dangling Docker Images
+        if: always()
+        run: |
+          docker image prune -f || true

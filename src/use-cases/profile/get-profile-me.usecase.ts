@@ -23,30 +23,36 @@ export class GetProfileMeUseCase {
   ) {}
 
   async execute(userId: string): Promise<GetProfileMeResult> {
-    const userProfile: ProfileEntity | null =
+    let userProfile: ProfileEntity | null =
       await this.profileRepository.findByUserId(userId);
 
-    if (userProfile) {
-      const birthday = userProfile.birthday;
-      const age = getAge(birthday);
-      const zodiac = getZodiacSign(birthday);
-      const postAndMatches =
-        await this.profileRepository.getProfilePostAndMatchCounts(
-          userProfile.id,
-        );
-
-      return {
-        nickname: userProfile.nickname,
-        avatarSeed: userProfile.avatarSeed,
-        bio: userProfile.bio,
-        zodiacSign: zodiac,
-        age: age,
-        personalityArchetypeId: userProfile.personalityArchetypeId,
-        numOfPosts: postAndMatches.outpostCount,
-        numOfMatches: postAndMatches.matchlistCount,
-      };
+    if (!userProfile) {
+      const defaultNickname = `user_${userId.substring(0, 8)}`;
+      const blankProfile = ProfileEntity.create({
+        userId,
+        nickname: defaultNickname,
+        gender: 'OTHER',
+        avatarSeed: defaultNickname,
+        birthday: new Date('2000-01-01T00:00:00.000Z'),
+      });
+      userProfile = await this.profileRepository.save(blankProfile);
     }
 
-    throw new AppException(ErrorCode.PROFILE_USER_NOT_FOUND);
+    const birthday = userProfile.birthday;
+    const age = getAge(birthday);
+    const zodiac = getZodiacSign(birthday);
+    const postAndMatches =
+      await this.profileRepository.getProfilePostAndMatchCounts(userProfile.id);
+
+    return {
+      nickname: userProfile.nickname,
+      avatarSeed: userProfile.avatarSeed,
+      bio: userProfile.bio,
+      zodiacSign: zodiac,
+      age: age,
+      personalityArchetypeId: userProfile.personalityArchetypeId,
+      numOfPosts: postAndMatches.outpostCount,
+      numOfMatches: postAndMatches.matchlistCount,
+    };
   }
 }

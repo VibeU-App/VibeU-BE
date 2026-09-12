@@ -8,6 +8,7 @@ import {
   GetProfileMeUseCase,
   UpdateProfileMeUseCase,
   UpdateProfileTagsUseCase,
+  GetProfileTagsUseCase,
 } from '../use-cases';
 import { JwtAuthGuard } from '../middleware/jwt-auth.guard';
 import { DatabaseModule } from '../infrastructure/frameworks/database/database.module';
@@ -20,6 +21,7 @@ const USE_CASES = [
   GetProfileMeUseCase,
   UpdateProfileMeUseCase,
   UpdateProfileTagsUseCase,
+  GetProfileTagsUseCase,
 ];
 
 @Module({

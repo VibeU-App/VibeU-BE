@@ -1,5 +1,5 @@
 import * as nodemailer from 'nodemailer';
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
 import { IMailService } from './mail.interface';
 import { config } from '../../../configuration';
 
@@ -9,7 +9,8 @@ import { config } from '../../../configuration';
  * Exposes a generic send method adhering to OCP and ISP.
  */
 @Injectable()
-export class SmtpMailService implements IMailService {
+export class SmtpMailService implements IMailService, OnModuleInit {
+  private readonly logger = new Logger(SmtpMailService.name);
   private transporter: nodemailer.Transporter;
 
   constructor() {
@@ -23,6 +24,12 @@ export class SmtpMailService implements IMailService {
         pass: config.smtp.pass,
       },
     });
+  }
+
+  onModuleInit() {
+    this.logger.log(
+      `SMTP Mail Service initialized -> Host: ${config.smtp.host}:${config.smtp.port}, User: ${config.smtp.user}`,
+    );
   }
 
   /**

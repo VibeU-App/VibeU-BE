@@ -5,9 +5,7 @@ import { PrismaService } from './prisma.service';
 import { PersonalityArchetype as PrismaArchetype } from '@prisma/client';
 
 @Injectable()
-export class PrismaPersonalityArchetypeRepository
-  implements IPersonalityArchetypeRepository
-{
+export class PrismaPersonalityArchetypeRepository implements IPersonalityArchetypeRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async findAll(): Promise<PersonalityArchetypeEntity[]> {

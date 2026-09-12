@@ -1,13 +1,60 @@
-name: Deploy & Migrate to Production
+name: Database Migration Pipeline
 
 on:
+  pull_request:
+    branches: [main, staging, develop]
+    paths:
+      - 'prisma/schema.prisma'
+      - 'prisma/migrations/**'
+
   push:
-    branches: [main, develop]
+    branches: [main, staging, develop]
+    paths:
+      - 'prisma/schema.prisma'
+      - 'prisma/migrations/**'
+
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target deployment environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+      dry_run:
+        description: 'Dry run only (validate migrations without deploying to remote database)'
+        required: false
+        default: false
+        type: boolean
+      run_seed:
+        description: 'Run seed script (prisma/seed.ts) after migrations'
+        required: false
+        default: true
+        type: boolean
 
 jobs:
-  deploy-migrate:
-    name: Deploy & Run Migrations
+  validate-migration:
+    name: Validate Migration
     runs-on: ubuntu-latest
+    outputs:
+      target_env: ${{ steps.determine-env.outputs.target_env }}
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: vibeu
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       - name: Checkout code
@@ -24,43 +71,117 @@ jobs:
           node-version: '20'
           cache: 'pnpm'
 
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Generate Prisma Client
+        run: pnpm run generate
+
+      - name: Validate Prisma Schema
+        run: pnpm prisma validate
+
+      - name: Check for migration drift
+        run: |
+          # Create a temporary migration to check if schema changes are valid
+          pnpm prisma migrate dev --name temp_validation --create-only
+
+          # Check if any temporary migration files were created
+          if ls -d prisma/migrations/*temp_validation* 1> /dev/null 2>&1; then
+            echo "✅ Migration files generated successfully"
+            rm -rf prisma/migrations/*temp_validation*
+          else
+            echo "⚠️ No new migration needed (schema unchanged)"
+          fi
+        env:
+          DATABASE_URL: 'postgresql://postgres:password@localhost:5432/vibeu'
+
+      - name: Test apply migrations against local test database
+        run: pnpm prisma migrate deploy
+        env:
+          DATABASE_URL: 'postgresql://postgres:password@localhost:5432/vibeu'
+
+      - name: Build project
+        run: pnpm build
+
+      - name: Determine Target Environment
+        id: determine-env
+        if: github.event_name != 'pull_request'
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "target_env=${{ inputs.environment }}" >> $GITHUB_OUTPUT
+            echo "Target environment (manual trigger): ${{ inputs.environment }}"
+          elif [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            echo "target_env=production" >> $GITHUB_OUTPUT
+            echo "Target environment (main branch): production"
+          else
+            echo "target_env=staging" >> $GITHUB_OUTPUT
+            echo "Target environment (${{ github.ref_name }} branch): staging"
+          fi
+
+  deploy-migration:
+    name: Deploy Migrations (${{ needs.validate-migration.outputs.target_env || 'N/A' }})
+    needs: validate-migration
+    if: success() && github.event_name != 'pull_request' && inputs.dry_run != true && inputs.dry_run != 'true'
+    runs-on: ubuntu-latest
+    environment: ${{ needs.validate-migration.outputs.target_env }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install
 
       - name: Generate Prisma Client
-        run: pnpm prisma generate
+        run: pnpm run generate
 
-      - name: Resolve failed migration
+      - name: Setup Database Connection URL
+        run: |
+          TARGET="${{ needs.validate-migration.outputs.target_env }}"
+          echo "Target deployment environment: $TARGET"
+
+          # Resolve direct database connection URL:
+          # 1. Environment-scoped secret (secrets.DIRECT_URL when using GitHub Environments)
+          # 2. Repo-level specific secrets: STAGING_DIRECT_URL / DIRECT_URL_STAGING / PRODUCTION_DIRECT_URL / DIRECT_URL_PRODUCTION
+          # 3. Fallback to repo-level secrets.DIRECT_URL
+          if [ "$TARGET" = "staging" ]; then
+            DB_URL="${{ secrets.STAGING_DIRECT_URL || secrets.DIRECT_URL_STAGING || secrets.DIRECT_URL }}"
+          else
+            DB_URL="${{ secrets.PRODUCTION_DIRECT_URL || secrets.DIRECT_URL_PRODUCTION || secrets.DIRECT_URL }}"
+          fi
+
+          if [ -z "$DB_URL" ]; then
+            echo "::error::No database connection URL found for environment '$TARGET'!"
+            echo "::error::Please configure DIRECT_URL in GitHub Environment '$TARGET', or add repository secret ${TARGET^^}_DIRECT_URL / DIRECT_URL_${TARGET^^}."
+            exit 1
+          fi
+
+          echo "::add-mask::$DB_URL"
+          echo "DATABASE_URL=$DB_URL" >> $GITHUB_ENV
+          echo "DIRECT_URL=$DB_URL" >> $GITHUB_ENV
+
+      - name: Resolve known failed migration (if applicable)
         run: pnpm prisma migrate resolve --rolled-back 20260721010000_profile_and_account_status_id_to_int || true
-        env:
-          DATABASE_URL: ${{ secrets.DIRECT_URL }}
 
-      - name: Run production migrations
+      - name: Run Prisma migrations (${{ needs.validate-migration.outputs.target_env }})
         run: pnpm prisma migrate deploy
-        env:
-          # Use DIRECT_URL for migrations (bypasses PgBouncer)
-          DATABASE_URL: ${{ secrets.DIRECT_URL }}
 
       - name: Seed database lookups
+        if: inputs.run_seed != false && inputs.run_seed != 'false'
         run: npx ts-node prisma/seed.ts
-        env:
-          DATABASE_URL: ${{ secrets.DIRECT_URL }}
 
-      - name: Verify migration success
+      - name: Verify migration status
         run: |
-          echo "✅ Migrations applied successfully"
+          echo "✅ Migrations applied successfully to ${{ needs.validate-migration.outputs.target_env }}"
           pnpm prisma migrate status
-        env:
-          DATABASE_URL: ${{ secrets.DIRECT_URL }}
-
-  # Optional: Deploy to hosting platform (e.g., Railway, Render, etc.)
-  # deploy-app:
-  #   name: Deploy Application
-  #   runs-on: ubuntu-latest
-  #   needs: deploy-migrate
-  #   steps:
-  #     - name: Deploy to Railway
-  #       uses: bervProject/railway-deploy@main
-  #       with:
-  #         railway_token: ${{ secrets.RAILWAY_TOKEN }}
