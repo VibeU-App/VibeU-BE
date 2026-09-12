@@ -1,0 +1,147 @@
+name: CD
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
+    branches:
+      - main
+      - staging
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target deployment environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+concurrency:
+  group: cd-${{ github.event.workflow_run.head_branch || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  build-and-push:
+    name: Build & Push Docker Image (ARM64)
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-24.04-arm
+    permissions:
+      contents: read
+      packages: write
+
+    outputs:
+      target_env: ${{ steps.determine-env.outputs.target_env }}
+      image_tag: ${{ steps.determine-env.outputs.image_tag }}
+
+    steps:
+      - name: Checkout VibeU-BE code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Determine Environment & Primary Tag
+        id: determine-env
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            ENV="${{ inputs.environment }}"
+          else
+            BRANCH="${{ github.event.workflow_run.head_branch }}"
+            if [ "$BRANCH" = "main" ]; then
+              ENV="production"
+            else
+              ENV="staging"
+            fi
+          fi
+
+          if [ "$ENV" = "production" ]; then
+            TAG="latest"
+          else
+            TAG="staging"
+          fi
+
+          echo "target_env=$ENV" >> $GITHUB_OUTPUT
+          echo "image_tag=$TAG" >> $GITHUB_OUTPUT
+          echo "Target Environment: $ENV"
+          echo "Primary Image Tag: $TAG"
+
+      - name: Lowercase repository name for GHCR
+        id: repo-name
+        run: |
+          echo "image=ghcr.io/${GITHUB_REPOSITORY,,}" >> $GITHUB_OUTPUT
+
+      - name: Extract Docker metadata (tags, labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ steps.repo-name.outputs.image }}
+          tags: |
+            type=raw,value=latest,enable=${{ steps.determine-env.outputs.target_env == 'production' }}
+            type=raw,value=staging,enable=${{ steps.determine-env.outputs.target_env == 'staging' }}
+            type=sha,format=short,prefix=sha-
+            type=ref,event=branch
+            type=ref,event=tag
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    name: Deploy via GitOps (${{ needs.build-and-push.outputs.target_env }})
+    needs: build-and-push
+    runs-on: self-hosted
+    permissions:
+      contents: read
+      packages: read
+
+    steps:
+      - name: Checkout GitOps repository
+        uses: actions/checkout@v4
+        with:
+          repository: VibeU-App/Gitops
+          token: ${{ secrets.GITOPS_PAT_VIBEU || secrets.GITOPS_PAT }}
+          path: gitops
+
+      - name: Log in to GitHub Container Registry on Self-Hosted Runner
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITOPS_PAT_VIBEU || secrets.GITOPS_PAT || secrets.GITHUB_TOKEN }}
+
+      - name: Deploy Staging
+        if: needs.build-and-push.outputs.target_env == 'staging'
+        run: |
+          echo "🚀 Deploying Staging environment via Gitops Makefile..."
+          make -C gitops deploy-staging
+
+      - name: Deploy Production
+        if: needs.build-and-push.outputs.target_env == 'production'
+        run: |
+          echo "🚀 Deploying Production environment via Gitops Makefile..."
+          make -C gitops deploy-prod
+
+      - name: Prune Dangling Docker Images
+        if: always()
+        run: |
+          docker image prune -f || true

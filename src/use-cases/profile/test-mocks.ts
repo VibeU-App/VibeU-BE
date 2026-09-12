@@ -84,9 +84,7 @@ export class MockHobbyRepository implements IHobbyRepository {
   }
 }
 
-export class MockPersonalityArchetypeRepository
-  implements IPersonalityArchetypeRepository
-{
+export class MockPersonalityArchetypeRepository implements IPersonalityArchetypeRepository {
   public archetypes: PersonalityArchetypeEntity[] = [];
 
   async findAll(): Promise<PersonalityArchetypeEntity[]> {

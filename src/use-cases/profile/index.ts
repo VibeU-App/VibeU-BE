@@ -5,3 +5,4 @@ export * from './get-profile.usecase';
 export * from './get-profile-me.usecase';
 export * from './update-profile-me.usecase';
 export * from './update-profile-tags.usecase';
+export * from './get-profile-tags.usecase';

@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, Logger } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { apiReference } from '@scalar/nestjs-api-reference';
 import { AppModule } from './app.module';
@@ -51,10 +51,19 @@ async function bootstrap() {
     }),
   );
 
-  console.log(`Server is running on port ${process.env.PORT ?? 3005}`);
-  console.log(
-    `API Documentation: http://localhost:${process.env.PORT ?? 3005}/docs`,
+  const port = process.env.PORT ?? 3005;
+  await app.listen(port);
+
+  const logger = new Logger('Bootstrap');
+  logger.log(
+    `================================================================`,
   );
-  await app.listen(process.env.PORT ?? 3005);
+  logger.log(`🚀 VibeU Backend Server running and listening on port: ${port}`);
+  logger.log(`🌐 Local URL:         http://localhost:${port}`);
+  logger.log(`📚 API Documentation: http://localhost:${port}/docs`);
+  logger.log(`🔧 Environment:       ${process.env.NODE_ENV ?? 'development'}`);
+  logger.log(
+    `================================================================`,
+  );
 }
 bootstrap();

@@ -1,0 +1,27 @@
+export MSYS_NO_PATHCONV=1
+
+if command -v gitleaks >/dev/null 2>&1; then
+  echo "🔍 [Gitleaks] Checking staged files for secrets..."
+  gitleaks protect -v --staged
+  if [ $? -ne 0 ]; then
+    echo "❌ [Gitleaks] Secret detected in staged changes! Commit aborted."
+    echo "💡 If this is a false positive, add an exception in .gitleaks.toml or comment '#gitleaks:allow'."
+    exit 1
+  fi
+  echo "✅ [Gitleaks] No secrets found in staged changes."
+elif command -v docker >/dev/null 2>&1; then
+  echo "🔍 [Gitleaks] Running Gitleaks via Docker on staged files..."
+  docker run --rm -v "${PWD}:/code" -w /code zricethezav/gitleaks:latest protect --staged -v
+  if [ $? -ne 0 ]; then
+    echo "❌ [Gitleaks] Secret detected in staged changes! Commit aborted."
+    echo "💡 If this is a false positive, add an exception in .gitleaks.toml or comment '#gitleaks:allow'."
+    exit 1
+  fi
+  echo "✅ [Gitleaks] No secrets found in staged changes."
+else
+  echo "⚠️  [Gitleaks] 'gitleaks' executable is not installed on this system. Secret scan skipped."
+  echo "💡 Recommended: install Gitleaks to protect against accidental credential leaks:"
+  echo "   - Windows (winget): winget install Gitleaks.Gitleaks"
+  echo "   - macOS (brew):     brew install gitleaks"
+  echo "   - Linux:            https://github.com/gitleaks/gitleaks#installing"
+fi

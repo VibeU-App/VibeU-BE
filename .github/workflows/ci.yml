@@ -1,31 +1,54 @@
 name: CI
 
 on:
+  push:
+    branches:
+      - main
+      - staging
   pull_request:
-    branches: [main, develop]
+    branches:
+      - main
+      - staging
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  build-test:
-    name: Build & Test
+  test:
+    name: Run Tests (Unit & Integration)
     runs-on: ubuntu-latest
+
+    env:
+      NODE_ENV: test
+      JWT_SECRET_KEY: test-secret-key-for-ci-minimum-32-chars
+      ACCESS_TOKEN_TTL: '3600'
+      REFRESH_TOKEN_TTL: '604800'
+      SMTP_HOST: smtp.test.com
+      SMTP_PORT: '587'
+      SMTP_USER: test@example.com
+      SMTP_PASS: testpassword123
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/vibeu_test
+      DIRECT_URL: postgresql://postgres:postgres@localhost:5432/vibeu_test
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
         with:
-          version: 8
+          version: 10
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma Client
         run: pnpm prisma generate
@@ -36,6 +59,8 @@ jobs:
       - name: Build project
         run: pnpm build
 
-      - name: Run tests
+      - name: Run unit tests
         run: pnpm test
-        continue-on-error: true # Tests may fail if use-cases are not implemented
+
+      - name: Run integration tests (Testcontainers)
+        run: pnpm test:integration

@@ -1,0 +1,24 @@
+# Dependencies and package managers
+node_modules/
+dist/
+coverage/
+generated/
+
+# Lockfiles
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# Specifications and agent guidelines
+specs/
+.agents/
+.specify/
+.serena/
+
+# Test suites & mock data (prevents false positives on test fixtures)
+test/
+*.spec.ts
+*.test.ts
+
+# Scripts & temporary files
+scripts/fix-prisma-cjs.js

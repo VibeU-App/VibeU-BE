@@ -24,12 +24,14 @@ import {
   GetProfileMeUseCase,
   UpdateProfileMeUseCase,
   UpdateProfileTagsUseCase,
+  GetProfileTagsUseCase,
 } from '../use-cases';
 import {
   GetProfileMeResponseDto,
   UpdateProfileRequestDto,
   UpdateProfileResponseDto,
   UpdateProfileTagsRequestDto,
+  GetProfileTagsResponseDto,
 } from '../core/dtos';
 import { JwtAuthGuard } from '../middleware/jwt-auth.guard';
 import { CurrentUser } from '../middleware/current-user.decorator';
@@ -42,6 +44,7 @@ export class ProfileController {
     private readonly getProfileMeUsecase: GetProfileMeUseCase,
     private readonly updateProfileMeUsecase: UpdateProfileMeUseCase,
     private readonly updateProfileTagsUsecase: UpdateProfileTagsUseCase,
+    private readonly getProfileTagsUsecase: GetProfileTagsUseCase,
   ) {}
 
   @Get('me')
@@ -92,6 +95,27 @@ export class ProfileController {
       statusCode: HttpStatus.CREATED,
       message: 'Profile successfully updated',
       data: { profile: result },
+      metadata: null,
+    };
+  }
+
+  @Get('me/tags')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Fetch the user's tag list" })
+  @ApiOkResponseEnvelope(GetProfileTagsResponseDto, {
+    description: "User's tag list fetched successfully",
+  })
+  async getProfileTags(
+    @CurrentUser() user: TokenPayload,
+  ): Promise<Envelope<GetProfileTagsResponseDto>> {
+    const tags = await this.getProfileTagsUsecase.execute(user.sub);
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: "User's tag list successfully found",
+      data: { tags },
       metadata: null,
     };
   }

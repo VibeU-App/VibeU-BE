@@ -6,10 +6,7 @@ import {
   IPolicyRepository,
   ITemplateLoaderService,
 } from '../../core/abstracts';
-import {
-  UserEntity,
-  AccountStatusName,
-} from '../../core/entities/user.entity';
+import { UserEntity, AccountStatusName } from '../../core/entities/user.entity';
 import { OtpEntity } from '../../core/entities/otp.entity';
 import { AppException } from '../../core/errors/app-exception';
 import { ErrorCode } from '../../core/errors/error-codes';

@@ -31,6 +31,10 @@ start: ## Start production server
 test: ## Run tests
 	pnpm test
 
+.PHONY: test-integration
+test-integration: ## Run integration tests with Testcontainers
+	pnpm test:integration
+
 .PHONY: lint
 lint: ## Run linter
 	pnpm lint
@@ -38,6 +42,10 @@ lint: ## Run linter
 .PHONY: format
 format: ## Format code
 	pnpm format
+
+.PHONY: semgrep
+semgrep: ## Run Semgrep SAST scan locally via Docker
+	docker run --rm -v "%cd%:/src" semgrep/semgrep semgrep scan --config auto
 
 # ======================
 # Prisma / Database
@@ -137,8 +145,10 @@ help: ## Show this help message
 	@echo   dev              Start development server
 	@echo   start            Start production server
 	@echo   test             Run tests
+	@echo   test-integration Run integration tests (Testcontainers)
 	@echo   lint             Run linter
 	@echo   format           Format code
+	@echo   semgrep          Run Semgrep SAST scan locally (Docker)
 	@echo.
 	@echo   generate         Generate Prisma Client
 	@echo   migrate          Run migrations (DIRECT_URL)

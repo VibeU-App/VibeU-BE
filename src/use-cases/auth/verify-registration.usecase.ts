@@ -1,14 +1,16 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, Optional } from '@nestjs/common';
 import {
   IUserRepository,
   IOtpRepository,
   ISessionRepository,
   ITokenService,
+  IProfileRepository,
 } from '../../core/abstracts';
 import { AppException } from '../../core/errors/app-exception';
 import { ErrorCode } from '../../core/errors/error-codes';
 import { AccountStatusName, UserEntity } from '../../core/entities/user.entity';
 import { SessionEntity } from '../../core/entities/session.entity';
+import { ProfileEntity } from '../../core/entities/profile.entity';
 import { config } from '../../configuration';
 
 export interface VerifyRegistrationResult {
@@ -28,6 +30,9 @@ export class VerifyRegistrationUsecase {
     private readonly sessionRepository: ISessionRepository,
     @Inject('ITokenService')
     private readonly tokenService: ITokenService,
+    @Optional()
+    @Inject('IProfileRepository')
+    private readonly profileRepository?: IProfileRepository,
   ) {}
 
   async execute(
@@ -95,7 +100,27 @@ export class VerifyRegistrationUsecase {
     // 5. Cleanup OTPs
     await this.otpRepository.deleteByUserId(user.id);
 
-    // 6. Generate access and refresh tokens using TokenService
+    // 6. Ensure blank profile is created upon registration
+    if (this.profileRepository) {
+      const existingProfile = await this.profileRepository.findByUserId(
+        updatedUser.id,
+      );
+      if (!existingProfile) {
+        const defaultNickname =
+          updatedUser.email.split('@')[0] ||
+          `user_${updatedUser.id.substring(0, 8)}`;
+        const blankProfile = ProfileEntity.create({
+          userId: updatedUser.id,
+          nickname: defaultNickname,
+          gender: 'OTHER',
+          avatarSeed: defaultNickname,
+          birthday: new Date('2000-01-01T00:00:00.000Z'),
+        });
+        await this.profileRepository.save(blankProfile);
+      }
+    }
+
+    // 7. Generate access and refresh tokens using TokenService
     const tokenPair = this.tokenService.createTokenPair(
       updatedUser.id,
       updatedUser.email,
