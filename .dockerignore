@@ -1,0 +1,77 @@
+# Version control
+.git
+.gitignore
+
+# Dependencies
+node_modules
+.pnpm-store
+
+# Compiled output
+dist
+build
+
+# Test & coverage
+coverage
+.nyc_output
+test
+**/*.spec.ts
+**/*.test.ts
+
+# Environment variables & secrets (CRITICAL)
+.env
+.env.*
+*.env
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# IDE & OS files
+.idea
+.vscode
+.DS_Store
+Thumbs.db
+*.sublime-workspace
+*.sublime-project
+
+# AI, Specifications & Agent artifacts
+.agents
+.serena
+.specify
+.opencode
+specs
+docs
+templates
+
+# Git hooks & CI
+.husky
+.github
+.pre-commit-config.yaml
+.gitleaks.toml
+.semgrepignore
+
+# Linter / Formatter configs
+eslint.config.mjs
+.prettierrc
+
+# Runtime / Temp data
+.temp
+.tmp
+pids
+*.pid
+*.seed
+*.pid.lock
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+generated/prisma
+
+# Build scripts / Docker / Docs
+Dockerfile*
+docker-compose*
+.dockerignore
+README.md
+Makefile
