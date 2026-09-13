@@ -20,24 +20,50 @@ export class TemplateLoaderService
   private readonly templatesDir: string;
 
   constructor() {
-    this.templatesDir = path.resolve(process.cwd(), 'templates', 'emails');
+    this.templatesDir = this.resolveTemplatesDir();
+  }
+
+  private resolveTemplatesDir(): string {
+    if (
+      process.env.EMAIL_TEMPLATES_DIR &&
+      fs.existsSync(process.env.EMAIL_TEMPLATES_DIR)
+    ) {
+      return process.env.EMAIL_TEMPLATES_DIR;
+    }
+
+    const candidatePaths = [
+      path.resolve(process.cwd(), 'templates', 'emails'),
+      path.resolve(__dirname, '../../../../templates/emails'),
+      path.resolve(__dirname, '../../../templates/emails'),
+      path.resolve(process.cwd(), '..', 'templates', 'emails'),
+    ];
+
+    for (const candidate of candidatePaths) {
+      if (fs.existsSync(candidate)) {
+        return candidate;
+      }
+    }
+
+    return path.resolve(process.cwd(), 'templates', 'emails');
   }
 
   /**
    * Called when the module initializes.
    * Loads all HTML templates from the templates/emails/ directory into RAM.
    */
-  async onModuleInit() {
-    await this.loadTemplates();
+  onModuleInit() {
+    this.loadTemplates();
   }
 
   /**
    * Loads all .html files from the templates directory into memory.
    */
-  private async loadTemplates(): Promise<void> {
+  private loadTemplates(): void {
     try {
       if (!fs.existsSync(this.templatesDir)) {
-        this.logger.warn(`Templates directory not found: ${this.templatesDir}`);
+        this.logger.error(
+          `Templates directory not found: ${this.templatesDir}`,
+        );
         return;
       }
 
@@ -69,7 +95,10 @@ export class TemplateLoaderService
     const template = this.templates.get(templateName);
 
     if (!template) {
-      throw new Error(`Template not found: ${templateName}`);
+      const available = Array.from(this.templates.keys()).join(', ') || 'none';
+      throw new Error(
+        `Template not found: ${templateName}. Available templates: [${available}]. Searched path: ${this.templatesDir}`,
+      );
     }
 
     let rendered = template;

@@ -46,7 +46,6 @@ Thumbs.db
 .opencode
 specs
 docs
-templates
 
 # Git hooks & CI
 .husky
