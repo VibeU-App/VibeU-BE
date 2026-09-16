@@ -18,7 +18,7 @@
 
 **Purpose**: Verify branch setup and directory infrastructure
 
-- [ ] T001 Verify git branch `13-09-spec` (`004-posts`) and feature specification directory `specs/004-posts/`
+- [X] T001 Verify git branch `13-09-spec` (`004-posts`) and feature specification directory `specs/004-posts/`
 
 ---
 
@@ -28,20 +28,20 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T002 Add `Post`, `Comment`, `PostLike`, `Swipe`, and `Match` models with compound indexes and relations in `prisma/schema.prisma`
-- [ ] T003 Generate Prisma Client and apply migrations framework using `pnpm prisma generate && node scripts/fix-prisma-cjs.js`
-- [ ] T004 [P] Create `PostEntity` (with `AuthorRelation`), `CommentEntity`, and `PostLikeEntity` in `src/core/entities/post.entity.ts`, `src/core/entities/comment.entity.ts`, and `src/core/entities/post-like.entity.ts`
-- [ ] T005 [P] Create keyset pagination and feed result contracts (`KeysetCursor`, `FeedResult`, `ProfileFeedResult`) in `src/core/types/feed.types.ts`
-- [ ] T006 [P] Create `IPostRepository` abstract contract in `src/core/abstracts/post-repository.abstract.ts`
-- [ ] T007 [P] Create `ICommentRepository` abstract contract in `src/core/abstracts/comment-repository.abstract.ts`
-- [ ] T008 [P] Create `IPostLikeRepository` abstract contract in `src/core/abstracts/post-like-repository.abstract.ts`
-- [ ] T009 [P] Create `ISocialRelationRepository` abstract contract in `src/core/abstracts/social-relation-repository.abstract.ts`
-- [ ] T010 Implement `PrismaPostRepository` with 3-tier feed query and keyset seek logic in `src/infrastructure/frameworks/database/prisma-post.repository.ts`
-- [ ] T011 Implement `PrismaCommentRepository` in `src/infrastructure/frameworks/database/prisma-comment.repository.ts`
-- [ ] T012 Implement `PrismaPostLikeRepository` with atomic counter updates in `src/infrastructure/frameworks/database/prisma-post-like.repository.ts`
-- [ ] T013 Implement `PrismaSocialRelationRepository` fetching matches and right-swipes in `src/infrastructure/frameworks/database/prisma-social-relation.repository.ts`
-- [ ] T014 Register repository providers (`IPostRepository`, `ICommentRepository`, `IPostLikeRepository`, `ISocialRelationRepository`) in `src/infrastructure/frameworks/database/database.module.ts`
-- [ ] T015 Create `PostModule` registering controllers and use-case providers in `src/controllers/post.module.ts` and import into `src/app.module.ts`
+- [X] T002 Add `Post`, `Comment`, `PostLike`, `Swipe`, and `Match` models with compound indexes and relations in `prisma/schema.prisma`
+- [X] T003 Generate Prisma Client and apply migrations framework using `pnpm prisma generate && node scripts/fix-prisma-cjs.js`
+- [X] T004 [P] Create `PostEntity` (with `AuthorRelation`), `CommentEntity`, and `PostLikeEntity` in `src/core/entities/post.entity.ts`, `src/core/entities/comment.entity.ts`, and `src/core/entities/post-like.entity.ts`
+- [X] T005 [P] Create keyset pagination and feed result contracts (`KeysetCursor`, `FeedResult`, `ProfileFeedResult`) in `src/core/types/feed.types.ts`
+- [X] T006 [P] Create `IPostRepository` abstract contract in `src/core/abstracts/post-repository.abstract.ts`
+- [X] T007 [P] Create `ICommentRepository` abstract contract in `src/core/abstracts/comment-repository.abstract.ts`
+- [X] T008 [P] Create `IPostLikeRepository` abstract contract in `src/core/abstracts/post-like-repository.abstract.ts`
+- [X] T009 [P] Create `ISocialRelationRepository` abstract contract in `src/core/abstracts/social-relation-repository.abstract.ts`
+- [X] T010 Implement `PrismaPostRepository` with 3-tier feed query and keyset seek logic in `src/infrastructure/frameworks/database/prisma-post.repository.ts`
+- [X] T011 Implement `PrismaCommentRepository` in `src/infrastructure/frameworks/database/prisma-comment.repository.ts`
+- [X] T012 Implement `PrismaPostLikeRepository` with atomic counter updates in `src/infrastructure/frameworks/database/prisma-post-like.repository.ts`
+- [X] T013 Implement `PrismaSocialRelationRepository` fetching matches and right-swipes in `src/infrastructure/frameworks/database/prisma-social-relation.repository.ts`
+- [X] T014 Register repository providers (`IPostRepository`, `ICommentRepository`, `IPostLikeRepository`, `ISocialRelationRepository`) in `src/infrastructure/frameworks/database/database.module.ts`
+- [X] T015 Create `PostModule` registering controllers and use-case providers in `src/controllers/post.module.ts` and import into `src/app.module.ts`
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
@@ -53,10 +53,10 @@
 
 **Independent Test**: Send `POST /api/v1/posts` request with text and media payload, verifying post creation, validation, and database persistence.
 
-- [ ] T016 [P] [US1] Create `CreatePostDto` validation class in `src/controllers/dto/post/create-post.dto.ts`
-- [ ] T017 [P] [US1] Implement `CreatePostUsecase` in `src/use-cases/post/create-post.usecase.ts`
-- [ ] T018 [US1] Add unit tests for `CreatePostUsecase` in `src/use-cases/post/create-post.usecase.spec.ts`
-- [ ] T019 [US1] Implement `POST /api/v1/posts` endpoint handler in `src/controllers/post.controller.ts`
+- [X] T016 [P] [US1] Create `CreatePostDto` validation class in `src/controllers/dto/post/create-post.dto.ts`
+- [X] T017 [P] [US1] Implement `CreatePostUsecase` in `src/use-cases/post/create-post.usecase.ts`
+- [X] T018 [US1] Add unit tests for `CreatePostUsecase` in `src/use-cases/post/create-post.usecase.spec.ts`
+- [X] T019 [US1] Implement `POST /api/v1/posts` endpoint handler in `src/controllers/post.controller.ts`
 
 **Checkpoint**: User Story 1 complete and independently testable (MVP reached!)
 
@@ -68,10 +68,10 @@
 
 **Independent Test**: Send `PATCH /api/v1/posts/:id/pin` with `{ "isPinned": true }` and verify the post becomes pinned while any previously pinned post is unpinned atomically.
 
-- [ ] T020 [P] [US2] Create `PinPostDto` validation class in `src/controllers/dto/post/pin-post.dto.ts`
-- [ ] T021 [P] [US2] Implement `PinPostUsecase` with atomic swapping in `src/use-cases/post/pin-post.usecase.ts`
-- [ ] T022 [US2] Add unit tests for `PinPostUsecase` in `src/use-cases/post/pin-post.usecase.spec.ts`
-- [ ] T023 [US2] Implement `PATCH /api/v1/posts/:id/pin` endpoint handler in `src/controllers/post.controller.ts`
+- [X] T020 [P] [US2] Create `PinPostDto` validation class in `src/controllers/dto/post/pin-post.dto.ts`
+- [X] T021 [P] [US2] Implement `PinPostUsecase` with atomic swapping in `src/use-cases/post/pin-post.usecase.ts`
+- [X] T022 [US2] Add unit tests for `PinPostUsecase` in `src/use-cases/post/pin-post.usecase.spec.ts`
+- [X] T023 [US2] Implement `PATCH /api/v1/posts/:id/pin` endpoint handler in `src/controllers/post.controller.ts`
 
 **Checkpoint**: User Stories 1 AND 2 functional and testable independently
 
@@ -83,9 +83,9 @@
 
 **Independent Test**: Send `DELETE /api/v1/posts/:id` and confirm the post is marked deleted (`deletedAt`), unpinned, and omitted from subsequent queries.
 
-- [ ] T024 [P] [US3] Implement `DeletePostUsecase` in `src/use-cases/post/delete-post.usecase.ts`
-- [ ] T025 [US3] Add unit tests for `DeletePostUsecase` in `src/use-cases/post/delete-post.usecase.spec.ts`
-- [ ] T026 [US3] Implement `DELETE /api/v1/posts/:id` endpoint handler in `src/controllers/post.controller.ts`
+- [X] T024 [P] [US3] Implement `DeletePostUsecase` in `src/use-cases/post/delete-post.usecase.ts`
+- [X] T025 [US3] Add unit tests for `DeletePostUsecase` in `src/use-cases/post/delete-post.usecase.spec.ts`
+- [X] T026 [US3] Implement `DELETE /api/v1/posts/:id` endpoint handler in `src/controllers/post.controller.ts`
 
 **Checkpoint**: All P1 Posting Flow stories (US1, US2, US3) complete and testable
 
@@ -97,11 +97,11 @@
 
 **Independent Test**: Query `GET /api/v1/posts/timeline` with test accounts having matched, swiped, and stranger relationships, validating posts arrive in Tier 1 -> Tier 2 -> Tier 3 sequence and paginating across tier boundaries.
 
-- [ ] T027 [P] [US5] Create `TimelineFeedQueryDto` in `src/controllers/dto/post/timeline-feed-query.dto.ts`
-- [ ] T028 [P] [US5] Implement keyset cursor encoding/decoding utilities in `src/core/utils/keyset-cursor.util.ts`
-- [ ] T029 [US5] Implement `GetTimelineFeedUsecase` coordinating matched/swiped user queries and feed fetch in `src/use-cases/post/get-timeline-feed.usecase.ts`
-- [ ] T030 [US5] Add unit tests for `GetTimelineFeedUsecase` in `src/use-cases/post/get-timeline-feed.usecase.spec.ts`
-- [ ] T031 [US5] Implement `GET /api/v1/posts/timeline` endpoint handler in `src/controllers/post.controller.ts`
+- [X] T027 [P] [US5] Create `TimelineFeedQueryDto` in `src/controllers/dto/post/timeline-feed-query.dto.ts`
+- [X] T028 [P] [US5] Implement keyset cursor encoding/decoding utilities in `src/core/utils/keyset-cursor.util.ts`
+- [X] T029 [US5] Implement `GetTimelineFeedUsecase` coordinating matched/swiped user queries and feed fetch in `src/use-cases/post/get-timeline-feed.usecase.ts`
+- [X] T030 [US5] Add unit tests for `GetTimelineFeedUsecase` in `src/use-cases/post/get-timeline-feed.usecase.spec.ts`
+- [X] T031 [US5] Implement `GET /api/v1/posts/timeline` endpoint handler in `src/controllers/post.controller.ts`
 
 **Checkpoint**: Core 3-tier Discovery Feed operational and testable end-to-end
 
@@ -113,12 +113,12 @@
 
 **Independent Test**: Send `POST /api/v1/posts/:id/like` and `POST /api/v1/posts/:id/comments`, verifying like/comment persistence and atomic counter increments/decrements.
 
-- [ ] T032 [P] [US4] Create `CreateCommentDto` validation class in `src/controllers/dto/post/create-comment.dto.ts`
-- [ ] T033 [P] [US4] Implement `ToggleLikeUsecase` in `src/use-cases/post/toggle-like.usecase.ts`
-- [ ] T034 [P] [US4] Implement `CreateCommentUsecase` in `src/use-cases/post/create-comment.usecase.ts`
-- [ ] T035 [US4] Add unit tests for `ToggleLikeUsecase` in `src/use-cases/post/toggle-like.usecase.spec.ts`
-- [ ] T036 [US4] Add unit tests for `CreateCommentUsecase` in `src/use-cases/post/create-comment.usecase.spec.ts`
-- [ ] T037 [US4] Implement `POST /api/v1/posts/:id/like` and `POST /api/v1/posts/:id/comments` in `src/controllers/post.controller.ts`
+- [X] T032 [P] [US4] Create `CreateCommentDto` validation class in `src/controllers/dto/post/create-comment.dto.ts`
+- [X] T033 [P] [US4] Implement `ToggleLikeUsecase` in `src/use-cases/post/toggle-like.usecase.ts`
+- [X] T034 [P] [US4] Implement `CreateCommentUsecase` in `src/use-cases/post/create-comment.usecase.ts`
+- [X] T035 [US4] Add unit tests for `ToggleLikeUsecase` in `src/use-cases/post/toggle-like.usecase.spec.ts`
+- [X] T036 [US4] Add unit tests for `CreateCommentUsecase` in `src/use-cases/post/create-comment.usecase.spec.ts`
+- [X] T037 [US4] Implement `POST /api/v1/posts/:id/like` and `POST /api/v1/posts/:id/comments` in `src/controllers/post.controller.ts`
 
 **Checkpoint**: Post engagement and commenting complete
 
@@ -130,10 +130,10 @@
 
 **Independent Test**: Send `GET /api/v1/posts/profile/:authorId` and verify the author's pinned post appears in `pinnedPost` followed by unpinned posts in chronological order.
 
-- [ ] T038 [P] [US6] Create `ProfileFeedQueryDto` in `src/controllers/dto/post/profile-feed-query.dto.ts`
-- [ ] T039 [P] [US6] Implement `GetProfileFeedUsecase` in `src/use-cases/post/get-profile-feed.usecase.ts`
-- [ ] T040 [US6] Add unit tests for `GetProfileFeedUsecase` in `src/use-cases/post/get-profile-feed.usecase.spec.ts`
-- [ ] T041 [US6] Implement `GET /api/v1/posts/profile/:authorId` endpoint handler in `src/controllers/post.controller.ts`
+- [X] T038 [P] [US6] Create `ProfileFeedQueryDto` in `src/controllers/dto/post/profile-feed-query.dto.ts`
+- [X] T039 [P] [US6] Implement `GetProfileFeedUsecase` in `src/use-cases/post/get-profile-feed.usecase.ts`
+- [X] T040 [US6] Add unit tests for `GetProfileFeedUsecase` in `src/use-cases/post/get-profile-feed.usecase.spec.ts`
+- [X] T041 [US6] Implement `GET /api/v1/posts/profile/:authorId` endpoint handler in `src/controllers/post.controller.ts`
 
 **Checkpoint**: User profile feed complete
 
@@ -145,10 +145,10 @@
 
 **Independent Test**: Send `GET /api/v1/posts/:id` and `GET /api/v1/posts/:id/comments`, verifying complete post details and chronological comment list.
 
-- [ ] T042 [P] [US7] Implement `GetPostDetailUsecase` in `src/use-cases/post/get-post-detail.usecase.ts`
-- [ ] T043 [P] [US7] Implement `GetCommentsUsecase` in `src/use-cases/post/get-comments.usecase.ts`
-- [ ] T044 [US7] Add unit tests for `GetPostDetailUsecase` and `GetCommentsUsecase` in `src/use-cases/post/get-post-detail.usecase.spec.ts` and `src/use-cases/post/get-comments.usecase.spec.ts`
-- [ ] T045 [US7] Implement `GET /api/v1/posts/:id` and `GET /api/v1/posts/:id/comments` in `src/controllers/post.controller.ts`
+- [X] T042 [P] [US7] Implement `GetPostDetailUsecase` in `src/use-cases/post/get-post-detail.usecase.ts`
+- [X] T043 [P] [US7] Implement `GetCommentsUsecase` in `src/use-cases/post/get-comments.usecase.ts`
+- [X] T044 [US7] Add unit tests for `GetPostDetailUsecase` and `GetCommentsUsecase` in `src/use-cases/post/get-post-detail.usecase.spec.ts` and `src/use-cases/post/get-comments.usecase.spec.ts`
+- [X] T045 [US7] Implement `GET /api/v1/posts/:id` and `GET /api/v1/posts/:id/comments` in `src/controllers/post.controller.ts`
 
 **Checkpoint**: All user stories functional and testable independently
 
@@ -158,10 +158,10 @@
 
 **Purpose**: Cross-cutting improvements, API documentation, and regression verification
 
-- [ ] T046 [P] Update module exports and Barrel index files in `src/core/entities/index.ts`, `src/core/abstracts/index.ts`, and `src/use-cases/index.ts`
-- [ ] T047 [P] Configure Swagger OpenAPI annotations and tags on `src/controllers/post.controller.ts`
-- [ ] T048 Run complete test suite via `pnpm test` and resolve any TypeScript/ESLint warnings
-- [ ] T049 Execute end-to-end verification scenarios per `specs/004-posts/quickstart.md`
+- [X] T046 [P] Update module exports and Barrel index files in `src/core/entities/index.ts`, `src/core/abstracts/index.ts`, and `src/use-cases/index.ts`
+- [X] T047 [P] Configure Swagger OpenAPI annotations and tags on `src/controllers/post.controller.ts`
+- [X] T048 Run complete test suite via `pnpm test` and resolve any TypeScript/ESLint warnings
+- [X] T049 Execute end-to-end verification scenarios per `specs/004-posts/quickstart.md`
 
 ---
 

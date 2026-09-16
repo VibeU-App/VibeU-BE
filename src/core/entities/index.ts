@@ -5,3 +5,6 @@ export * from './profile.entity';
 export * from './hobby.entity';
 export * from './personality-archetype.entity';
 export * from './questionnaire.entity';
+export * from './post.entity';
+export * from './comment.entity';
+export * from './post-like.entity';
