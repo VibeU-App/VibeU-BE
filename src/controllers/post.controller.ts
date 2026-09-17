@@ -33,7 +33,7 @@ import {
   TimelineFeedQueryDto,
   CreateCommentDto,
   ProfileFeedQueryDto,
-} from './dto/post';
+} from '../core/dtos';
 
 import {
   CreatePostUsecase,
