@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { PrismaService } from './prisma.service';
 import { PrismaUserRepository } from './user.repository';
 import { PrismaSessionRepository } from './session.repository';
@@ -10,44 +10,25 @@ import { PrismaPersonalityArchetypeRepository } from './personality-archetype.re
 import { PrismaQuestionnaireRepository } from './questionnaire.repository';
 import { AccountStatusLoaderService } from './account-status-loader.service';
 import { DatabasePrewarmService } from './database-prewarm.service';
-
-/**
- * Database module for VibeU.
- * Consolidates repositories and database services under a single module.
- */
+import { PrismaPostRepository } from './prisma-post.repository';
+import { PrismaCommentRepository } from './prisma-comment.repository';
+import { PrismaPostLikeRepository } from './prisma-post-like.repository';
+import { PrismaSocialRelationRepository } from './prisma-social-relation.repository';
 @Module({
   providers: [
     PrismaService,
     PrismaUserRepository,
-    {
-      provide: 'IUserRepository',
-      useClass: PrismaUserRepository,
-    },
+    { provide: 'IUserRepository', useClass: PrismaUserRepository },
     PrismaSessionRepository,
-    {
-      provide: 'ISessionRepository',
-      useClass: PrismaSessionRepository,
-    },
+    { provide: 'ISessionRepository', useClass: PrismaSessionRepository },
     PrismaPolicyRepository,
-    {
-      provide: 'IPolicyRepository',
-      useClass: PrismaPolicyRepository,
-    },
+    { provide: 'IPolicyRepository', useClass: PrismaPolicyRepository },
     PrismaOtpRepository,
-    {
-      provide: 'IOtpRepository',
-      useClass: PrismaOtpRepository,
-    },
+    { provide: 'IOtpRepository', useClass: PrismaOtpRepository },
     PrismaProfileRepository,
-    {
-      provide: 'IProfileRepository',
-      useClass: PrismaProfileRepository,
-    },
+    { provide: 'IProfileRepository', useClass: PrismaProfileRepository },
     PrismaHobbyRepository,
-    {
-      provide: 'IHobbyRepository',
-      useClass: PrismaHobbyRepository,
-    },
+    { provide: 'IHobbyRepository', useClass: PrismaHobbyRepository },
     PrismaPersonalityArchetypeRepository,
     {
       provide: 'IPersonalityArchetypeRepository',
@@ -57,6 +38,17 @@ import { DatabasePrewarmService } from './database-prewarm.service';
     {
       provide: 'IQuestionnaireRepository',
       useClass: PrismaQuestionnaireRepository,
+    },
+    PrismaPostRepository,
+    { provide: 'IPostRepository', useClass: PrismaPostRepository },
+    PrismaCommentRepository,
+    { provide: 'ICommentRepository', useClass: PrismaCommentRepository },
+    PrismaPostLikeRepository,
+    { provide: 'IPostLikeRepository', useClass: PrismaPostLikeRepository },
+    PrismaSocialRelationRepository,
+    {
+      provide: 'ISocialRelationRepository',
+      useClass: PrismaSocialRelationRepository,
     },
     AccountStatusLoaderService,
     DatabasePrewarmService,
@@ -70,6 +62,10 @@ import { DatabasePrewarmService } from './database-prewarm.service';
     'IHobbyRepository',
     'IPersonalityArchetypeRepository',
     'IQuestionnaireRepository',
+    'IPostRepository',
+    'ICommentRepository',
+    'IPostLikeRepository',
+    'ISocialRelationRepository',
     AccountStatusLoaderService,
     DatabasePrewarmService,
   ],

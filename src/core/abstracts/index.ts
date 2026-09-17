@@ -12,3 +12,7 @@ export * from './mail-service.interface';
 export * from './token-service.interface';
 export * from './jwt-service.interface';
 export * from './template-loader-service.interface';
+export * from './post-repository.abstract';
+export * from './comment-repository.abstract';
+export * from './post-like-repository.abstract';
+export * from './social-relation-repository.abstract';

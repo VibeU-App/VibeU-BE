@@ -56,6 +56,13 @@ model User {
   sessions      Session[]
   otp           Otp?
   profile       Profile?
+  posts         Post[]
+  comments      Comment[]
+  postLikes     PostLike[]
+  swipesAsSwiperUser Swipe[] @relation("SwiperUser")
+  swipesAsTargetUser Swipe[] @relation("TargetUser")
+  matchesAsUser1     Match[] @relation("MatchUser1")
+  matchesAsUser2     Match[] @relation("MatchUser2")
 
   // Soft delete index
   @@index([deletedAt])
@@ -221,4 +228,92 @@ model UserQuestionnaireAnswer {
 
   @@unique([profileId, questionId])
   @@map("user_questionnaire_answers")
+}
+
+// Post model - stores user posts with text and image media
+model Post {
+  id           String    @id @default(uuid())
+  authorId     String    @map("author_id")
+  content      String?   @db.Text
+  mediaUrls    String[]  @default([]) @map("media_urls")
+  isPinned     Boolean   @default(false) @map("is_pinned")
+  likeCount    Int       @default(0) @map("like_count")
+  commentCount Int       @default(0) @map("comment_count")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+
+  user     User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  comments Comment[]
+  likes    PostLike[]
+
+  @@index([deletedAt, createdAt(sort: Desc), id(sort: Desc)])
+  @@index([authorId, deletedAt, isPinned(sort: Desc), createdAt(sort: Desc)])
+  @@map("posts")
+}
+
+// Comment model
+model Comment {
+  id        String    @id @default(uuid())
+  postId    String    @map("post_id")
+  authorId  String    @map("author_id")
+  content   String    @db.VarChar(500)
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([postId, deletedAt, createdAt(sort: Asc)])
+  @@index([authorId, deletedAt])
+  @@map("comments")
+}
+
+// PostLike model
+model PostLike {
+  id        String   @id @default(uuid())
+  postId    String   @map("post_id")
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+  @@index([userId, postId])
+  @@map("post_likes")
+}
+
+// Swipe model
+model Swipe {
+  id        String   @id @default(uuid())
+  swiperId  String   @map("swiper_id")
+  targetId  String   @map("target_id")
+  isLike    Boolean  @default(true) @map("is_like")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  swiper User @relation("SwiperUser", fields: [swiperId], references: [id], onDelete: Cascade)
+  target User @relation("TargetUser", fields: [targetId], references: [id], onDelete: Cascade)
+
+  @@unique([swiperId, targetId])
+  @@index([swiperId, isLike])
+  @@index([targetId, isLike])
+  @@map("swipes")
+}
+
+// Match model
+model Match {
+  id        String   @id @default(uuid())
+  user1Id   String   @map("user1_id")
+  user2Id   String   @map("user2_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user1 User @relation("MatchUser1", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2 User @relation("MatchUser2", fields: [user2Id], references: [id], onDelete: Cascade)
+
+  @@unique([user1Id, user2Id])
+  @@index([user1Id])
+  @@index([user2Id])
+  @@map("matches")
 }

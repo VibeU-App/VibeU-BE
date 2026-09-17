@@ -49,7 +49,7 @@ export class GeminiAiService implements IAIService {
       `;
 
       const result = await model.generateContent(prompt);
-      const response = await result.response;
+      const response = result.response;
       const text = response.text().trim();
 
       const parsedId = parseInt(text, 10);
@@ -100,10 +100,46 @@ export class GeminiAiService implements IAIService {
         model: 'gemini-1.5-flash',
       });
 
-      const promptTemplatePath = path.join(
-        __dirname,
-        'generate-personality-prompt.txt',
-      );
+      const promptCandidates = [
+        path.join(__dirname, 'generate-personality-prompt.txt'),
+        path.join(
+          __dirname,
+          '..',
+          '..',
+          '..',
+          'infrastructure',
+          'services',
+          'generate-personality-prompt.txt',
+        ),
+        path.resolve(
+          process.cwd(),
+          'dist',
+          'src',
+          'infrastructure',
+          'services',
+          'generate-personality-prompt.txt',
+        ),
+        path.resolve(
+          process.cwd(),
+          'dist',
+          'infrastructure',
+          'services',
+          'generate-personality-prompt.txt',
+        ),
+        path.resolve(
+          process.cwd(),
+          'src',
+          'infrastructure',
+          'services',
+          'generate-personality-prompt.txt',
+        ),
+      ];
+      const promptTemplatePath = promptCandidates.find((p) => fs.existsSync(p));
+      if (!promptTemplatePath) {
+        throw new Error(
+          `Personality prompt template not found. Checked: ${promptCandidates.join(', ')}`,
+        );
+      }
       const promptTemplate = fs.readFileSync(promptTemplatePath, 'utf8');
 
       const userDataStr = JSON.stringify(
@@ -123,23 +159,25 @@ export class GeminiAiService implements IAIService {
       const prompt = promptTemplate.replace('{{USER_INPUT_DATA}}', userDataStr);
 
       const result = await model.generateContent(prompt);
-      const response = await result.response;
+      const response = result.response;
       let text = response.text().trim();
 
       // Clean up potential markdown formatting wrapping the JSON
-      if (text.startsWith('\`\`\`json')) {
+      if (text.startsWith('```json')) {
         text = text
-          .replace(/^\`\`\`json/, '')
-          .replace(/\`\`\`$/, '')
+          .replace(/^```json/, '')
+          .replace(/```$/, '')
           .trim();
-      } else if (text.startsWith('\`\`\`')) {
-        text = text
-          .replace(/^\`\`\`/, '')
-          .replace(/\`\`\`$/, '')
-          .trim();
+      } else if (text.startsWith('```')) {
+        text = text.replace(/^```/, '').replace(/```$/, '').trim();
       }
 
-      return JSON.parse(text);
+      return JSON.parse(text) as {
+        personality_code: string;
+        personality_name: string;
+        vibe_description: string;
+        matching_criteria: string;
+      };
     } catch (error) {
       this.logger.error(
         'Error calling Gemini API for personality result generation',
