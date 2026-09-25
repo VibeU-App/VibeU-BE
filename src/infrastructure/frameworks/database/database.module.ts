@@ -10,6 +10,8 @@ import { PrismaPersonalityArchetypeRepository } from './personality-archetype.re
 import { PrismaQuestionnaireRepository } from './questionnaire.repository';
 import { AccountStatusLoaderService } from './account-status-loader.service';
 import { DatabasePrewarmService } from './database-prewarm.service';
+import { PrismaSwipeRepository } from './swipe.repository';
+import { PrismaMatchRepository } from './match.repository';
 
 /**
  * Database module for VibeU.
@@ -58,6 +60,16 @@ import { DatabasePrewarmService } from './database-prewarm.service';
       provide: 'IQuestionnaireRepository',
       useClass: PrismaQuestionnaireRepository,
     },
+    PrismaSwipeRepository,
+    {
+      provide: 'ISwipeRepository',
+      useClass: PrismaSwipeRepository,
+    },
+    PrismaMatchRepository,
+    {
+      provide: 'IMatchRepository',
+      useClass: PrismaMatchRepository,
+    },
     AccountStatusLoaderService,
     DatabasePrewarmService,
   ],
@@ -70,6 +82,8 @@ import { DatabasePrewarmService } from './database-prewarm.service';
     'IHobbyRepository',
     'IPersonalityArchetypeRepository',
     'IQuestionnaireRepository',
+    'ISwipeRepository',
+    'IMatchRepository',
     AccountStatusLoaderService,
     DatabasePrewarmService,
   ],
