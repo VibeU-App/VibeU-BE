@@ -18,6 +18,12 @@ export enum ErrorCode {
   PROFILE_USER_NOT_FOUND = 'PROFILE_1001',
   PROFILE_USER_NOT_OLD_ENOUGH = 'PROFILE_1002',
 
+  // Swipe Errors (1xxx)
+  SWIPE_DUPLICATE = 'SWIPE_1001',
+  SWIPE_SELF_SWIPE = 'SWIPE_1002',
+  SWIPE_SAME_SEX = 'SWIPE_1003',
+  SWIPE_USER_NOT_FOUND = 'SWIPE_1004',
+
   // Validation Errors (2xxx)
   VALIDATION_FAILED = 'VAL_2001',
 
@@ -47,6 +53,11 @@ export const ErrorMessage: Record<ErrorCode, string> = {
   [ErrorCode.AUTH_SESSION_EXPIRED]: 'Session has expired, please log in again',
   [ErrorCode.PROFILE_USER_NOT_FOUND]: 'No profile was found with this user',
   [ErrorCode.PROFILE_USER_NOT_OLD_ENOUGH]: 'User must be 18 or older',
+  [ErrorCode.SWIPE_DUPLICATE]: 'Swipe already exists',
+  [ErrorCode.SWIPE_SELF_SWIPE]:
+    'Target of the swipe must not be the same as the swiper',
+  [ErrorCode.SWIPE_SAME_SEX]: 'Cannot create swipe of the same sex',
+  [ErrorCode.SWIPE_USER_NOT_FOUND]: 'No profile with this ID is found',
   [ErrorCode.VALIDATION_FAILED]: 'Request validation failed',
   [ErrorCode.INTERNAL_SERVER_ERROR]: 'An unexpected error occurred',
 };

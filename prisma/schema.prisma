@@ -57,6 +57,12 @@ model User {
   otp           Otp?
   profile       Profile?
 
+  // Swiping relations
+  swipesSent     Swipe[] @relation("SwiperUser")
+  swipesReceived Swipe[] @relation("TargetUser")
+  matchesAsUser1 Match[] @relation("MatchUser1")
+  matchesAsUser2 Match[] @relation("MatchUser2")
+
   // Soft delete index
   @@index([deletedAt])
   @@map("users")
@@ -221,4 +227,41 @@ model UserQuestionnaireAnswer {
 
   @@unique([profileId, questionId])
   @@map("user_questionnaire_answers")
+}
+
+// Swipe model - records swiping decisions (LIKE or PASS)
+model Swipe {
+  id        String   @id @default(uuid())
+  swiperId  String   @map("swiper_id")
+  targetId  String   @map("target_id")
+  isLike    Boolean  @default(true) @map("is_like")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  swiper User @relation("SwiperUser", fields: [swiperId], references: [id], onDelete: Cascade)
+  target User @relation("TargetUser", fields: [targetId], references: [id], onDelete: Cascade)
+
+  // Composite unique constraint: exactly 1 swipe per swiper-target pair
+  @@unique([swiperId, targetId])
+  @@index([swiperId, isLike])
+  @@index([targetId, isLike])
+  @@map("swipes")
+}
+
+// Match model - records mutual right-swipe connections
+model Match {
+  id        String   @id @default(uuid())
+  user1Id   String   @map("user1_id")
+  user2Id   String   @map("user2_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user1 User @relation("MatchUser1", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2 User @relation("MatchUser2", fields: [user2Id], references: [id], onDelete: Cascade)
+
+  // Canonical ordering constraint: user1Id < user2Id ensures exactly 1 match row per pair
+  @@unique([user1Id, user2Id])
+  @@index([user1Id])
+  @@index([user2Id])
+  @@map("matches")
 }

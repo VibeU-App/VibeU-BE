@@ -83,3 +83,12 @@ if (fs.existsSync(rootPrismaDir)) {
   console.log('Copied database schema, migrations, seed scripts, SQL to dist/generated/prisma/');
 }
 
+// Copy prompt template txt file to dist/src/infrastructure/services/ if needed
+const assetSrc = path.join(__dirname, '..', 'src', 'infrastructure', 'services', 'generate-personality-prompt.txt');
+const assetDistSrc = path.join(__dirname, '..', 'dist', 'src', 'infrastructure', 'services', 'generate-personality-prompt.txt');
+if (fs.existsSync(assetSrc)) {
+  fs.mkdirSync(path.dirname(assetDistSrc), { recursive: true });
+  fs.copyFileSync(assetSrc, assetDistSrc);
+  console.log('Copied generate-personality-prompt.txt to dist/src/infrastructure/services/');
+}
+

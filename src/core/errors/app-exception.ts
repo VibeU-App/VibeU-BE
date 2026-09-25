@@ -16,6 +16,10 @@ export const ErrorCodeToHttpStatus: Record<ErrorCode, number> = {
   [ErrorCode.AUTH_SESSION_EXPIRED]: 401,
   [ErrorCode.PROFILE_USER_NOT_FOUND]: 404,
   [ErrorCode.PROFILE_USER_NOT_OLD_ENOUGH]: 400,
+  [ErrorCode.SWIPE_DUPLICATE]: 400,
+  [ErrorCode.SWIPE_SELF_SWIPE]: 400,
+  [ErrorCode.SWIPE_SAME_SEX]: 400,
+  [ErrorCode.SWIPE_USER_NOT_FOUND]: 404,
   [ErrorCode.VALIDATION_FAILED]: 400,
   [ErrorCode.INTERNAL_SERVER_ERROR]: 500,
 };

@@ -1,7 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { IProfileRepository } from '../../core/abstracts';
 import { ProfileEntity } from '../../core/entities';
-import { AppException, ErrorCode } from '../../core/errors';
 import { getAge, getZodiacSign } from '../../utils/calculating';
 
 export interface GetProfileMeResult {

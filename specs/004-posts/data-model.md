@@ -1,4 +1,4 @@
-# Data Model: Post & Comment Management (Posting Domain)
+# Data Model: Post & Feed Management (Posting Domain)
 
 ## Prisma Database Schema Additions
 
@@ -17,12 +17,13 @@ model Post {
   deletedAt    DateTime? @map("deleted_at")
 
   // Relations
-  user     User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  user     User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
   comments Comment[]
+  likes    PostLike[]
 
-  // Indexes
-  @@index([authorId, deletedAt, isPinned, createdAt(sort: Desc)])
-  @@index([deletedAt, createdAt(sort: Desc)])
+  // Indexes optimized for PostgreSQL Keyset Feeds
+  @@index([deletedAt, createdAt(sort: Desc), id(sort: Desc)])
+  @@index([authorId, deletedAt, isPinned(sort: Desc), createdAt(sort: Desc)])
   @@map("posts")
 }
 
@@ -45,6 +46,56 @@ model Comment {
   @@index([authorId, deletedAt])
   @@map("comments")
 }
+
+// PostLike model - tracks post likes with strict 1-like-per-user constraint
+model PostLike {
+  id        String   @id @default(uuid())
+  postId    String   @map("post_id")
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Uniqueness & Fast Lookup Indexes
+  @@unique([postId, userId])
+  @@index([userId, postId])
+  @@map("post_likes")
+}
+
+// Swipe model - records swiping activity between users for feed tiering & matching
+model Swipe {
+  id        String   @id @default(uuid())
+  swiperId  String   @map("swiper_id")
+  targetId  String   @map("target_id")
+  isLike    Boolean  @default(true) @map("is_like")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  swiper User @relation("SwiperUser", fields: [swiperId], references: [id], onDelete: Cascade)
+  target User @relation("TargetUser", fields: [targetId], references: [id], onDelete: Cascade)
+
+  @@unique([swiperId, targetId])
+  @@index([swiperId, isLike])
+  @@index([targetId, isLike])
+  @@map("swipes")
+}
+
+// Match model - records mutual right-swipe connections
+model Match {
+  id        String   @id @default(uuid())
+  user1Id   String   @map("user1_id")
+  user2Id   String   @map("user2_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user1 User @relation("MatchUser1", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2 User @relation("MatchUser2", fields: [user2Id], references: [id], onDelete: Cascade)
+
+  @@unique([user1Id, user2Id])
+  @@index([user1Id])
+  @@index([user2Id])
+  @@map("matches")
+}
 ```
 
 ---
@@ -54,6 +105,8 @@ model Comment {
 ### `PostEntity` (`src/core/entities/post.entity.ts`)
 
 ```typescript
+export type AuthorRelation = 'MATCHED' | 'SWIPED' | 'STRANGER';
+
 export class PostEntity {
   id: string;
   authorId: string;
@@ -62,6 +115,8 @@ export class PostEntity {
   isPinned: boolean;
   likeCount: number;
   commentCount: number;
+  hasLiked?: boolean;
+  relation?: AuthorRelation;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
@@ -96,6 +151,48 @@ export class CommentEntity {
 }
 ```
 
+### `PostLikeEntity` (`src/core/entities/post-like.entity.ts`)
+
+```typescript
+export class PostLikeEntity {
+  id: string;
+  postId: string;
+  userId: string;
+  createdAt: Date;
+}
+```
+
+---
+
+## Keyset Cursor Pagination Contract
+
+```typescript
+export interface KeysetCursor {
+  tier?: number; // 1: MATCHED, 2: SWIPED, 3: STRANGER
+  createdAt: Date;
+  id: string;
+}
+
+export interface FeedResult<T> {
+  items: T[];
+  pagination: {
+    limit: number;
+    nextCursor: string | null;
+    hasMore: boolean;
+  };
+}
+
+export interface ProfileFeedResult {
+  pinnedPost: PostEntity | null;
+  items: PostEntity[];
+  pagination: {
+    limit: number;
+    nextCursor: string | null;
+    hasMore: boolean;
+  };
+}
+```
+
 ---
 
 ## Abstract Repository Contracts
@@ -103,6 +200,9 @@ export class CommentEntity {
 ### `IPostRepository` (`src/core/abstracts/post-repository.abstract.ts`)
 
 ```typescript
+import { PostEntity } from '../entities/post.entity';
+import { FeedResult, KeysetCursor, ProfileFeedResult } from '../types/feed.types';
+
 export abstract class IPostRepository {
   abstract create(data: {
     authorId: string;
@@ -110,12 +210,24 @@ export abstract class IPostRepository {
     mediaUrls?: string[];
   }): Promise<PostEntity>;
 
-  abstract findById(id: string): Promise<PostEntity | null>;
+  abstract findById(id: string, currentUserId?: string): Promise<PostEntity | null>;
 
-  abstract findFeedByAuthor(
+  abstract findTimelineFeed(options: {
+    viewerId: string;
+    matchedUserIds: string[];
+    swipedUserIds: string[];
+    limit: number;
+    cursor?: KeysetCursor;
+  }): Promise<FeedResult<PostEntity>>;
+
+  abstract findProfileFeed(
     authorId: string,
-    options?: { limit?: number; skip?: number },
-  ): Promise<PostEntity[]>;
+    options: {
+      limit: number;
+      cursor?: KeysetCursor;
+      currentUserId?: string;
+    },
+  ): Promise<ProfileFeedResult>;
 
   abstract setPinned(
     authorId: string,
@@ -126,12 +238,16 @@ export abstract class IPostRepository {
   abstract softDelete(id: string): Promise<void>;
 
   abstract incrementCommentCount(postId: string, by: number): Promise<void>;
+  
+  abstract incrementLikeCount(postId: string, by: number): Promise<void>;
 }
 ```
 
 ### `ICommentRepository` (`src/core/abstracts/comment-repository.abstract.ts`)
 
 ```typescript
+import { CommentEntity } from '../entities/comment.entity';
+
 export abstract class ICommentRepository {
   abstract create(data: {
     postId: string;
@@ -141,10 +257,37 @@ export abstract class ICommentRepository {
 
   abstract findByPostId(
     postId: string,
-    options?: { limit?: number; skip?: number },
-  ): Promise<CommentEntity[]>;
+    options?: { limit?: number; cursor?: { createdAt: Date; id: string } },
+  ): Promise<{ items: CommentEntity[]; nextCursor: string | null; hasMore: boolean }>;
 
   abstract findById(id: string): Promise<CommentEntity | null>;
+}
+```
+
+### `IPostLikeRepository` (`src/core/abstracts/post-like-repository.abstract.ts`)
+
+```typescript
+export abstract class IPostLikeRepository {
+  abstract toggleLike(
+    postId: string,
+    userId: string,
+  ): Promise<{ hasLiked: boolean; likeDelta: number }>;
+
+  abstract hasUserLiked(postId: string, userId: string): Promise<boolean>;
+
+  abstract getUserLikedPostIds(
+    postIds: string[],
+    userId: string,
+  ): Promise<Set<string>>;
+}
+```
+
+### `ISocialRelationRepository` (`src/core/abstracts/social-relation-repository.abstract.ts`)
+
+```typescript
+export abstract class ISocialRelationRepository {
+  abstract getMatchedUserIds(userId: string): Promise<string[]>;
+  abstract getSwipedRightUserIds(userId: string): Promise<string[]>;
 }
 ```
 
@@ -159,11 +302,17 @@ export abstract class ICommentRepository {
 
 2. **Pinning Rule**:
    - Only the post's author (`authorId`) can pin/unpin a post. Attempt by non-author throws `ForbiddenException`.
-   - When `isPinned` is set to `true`, any existing post with `authorId = X AND isPinned = true` is transactionally reset to `isPinned = false`.
+   - When `isPinned` is set to `true`, any existing post with `authorId = X AND isPinned = true` is transactionally reset to `isPinned = false` within `prisma.$transaction`.
 
 3. **Deletion Rule**:
    - Only the post's author can delete their post. Attempt by non-author throws `ForbiddenException`.
-   - Post soft-deletion automatically decrements/resets pinned status and excludes associated comments from query listings.
+   - Post soft-deletion sets `deletedAt = now()` and sets `isPinned = false`.
 
-4. **Comment Content Validation**:
-   - `content` MUST be non-empty string, length 1 to 500 characters.
+4. **Like Uniqueness & Atomic Counter**:
+   - Exactly one like per `(postId, userId)` enforced by compound primary/unique constraint.
+   - Toggling like updates `PostLike` table and atomically modifies `post.likeCount` in a single transaction.
+
+5. **3-Tier Feed Prioritization & Keyset Cursor**:
+   - Timeline queries evaluate relation affinity: Tier 1 (`MATCHED`), Tier 2 (`SWIPED`), Tier 3 (`STRANGER`).
+   - Cursors are serialized as `base64(tier + '_' + createdAt.toISOString() + '_' + id)`.
+   - Guarantees seamless progression across tiers as users scroll, with zero duplicate rows and zero skipped items.

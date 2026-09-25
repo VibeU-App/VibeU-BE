@@ -48,6 +48,7 @@ COPY --from=deps /app/prisma.config.ts ./
 COPY tsconfig*.json nest-cli.json ./
 COPY scripts ./scripts
 COPY src ./src
+COPY templates ./templates
 
 # Compile NestJS application and execute post-build prisma CJS script
 RUN pnpm run build
@@ -78,9 +79,10 @@ ENV PORT=3000
 COPY --from=prod-deps /app/node_modules ./node_modules
 COPY --from=prod-deps /app/package.json ./
 
-# Copy compiled application code and Prisma artifacts
+# Copy compiled application code, Prisma artifacts, and email templates
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/templates ./templates
 
 # Use non-root node user for container security
 USER node
